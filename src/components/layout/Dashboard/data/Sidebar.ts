@@ -4,7 +4,6 @@ import {
   FileText,
   LayoutDashboard,
   Building2,
-  Newspaper,
   Images,
   UserRoundPen,
   CircleUserRound,
@@ -69,9 +68,9 @@ export const menuItems = [
   },
 
   {
-    href: "/dashboard/gallery",
-    label: "Gallery",
-    icon: Images,
+    href: "/dashboard/volunteer",
+    label: "Volunteer",
+    icon: Users,
   },
 
   {
