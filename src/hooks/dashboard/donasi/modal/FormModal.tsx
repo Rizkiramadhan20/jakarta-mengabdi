@@ -8,9 +8,9 @@ import { Input } from '@/components/ui/input';
 
 import { Label } from '@/components/ui/label';
 
-import QuilEditor from '@/base/helper/QuilEditor';
+import { Textarea } from '@/components/ui/textarea';
 
-import { formatIDR } from '@/base/helper/FormatPrice';
+import { formatIDR, getRawNumberFromIDR } from '@/base/helper/FormatPrice';
 
 import { UploadCloud, Trash2 } from 'lucide-react';
 
@@ -21,6 +21,16 @@ import {
     SelectContent,
     SelectItem
 } from '@/components/ui/select';
+
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger
+} from '@/components/ui/popover';
+
+import {
+    Calendar,
+} from '@/components/ui/calendar';
 
 interface FormModalProps {
     isEditMode: boolean;
@@ -75,21 +85,72 @@ const FormModal: React.FC<FormModalProps> = ({
     closeModal,
     setImagePreviews,
 }) => {
+    const handleTargetAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const rawValue = getRawNumberFromIDR(e.target.value);
+        setForm({ ...form, target_amount: rawValue });
+    };
+
+    React.useEffect(() => {
+        if (!form.message_template) {
+            setForm((prev: any) => ({
+                ...prev,
+                message_template: 'Terima kasih {{name}} atas donasi sebesar {{amount}}. Pembayaran Anda {{status}}.'
+            }));
+        }
+    }, []);
+
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4 space-y-4 w-full max-w-full">
             <div className='flex flex-col gap-2'>
-                <Label htmlFor="name">Nama Produk</Label>
-                <Input id="name" name="name" value={form.name} onChange={handleChange} required />
+                <Label htmlFor="title">Title</Label>
+                <Input id="title" name="title" value={form.title} onChange={handleChange} required />
+            </div>
+            <div className='flex flex-col gap-2'>
+                <Label htmlFor="description">Description</Label>
+                <Textarea id="description" name="description" value={form.description} onChange={handleChange} required className="h-32 resize-none" />
             </div>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <div className='flex flex-col gap-2'>
-                    <Label htmlFor="price">Harga</Label>
-                    <Input id="price" name="price" type="text" value={form.price === 0 ? '' : formatIDR(form.price)} onChange={handleChange} required min="0" />
+                    <Label htmlFor="target_amount">Target Amount</Label>
+                    <Input
+                        id="target_amount"
+                        name="target_amount"
+                        type="text"
+                        value={form.target_amount ? formatIDR(Number(form.target_amount)) : ''}
+                        onChange={handleTargetAmountChange}
+                        required
+                        min="0"
+                        inputMode="numeric"
+                        pattern="[0-9.]*"
+                    />
                 </div>
+
                 <div className='flex flex-col gap-2'>
-                    <Label htmlFor="stock">Stok</Label>
-                    <Input id="stock" name="stock" type="text" value={form.stock === 0 ? '' : form.stock.toString()} onChange={handleChange} required min="0" />
+                    <Label htmlFor="deadline">Deadline</Label>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                className={
+                                    `w-full justify-start text-left font-normal rounded-md border px-3 py-2 text-sm ${!form.deadline ? 'text-muted-foreground' : ''}`
+                                }
+                            >
+                                {form.deadline ? new Date(form.deadline).toLocaleDateString('id-ID') : 'Pilih tanggal deadline'}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                mode="single"
+                                selected={form.deadline ? new Date(form.deadline) : undefined}
+                                onSelect={date => {
+                                    setForm({ ...form, deadline: date ? date.toISOString().slice(0, 10) : '' });
+                                }}
+                                initialFocus
+                            />
+                        </PopoverContent>
+                    </Popover>
                 </div>
+
                 <div className='flex flex-col gap-2'>
                     <Label htmlFor="status">Status</Label>
                     <Select
@@ -100,15 +161,19 @@ const FormModal: React.FC<FormModalProps> = ({
                             <SelectValue placeholder="Pilih status" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="tidak tersedia">Tidak Tersedia</SelectItem>
-                            <SelectItem value="tersedia">Tersedia</SelectItem>
-                            <SelectItem value="arsip">Arsip</SelectItem>
+                            <SelectItem value="open">Open</SelectItem>
+                            <SelectItem value="closed">Closed</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
             </div>
+
             <div className='flex flex-col gap-2'>
-                <Label htmlFor="images">Images</Label>
+                <Label htmlFor="message_template">Message Template</Label>
+                <Textarea id="message_template" name="message_template" value={form.message_template || ''} onChange={handleChange} className="h-32 resize-none" />
+            </div>
+            <div className='flex flex-col gap-2'>
+                <Label htmlFor="images">Image</Label>
                 {imagePreviews.length === 0 && (
                     <div
                         onClick={() => inputRef.current?.click()}
@@ -175,7 +240,7 @@ const FormModal: React.FC<FormModalProps> = ({
                                             setImagePreviews(imagePreviews.filter((_, i) => i !== idx))
                                         } else {
                                             setImagePreviews(imagePreviews.filter((imgUrl: string) => imgUrl !== url))
-                                            setForm({ ...form, image_urls: form.image_urls.filter((imgUrl: string) => imgUrl !== url) })
+                                            setForm({ ...form, image_url: url })
                                         }
                                     }}
                                     title="Remove image"
@@ -190,19 +255,10 @@ const FormModal: React.FC<FormModalProps> = ({
                     </div>
                 )}
             </div>
-            <div className='flex flex-col gap-2'>
-                <Label htmlFor="content">Deskripsi</Label>
-                <div className="bg-white rounded-md border px-1 py-1">
-                    <QuilEditor
-                        value={form.content}
-                        onChange={(val: string) => setForm({ ...form, content: val })}
-                        placeholder="Enter content..."
-                        height="200px"
-                    />
-                </div>
-            </div>
-            <DialogFooter>
-                <Button type="submit" disabled={creating || uploading}>{isEditMode ? (creating ? 'Saving...' : 'Save') : (creating ? 'Creating...' : 'Create')}</Button>
+            <DialogFooter className="mt-4">
+                <Button type="submit" disabled={creating || uploading}>
+                    {creating ? 'Saving...' : isEditMode ? 'Update Donasi' : 'Create Donasi'}
+                </Button>
                 <DialogClose asChild>
                     <Button type="button" variant="outline" onClick={closeModal}>Cancel</Button>
                 </DialogClose>

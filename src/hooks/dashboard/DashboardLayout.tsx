@@ -13,7 +13,6 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js'
-import { Bar, Pie } from 'react-chartjs-2'
 import { supabase } from '@/utils/supabase/supabase'
 import { HandPlatter, Home, Info, Users, UserCog } from 'lucide-react'
 import Image from 'next/image'
@@ -46,11 +45,6 @@ interface UserProfile {
 
 export default function DashboardPage() {
     const { user } = useAuth();
-    // const [products, setProducts] = useState<Product[]>([])
-    // const [services, setServices] = useState<Service[]>([])
-    // const [homeContent, setHomeContent] = useState<HomeContent[]>([])
-    // const [aboutContent, setAboutContent] = useState<AboutContent[]>([])
-    // const [testimonials, setTestimonials] = useState<Testimonial[]>([])
     const [profile, setProfile] = useState<UserProfile | null>(null)
     const [loading, setLoading] = useState(true)
     const [currentTime, setCurrentTime] = useState(new Date())
@@ -86,43 +80,6 @@ export default function DashboardPage() {
 
         return () => clearInterval(timer)
     }, [])
-
-    // Process data for category distribution
-    // const categoryData = {
-    //     labels: Array.from(new Set(products.map(product => product.categories))),
-    //     datasets: [
-    //         {
-    //             data: Array.from(new Set(products.map(product => product.categories))).map(
-    //                 category => products.filter(product => product.categories === category).length
-    //             ),
-    //             backgroundColor: [
-    //                 'rgb(255, 99, 132)',
-    //                 'rgb(54, 162, 235)',
-    //                 'rgb(255, 205, 86)',
-    //                 'rgb(75, 192, 192)',
-    //                 'rgb(153, 102, 255)',
-    //             ],
-    //         },
-    //     ],
-    // }
-
-    // // Process data for price ranges
-    // const priceRanges = {
-    //     labels: ['0-50K', '51-100K', '101-150K', '151-200K', '200K+'],
-    //     datasets: [
-    //         {
-    //             label: 'Number of Products',
-    //             data: [
-    //                 products.filter(p => p.price <= 50).length,
-    //                 products.filter(p => p.price > 50 && p.price <= 100).length,
-    //                 products.filter(p => p.price > 100 && p.price <= 150).length,
-    //                 products.filter(p => p.price > 150 && p.price <= 200).length,
-    //                 products.filter(p => p.price > 200).length,
-    //             ],
-    //             backgroundColor: 'rgba(75, 192, 192, 0.5)',
-    //         },
-    //     ],
-    // }
 
     if (loading) {
         return (

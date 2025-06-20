@@ -10,44 +10,32 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from 
 
 import { supabase } from '@/utils/supabase/supabase'
 
-import type { Product } from '@/types/products'
+import type { Donasi } from '@/types/donasi'
 
-import { useManagamentProducts } from '@/hooks/dashboard/products/utils/useManagamentProducts';
+import { useManagamentDonasi } from '@/hooks/dashboard/donasi/utils/useManagamentDonasi';
 
-import FormModal from '@/hooks/dashboard/products/modal/FormModal';
+import FormModal from '@/hooks/dashboard/donasi/modal/FormModal';
 
-import ViewModal from '@/hooks/dashboard/products/modal/ViewModal';
+import ViewModal from '@/hooks/dashboard/donasi/modal/ViewModal';
 
-import DeleteModal from '@/hooks/dashboard/products/modal/DeleteModal';
-
-import ProductsSkelaton from '@/hooks/dashboard/products/ProductsSkelaton'
+import DeleteModal from '@/hooks/dashboard/donasi/modal/DeleteModal';
 
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination'
 
-import {
-    Table,
-    TableHeader,
-    TableBody,
-    TableRow,
-    TableHead,
-    TableCell,
-} from '@/components/ui/table';
-import {
-    Popover,
-    PopoverTrigger,
-    PopoverContent,
-} from '@/components/ui/popover';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 
-export default function ProductsLayout() {
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+
+export default function DonasiLayout() {
     const {
-        products, setProducts,
+        donasi, setDonasi,
         loading, setLoading,
         modalOpen, setModalOpen,
         isEditMode,
         form, setForm,
         creating,
         uploading,
-        imagePreviews, setImagePreviews,
+        imagePreview, setImagePreview,
         dragActive,
         inputRef,
         uploadProgress,
@@ -73,21 +61,21 @@ export default function ProductsLayout() {
         handleImageDragEnd,
         closeViewModal,
         openViewModal,
-    } = useManagamentProducts();
+    } = useManagamentDonasi();
 
     const [currentPage, setCurrentPage] = React.useState(1);
     const itemsPerPage = 10;
-    const totalPages = Math.ceil(products.length / itemsPerPage);
-    const paginatedProducts = products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const totalPages = Math.ceil(donasi.length / itemsPerPage);
+    const paginatedDonasi = donasi.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchDonasi = async () => {
             setLoading(true)
-            const { data, error } = await supabase.from(process.env.NEXT_PUBLIC_PRODUCTS as string).select('*').order('created_at', { ascending: false })
-            if (!error && data) setProducts(data as Product[])
+            const { data, error } = await supabase.from(process.env.NEXT_PUBLIC_DONATIONS as string).select('*').order('created_at', { ascending: false })
+            if (!error && data) setDonasi(data as Donasi[])
             setLoading(false)
         }
-        fetchProducts()
+        fetchDonasi()
     }, [creating])
 
     return (
@@ -95,7 +83,7 @@ export default function ProductsLayout() {
             <div className='flex flex-col md:flex-row justify-between items-start md:items-center p-4 md:p-6 border rounded-2xl border-border bg-card shadow-sm gap-4'>
                 <div className='flex flex-col gap-3'>
                     <h3 className='text-2xl md:text-3xl font-bold'>
-                        Manajemen Produk
+                        Manajemen Donasi
                     </h3>
                     <ol className='flex gap-2 items-center text-sm text-muted-foreground'>
                         <li className='flex items-center hover:text-primary transition-colors'>
@@ -103,7 +91,7 @@ export default function ProductsLayout() {
                             <ChevronRight className="w-4 h-4 mx-1 text-muted-foreground" />
                         </li>
                         <li className='flex items-center text-primary font-medium'>
-                            <span>Products</span>
+                            <span>Donasi</span>
                         </li>
                     </ol>
                 </div>
@@ -115,12 +103,12 @@ export default function ProductsLayout() {
                             className="w-full md:w-auto px-6 py-2.5 font-medium shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105"
                             onClick={openCreateModal}
                         >
-                            Create Content
+                            Create Donasi
                         </Button>
                     </DialogTrigger>
                     <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto'>
                         <DialogHeader>
-                            <DialogTitle>{isEditMode ? 'Edit Product' : 'Create Product'}</DialogTitle>
+                            <DialogTitle>{isEditMode ? 'Edit Donasi' : 'Create Donasi'}</DialogTitle>
                         </DialogHeader>
                         <FormModal
                             isEditMode={isEditMode}
@@ -128,7 +116,7 @@ export default function ProductsLayout() {
                             setForm={setForm}
                             creating={creating}
                             uploading={uploading}
-                            imagePreviews={imagePreviews}
+                            imagePreviews={imagePreview ? [imagePreview] : []}
                             dragActive={dragActive}
                             inputRef={inputRef}
                             uploadProgress={uploadProgress}
@@ -146,66 +134,68 @@ export default function ProductsLayout() {
                             handleImageDrop={handleImageDrop}
                             handleImageDragEnd={handleImageDragEnd}
                             closeModal={closeModal}
-                            setImagePreviews={setImagePreviews}
+                            setImagePreviews={imgs => setImagePreview(imgs[0] || null)}
                         />
                     </DialogContent>
                 </Dialog>
             </div>
-            {/* Product Table */}
+            {/* Donasi Table */}
             <div className="mt-8 overflow-x-auto rounded-xl border border-border bg-white shadow-sm">
                 <Table className="min-w-[900px]">
                     <TableHeader className="bg-gray-50">
                         <TableRow>
                             <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Gambar</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Nama</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Harga</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Stok</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Terjual</TableHead>
+                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Judul</TableHead>
+                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Target</TableHead>
+                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Terkumpul</TableHead>
                             <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Status</TableHead>
+                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Deadline</TableHead>
                             <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Dibuat</TableHead>
                             <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Aksi</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {loading ? (
-                            <ProductsSkelaton />
-                        ) : products.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={8} className="text-center px-6 py-8">Loading...</TableCell>
+                            </TableRow>
+                        ) : donasi.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={8} className="text-center px-6 py-12">
                                     <div className="flex flex-col items-center justify-center py-8">
-                                        <img src="/globe.svg" alt="No products" className="w-20 h-20 mb-4 opacity-80 mx-auto" />
-                                        <h4 className="text-lg font-semibold mb-1">Belum ada produk</h4>
-                                        <p className="text-muted-foreground text-sm">Produk belum tersedia. Mulai tambahkan produk baru untuk mengisi toko Anda.</p>
+                                        <img src="/globe.svg" alt="No donasi" className="w-20 h-20 mb-4 opacity-80 mx-auto" />
+                                        <h4 className="text-lg font-semibold mb-1">Belum ada donasi</h4>
+                                        <p className="text-muted-foreground text-sm">Donasi belum tersedia. Mulai tambahkan donasi baru.</p>
                                     </div>
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            paginatedProducts.map((product, idx) => (
-                                <TableRow key={idx} className="hover:bg-gray-50 transition-colors">
+                            paginatedDonasi.map((item, idx) => (
+                                <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
                                     <TableCell className="px-4 py-3 border-b">
-                                        {product.image_urls && product.image_urls.length > 0 ? (
-                                            <img src={product.image_urls[0]} alt={product.name} className="w-16 h-16 object-cover rounded-md border" />
+                                        {item.image_url ? (
+                                            <img src={item.image_url} alt={item.title} className="w-16 h-16 object-cover rounded-md border" />
                                         ) : (
                                             <span className="text-gray-400">No image</span>
                                         )}
                                     </TableCell>
                                     <TableCell className="px-4 py-3 border-b max-w-[180px] truncate">
-                                        <span className="text-base font-medium text-gray-900">{product.name}</span>
+                                        <span className="text-base font-medium text-gray-900">{item.title}</span>
                                     </TableCell>
                                     <TableCell className="px-4 py-3 border-b">
-                                        <span className="text-sm text-gray-700 font-medium">Rp{Number(product.price).toLocaleString()}</span>
+                                        <span className="text-sm text-gray-700 font-medium">Rp{Number(item.target_amount).toLocaleString()}</span>
                                     </TableCell>
                                     <TableCell className="px-4 py-3 border-b">
-                                        <span className="text-sm text-gray-700 font-medium">{product.stock}</span>
+                                        <span className="text-sm text-gray-700 font-medium">Rp{Number(item.current_amount).toLocaleString()}</span>
                                     </TableCell>
                                     <TableCell className="px-4 py-3 border-b">
-                                        <span className="text-sm text-gray-700 font-medium">{product.sold}</span>
+                                        <span className={`px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full transition-colors duration-200 ${item.status === 'open' ? 'bg-green-100 text-green-800' : item.status === 'closed' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-600'}`}>{item.status.charAt(0).toUpperCase() + item.status.slice(1)}</span>
                                     </TableCell>
                                     <TableCell className="px-4 py-3 border-b">
-                                        <span className={`px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full transition-colors duration-200 ${product.status === 'tersedia' ? 'bg-green-100 text-green-800' : product.status === 'tidak tersedia' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-600'}`}>{product.status.charAt(0).toUpperCase() + product.status.slice(1)}</span>
+                                        <span className="text-sm text-gray-700">{item.deadline ? new Date(item.deadline).toLocaleDateString('id-ID') : '-'}</span>
                                     </TableCell>
                                     <TableCell className="px-4 py-3 border-b">
-                                        <span className="text-sm text-gray-700">{new Date(product.created_at).toLocaleDateString('id-ID')}</span>
+                                        <span className="text-sm text-gray-700">{new Date(item.created_at).toLocaleDateString('id-ID')}</span>
                                     </TableCell>
                                     <TableCell className="px-4 py-3 border-b">
                                         <Popover>
@@ -221,7 +211,7 @@ export default function ProductsLayout() {
                                                         variant="ghost"
                                                         size="sm"
                                                         className="justify-start text-blue-700 hover:bg-blue-50"
-                                                        onClick={() => openViewModal(product)}
+                                                        onClick={() => openViewModal(item)}
                                                     >
                                                         View
                                                     </Button>
@@ -229,7 +219,7 @@ export default function ProductsLayout() {
                                                         variant="ghost"
                                                         size="sm"
                                                         className="justify-start text-yellow-700 hover:bg-yellow-50"
-                                                        onClick={() => openEditModal(product)}
+                                                        onClick={() => openEditModal(item)}
                                                     >
                                                         Edit
                                                     </Button>
@@ -238,7 +228,7 @@ export default function ProductsLayout() {
                                                         size="sm"
                                                         className="justify-start text-red-700 hover:bg-red-50"
                                                         onClick={() => {
-                                                            setDeletingId(product.id);
+                                                            setDeletingId(item.id);
                                                             setDeleteModalOpen(true);
                                                         }}
                                                     >
@@ -254,7 +244,7 @@ export default function ProductsLayout() {
                     </TableBody>
                 </Table>
                 {/* Pagination */}
-                {products.length > itemsPerPage && (
+                {donasi.length > itemsPerPage && (
                     <div className="py-4 flex justify-center">
                         <Pagination>
                             <PaginationContent>

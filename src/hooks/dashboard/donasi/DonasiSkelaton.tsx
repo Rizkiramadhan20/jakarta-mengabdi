@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Skeleton } from '@/components/ui/skeleton'
+
 import { TableRow, TableCell } from "@/components/ui/table"
 
 export default function ProductsSkelaton() {
