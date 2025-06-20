@@ -1,16 +1,16 @@
 "use client"
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
 
-import { ChevronRight, Image as ImageIcon, } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 import { supabase } from '@/utils/supabase/supabase'
 
-import type { Volunteer } from '@/types/volunteer'
+import { Volunteer } from '@/types/volunteer'
 
 import { useManagamentVolunteer } from '@/hooks/dashboard/volunteer/utils/useManagamentVolunteer'
 
@@ -22,16 +22,17 @@ import DeleteModal from '@/hooks/dashboard/volunteer/modal/DeleteModal'
 
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination'
 
-import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription, CardAction } from '@/components/ui/card'
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 
 import VolunteerCardSkeleton from '@/hooks/dashboard/volunteer/VolunteerSkelaton'
+
+import Image from 'next/image'
 
 export default function VolunteerLayout() {
     const {
         volunteers, setVolunteers,
         loading, setLoading,
-        modalOpen, setModalOpen,
-        isEditMode,
+        modal, setModal,
         form, setForm,
         creating,
         uploading,
@@ -40,8 +41,6 @@ export default function VolunteerLayout() {
         inputRef,
         uploadProgress,
         pendingImages, setPendingImages,
-        draggedImageIdx,
-        isDraggingImage,
         deleteModalOpen, setDeleteModalOpen,
         deletingId, setDeletingId,
         viewModalOpen,
@@ -55,10 +54,6 @@ export default function VolunteerLayout() {
         handleDrag,
         handleDrop,
         handleDelete,
-        handleImageDragStart,
-        handleImageDragOver,
-        handleImageDrop,
-        handleImageDragEnd,
         closeViewModal,
         openViewModal,
         handleDeleteFileDocument,
@@ -98,7 +93,7 @@ export default function VolunteerLayout() {
                     </ol>
                 </div>
 
-                <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+                <Dialog open={modal.open} onOpenChange={open => setModal(m => ({ ...m, open }))}>
                     <DialogTrigger asChild>
                         <Button
                             variant="default"
@@ -108,12 +103,12 @@ export default function VolunteerLayout() {
                             Tambah Volunteer
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto'>
+                    <DialogContent className='max-w-5xl max-h-[95vh] md:max-h-[90vh] overflow-y-auto'>
                         <DialogHeader>
-                            <DialogTitle>{isEditMode ? 'Edit Volunteer' : 'Tambah Volunteer'}</DialogTitle>
+                            <DialogTitle>{modal.editMode ? 'Edit Volunteer' : 'Tambah Volunteer'}</DialogTitle>
                         </DialogHeader>
                         <FormModal
-                            isEditMode={isEditMode}
+                            isEditMode={modal.editMode}
                             form={form}
                             setForm={setForm}
                             creating={creating}
@@ -122,19 +117,11 @@ export default function VolunteerLayout() {
                             dragActive={dragActive}
                             inputRef={inputRef}
                             uploadProgress={uploadProgress}
-                            pendingImages={pendingImages}
                             setPendingImages={setPendingImages}
-                            draggedImageIdx={draggedImageIdx}
-                            isDraggingImage={isDraggingImage}
                             handleChange={handleChange}
-                            handleImageChange={handleImageChange}
                             handleSubmit={handleSubmit}
                             handleDrag={handleDrag}
                             handleDrop={handleDrop}
-                            handleImageDragStart={handleImageDragStart}
-                            handleImageDragOver={handleImageDragOver}
-                            handleImageDrop={handleImageDrop}
-                            handleImageDragEnd={handleImageDragEnd}
                             closeModal={closeModal}
                             setImagePreviews={setImagePreviews}
                             handleDeleteFileDocument={handleDeleteFileDocument}
@@ -143,39 +130,63 @@ export default function VolunteerLayout() {
                 </Dialog>
             </div>
             {/* Volunteer Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
                 {loading ? (
                     <VolunteerCardSkeleton />
                 ) : paginatedVolunteers.length === 0 ? (
-                    <div className="col-span-full text-center text-muted-foreground py-12">Belum ada data volunteer.</div>
+                    <div className="col-span-full flex flex-col items-center justify-center py-8 border rounded-2xl bg-white/95 shadow-md">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" className="w-20 h-20 mb-4 opacity-80 mx-auto" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#888" strokeWidth="2" fill="#f3f4f6" />
+                            <path d="M8 15c1.333-2 6.667-2 8 0" stroke="#888" strokeWidth="1.5" strokeLinecap="round" />
+                            <circle cx="9" cy="10" r="1" fill="#888" />
+                            <circle cx="15" cy="10" r="1" fill="#888" />
+                        </svg>
+                        <h4 className="text-lg font-semibold mb-1">Belum ada data volunteer.</h4>
+                        <p className="text-muted-foreground text-sm">Volunteer belum tersedia. Mulai tambahkan volunteer baru.</p>
+                    </div>
                 ) : (
                     paginatedVolunteers.map((volunteer) => (
-                        <Card key={volunteer.id} className="relative">
-                            <CardHeader className="flex flex-row items-center gap-4">
-                                <img
-                                    src={volunteer.img_url || '/placeholder.png'}
-                                    alt={volunteer.title}
-                                    className="w-20 h-20 object-cover rounded-lg border"
-                                />
-                                <div>
-                                    <CardTitle className="text-lg font-bold">{volunteer.title}</CardTitle>
-                                    <CardDescription>{volunteer.category}</CardDescription>
+                        <Card
+                            key={volunteer.id}
+                            className="relative p-0 bg-white rounded-xl border border-gray-200 transition-all duration-300 group flex flex-col overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-primary/60"
+                        >
+                            <CardHeader className="relative p-0 flex flex-col items-stretch">
+                                <div className="relative w-full aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
+                                    {/* Badge Kategori */}
+                                    {volunteer.category && (
+                                        <span className="absolute top-3 left-3 bg-primary/90 text-xs font-semibold text-white rounded-full px-3 py-1 shadow-md border border-primary/80 select-none z-10">
+                                            {volunteer.category}
+                                        </span>
+                                    )}
+                                    <Image
+                                        src={volunteer.img_url || '/placeholder.png'}
+                                        alt={volunteer.title}
+                                        width={1080}
+                                        height={1080}
+                                        className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 z-0 rounded-t-xl"
+                                        style={{ aspectRatio: '4/3', objectFit: 'cover' }}
+                                    />
                                 </div>
                             </CardHeader>
-                            <CardContent className="flex flex-col gap-2">
-                                <div><span className="font-medium">Kuota:</span> {volunteer.quota_available}</div>
-                                <div><span className="font-medium">Lokasi:</span> {volunteer.location}</div>
-                                <div><span className="font-medium">Waktu:</span> {new Date(volunteer.time).toLocaleString("id-ID")}</div>
-                                <div><span className="font-medium">Harga:</span> Rp{Number(volunteer.price).toLocaleString()}</div>
+                            <CardContent className="flex flex-col gap-2 p-5 pt-0">
+                                <CardTitle className="text-lg font-bold text-gray-900 truncate max-w-full leading-tight mb-1">
+                                    {volunteer.title}
+                                </CardTitle>
+                                <div className="flex flex-wrap gap-3 text-sm text-gray-700 mb-1">
+                                    <span>Kuota: <span className="font-medium">{volunteer.quota_available}</span></span>
+                                    <span>Lokasi: <span className="font-medium">{volunteer.location}</span></span>
+                                </div>
+                                <span className="text-xs text-gray-500">Waktu: {new Date(volunteer.time).toLocaleString("id-ID")}</span>
+                                <span className="text-xs text-gray-500">Harga: Rp{Number(volunteer.price).toLocaleString()}</span>
                             </CardContent>
-                            <CardFooter className="flex gap-2">
-                                <Button size="sm" variant="outline" onClick={() => openViewModal(volunteer)}>
+                            <CardFooter className="flex flex-row gap-2 mt-2 px-5 pb-4">
+                                <Button size="sm" variant="secondary" className="flex-1 min-w-[80px] font-medium" onClick={() => openViewModal(volunteer)}>
                                     Lihat
                                 </Button>
-                                <Button size="sm" variant="secondary" onClick={() => openEditModal(volunteer)}>
+                                <Button size="sm" variant="outline" className="flex-1 min-w-[80px] font-medium border-primary/60" onClick={() => openEditModal(volunteer)}>
                                     Edit
                                 </Button>
-                                <Button size="sm" variant="destructive" onClick={() => { setDeletingId(volunteer.id); setDeleteModalOpen(true); }}>
+                                <Button size="sm" variant="destructive" className="flex-1 min-w-[80px] font-medium" onClick={() => { setDeletingId(volunteer.id); setDeleteModalOpen(true); }}>
                                     Hapus
                                 </Button>
                             </CardFooter>

@@ -24,19 +24,9 @@ import ProductsSkelaton from '@/hooks/dashboard/products/ProductsSkelaton'
 
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination'
 
-import {
-    Table,
-    TableHeader,
-    TableBody,
-    TableRow,
-    TableHead,
-    TableCell,
-} from '@/components/ui/table';
-import {
-    Popover,
-    PopoverTrigger,
-    PopoverContent,
-} from '@/components/ui/popover';
+import { Card } from '@/components/ui/card'
+
+import Image from 'next/image'
 
 export default function ProductsLayout() {
     const {
@@ -151,143 +141,123 @@ export default function ProductsLayout() {
                     </DialogContent>
                 </Dialog>
             </div>
-            {/* Product Table */}
-            <div className="mt-8 overflow-x-auto rounded-xl border border-border bg-white shadow-sm">
-                <Table className="min-w-[900px]">
-                    <TableHeader className="bg-gray-50">
-                        <TableRow>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Gambar</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Nama</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Harga</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Stok</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Terjual</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Status</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Dibuat</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Aksi</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {loading ? (
-                            <ProductsSkelaton />
-                        ) : products.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={8} className="text-center px-6 py-12">
-                                    <div className="flex flex-col items-center justify-center py-8">
-                                        <img src="/globe.svg" alt="No products" className="w-20 h-20 mb-4 opacity-80 mx-auto" />
-                                        <h4 className="text-lg font-semibold mb-1">Belum ada produk</h4>
-                                        <p className="text-muted-foreground text-sm">Produk belum tersedia. Mulai tambahkan produk baru untuk mengisi toko Anda.</p>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            paginatedProducts.map((product, idx) => (
-                                <TableRow key={idx} className="hover:bg-gray-50 transition-colors">
-                                    <TableCell className="px-4 py-3 border-b">
-                                        {product.image_urls && product.image_urls.length > 0 ? (
-                                            <img src={product.image_urls[0]} alt={product.name} className="w-16 h-16 object-cover rounded-md border" />
-                                        ) : (
-                                            <span className="text-gray-400">No image</span>
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 border-b max-w-[180px] truncate">
-                                        <span className="text-base font-medium text-gray-900">{product.name}</span>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 border-b">
-                                        <span className="text-sm text-gray-700 font-medium">Rp{Number(product.price).toLocaleString()}</span>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 border-b">
-                                        <span className="text-sm text-gray-700 font-medium">{product.stock}</span>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 border-b">
-                                        <span className="text-sm text-gray-700 font-medium">{product.sold}</span>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 border-b">
-                                        <span className={`px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full transition-colors duration-200 ${product.status === 'tersedia' ? 'bg-green-100 text-green-800' : product.status === 'tidak tersedia' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-600'}`}>{product.status.charAt(0).toUpperCase() + product.status.slice(1)}</span>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 border-b">
-                                        <span className="text-sm text-gray-700">{new Date(product.created_at).toLocaleDateString('id-ID')}</span>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 border-b">
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <Button variant="outline" size="icon" className="w-8 h-8 p-0 flex items-center justify-center">
-                                                    <span className="sr-only">Aksi</span>
-                                                    <ChevronRight className="w-5 h-5" />
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-40 p-2">
-                                                <div className="flex flex-col gap-1">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="justify-start text-blue-700 hover:bg-blue-50"
-                                                        onClick={() => openViewModal(product)}
-                                                    >
-                                                        View
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="justify-start text-yellow-700 hover:bg-yellow-50"
-                                                        onClick={() => openEditModal(product)}
-                                                    >
-                                                        Edit
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="justify-start text-red-700 hover:bg-red-50"
-                                                        onClick={() => {
-                                                            setDeletingId(product.id);
-                                                            setDeleteModalOpen(true);
-                                                        }}
-                                                    >
-                                                        Delete
-                                                    </Button>
-                                                </div>
-                                            </PopoverContent>
-                                        </Popover>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-                {/* Pagination */}
-                {products.length > itemsPerPage && (
-                    <div className="py-4 flex justify-center">
-                        <Pagination>
-                            <PaginationContent>
-                                <PaginationItem>
-                                    <PaginationPrevious
-                                        href="#"
-                                        onClick={e => { e.preventDefault(); setCurrentPage(p => Math.max(1, p - 1)); }}
-                                        aria-disabled={currentPage === 1}
-                                    />
-                                </PaginationItem>
-                                {Array.from({ length: totalPages }, (_, i) => (
-                                    <PaginationItem key={i}>
-                                        <PaginationLink
-                                            href="#"
-                                            isActive={currentPage === i + 1}
-                                            onClick={e => { e.preventDefault(); setCurrentPage(i + 1); }}
-                                        >
-                                            {i + 1}
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                ))}
-                                <PaginationItem>
-                                    <PaginationNext
-                                        href="#"
-                                        onClick={e => { e.preventDefault(); setCurrentPage(p => Math.min(totalPages, p + 1)); }}
-                                        aria-disabled={currentPage === totalPages}
-                                    />
-                                </PaginationItem>
-                            </PaginationContent>
-                        </Pagination>
+            {/* Product Cards Grid */}
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {loading ? (
+                    <ProductsSkelaton />
+                ) : products.length === 0 ? (
+                    <div className="col-span-full flex flex-col items-center justify-center py-8 border rounded-2xl bg-white/95 shadow-md">
+                        <img src="/globe.svg" alt="No products" className="w-20 h-20 mb-4 opacity-80 mx-auto" />
+                        <h4 className="text-lg font-semibold mb-1">Belum ada produk</h4>
+                        <p className="text-muted-foreground text-sm">Produk belum tersedia. Mulai tambahkan produk baru untuk mengisi toko Anda.</p>
                     </div>
+                ) : (
+                    paginatedProducts.map((product, idx) => (
+                        <Card
+                            key={idx}
+                            className="relative p-0 bg-white/95 rounded-2xl border border-gray-100 transition-all duration-300 group flex flex-col overflow-hidden"
+                        >
+                            <div className="flex flex-col h-full">
+                                <div className="relative w-full aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
+                                    {/* Badge Stok & Terjual */}
+                                    <span className="absolute bottom-2 left-2 bg-white/90 text-xs font-semibold text-gray-800 rounded-full px-3 py-1 shadow-sm border border-gray-200 select-none z-10">
+                                        Stok: {product.stock}
+                                    </span>
+                                    <span className="absolute bottom-2 left-[85] bg-white/90 text-xs font-semibold text-gray-800 rounded-full px-3 py-1 shadow-sm border border-gray-200 select-none z-10">
+                                        Terjual: {product.sold}
+                                    </span>
+                                    {product.image_urls && product.image_urls.length > 0 ? (
+                                        <Image
+                                            src={product.image_urls[0]}
+                                            width={1080}
+                                            height={810}
+                                            alt={product.name}
+                                            className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 z-0"
+                                            style={{ aspectRatio: '4/3' }}
+                                            priority={idx < 3}
+                                        />
+                                    ) : (
+                                        <span className="text-gray-400">No image</span>
+                                    )}
+                                </div>
+                                <div className="flex-1 flex flex-col gap-2 p-4">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <span className="text-base font-semibold text-gray-900 truncate max-w-[180px]">{product.name}</span>
+                                        <span className={`px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full transition-colors duration-200 ${product.status === 'tersedia' ? 'bg-green-100 text-green-800' : product.status === 'tidak tersedia' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-600'}`}>{product.status.charAt(0).toUpperCase() + product.status.slice(1)}</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2 text-sm text-gray-700">
+                                        <span>Harga: <span className="font-medium">Rp{Number(product.price).toLocaleString()}</span></span>
+                                    </div>
+                                    <span className="text-xs text-gray-500">Dibuat: {new Date(product.created_at).toLocaleDateString('id-ID')}</span>
+                                    <div className="flex flex-row gap-2 mt-3">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="flex-1 min-w-[80px]"
+                                            onClick={() => openViewModal(product)}
+                                        >
+                                            View
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="flex-1 min-w-[80px]"
+                                            onClick={() => openEditModal(product)}
+                                        >
+                                            Edit
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="flex-1 min-w-[80px]"
+                                            onClick={() => {
+                                                setDeletingId(product.id);
+                                                setDeleteModalOpen(true);
+                                            }}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </Card>
+                    ))
                 )}
             </div>
+            {/* Pagination */}
+            {products.length > itemsPerPage && (
+                <div className="py-4 flex justify-center">
+                    <Pagination>
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious
+                                    href="#"
+                                    onClick={e => { e.preventDefault(); setCurrentPage(p => Math.max(1, p - 1)); }}
+                                    aria-disabled={currentPage === 1}
+                                />
+                            </PaginationItem>
+                            {Array.from({ length: totalPages }, (_, i) => (
+                                <PaginationItem key={i}>
+                                    <PaginationLink
+                                        href="#"
+                                        isActive={currentPage === i + 1}
+                                        onClick={e => { e.preventDefault(); setCurrentPage(i + 1); }}
+                                    >
+                                        {i + 1}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            ))}
+                            <PaginationItem>
+                                <PaginationNext
+                                    href="#"
+                                    onClick={e => { e.preventDefault(); setCurrentPage(p => Math.min(totalPages, p + 1)); }}
+                                    aria-disabled={currentPage === totalPages}
+                                />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                </div>
+            )}
             <DeleteModal
                 open={deleteModalOpen}
                 onOpenChange={setDeleteModalOpen}

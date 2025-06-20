@@ -22,9 +22,7 @@ import DeleteModal from '@/hooks/dashboard/donasi/modal/DeleteModal';
 
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination'
 
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
-
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { Card } from '@/components/ui/card'
 
 export default function DonasiLayout() {
     const {
@@ -139,145 +137,111 @@ export default function DonasiLayout() {
                     </DialogContent>
                 </Dialog>
             </div>
-            {/* Donasi Table */}
-            <div className="mt-8 overflow-x-auto rounded-xl border border-border bg-white shadow-sm">
-                <Table className="min-w-[900px]">
-                    <TableHeader className="bg-gray-50">
-                        <TableRow>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Gambar</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Judul</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Target</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Terkumpul</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Status</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Deadline</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Dibuat</TableHead>
-                            <TableHead className="px-4 py-3 font-semibold text-gray-700 border-b">Aksi</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {loading ? (
-                            <TableRow>
-                                <TableCell colSpan={8} className="text-center px-6 py-8">Loading...</TableCell>
-                            </TableRow>
-                        ) : donasi.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={8} className="text-center px-6 py-12">
-                                    <div className="flex flex-col items-center justify-center py-8">
-                                        <img src="/globe.svg" alt="No donasi" className="w-20 h-20 mb-4 opacity-80 mx-auto" />
-                                        <h4 className="text-lg font-semibold mb-1">Belum ada donasi</h4>
-                                        <p className="text-muted-foreground text-sm">Donasi belum tersedia. Mulai tambahkan donasi baru.</p>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            paginatedDonasi.map((item, idx) => (
-                                <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
-                                    <TableCell className="px-4 py-3 border-b">
-                                        {item.image_url ? (
-                                            <img src={item.image_url} alt={item.title} className="w-16 h-16 object-cover rounded-md border" />
-                                        ) : (
-                                            <span className="text-gray-400">No image</span>
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 border-b max-w-[180px] truncate">
-                                        <span className="text-base font-medium text-gray-900">{item.title}</span>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 border-b">
-                                        <span className="text-sm text-gray-700 font-medium">Rp{Number(item.target_amount).toLocaleString()}</span>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 border-b">
-                                        <span className="text-sm text-gray-700 font-medium">Rp{Number(item.current_amount).toLocaleString()}</span>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 border-b">
-                                        <span className={`px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full transition-colors duration-200 ${item.status === 'open' ? 'bg-green-100 text-green-800' : item.status === 'closed' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-600'}`}>{item.status.charAt(0).toUpperCase() + item.status.slice(1)}</span>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 border-b">
-                                        <span className="text-sm text-gray-700">{item.deadline ? new Date(item.deadline).toLocaleDateString('id-ID') : '-'}</span>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 border-b">
-                                        <span className="text-sm text-gray-700">{new Date(item.created_at).toLocaleDateString('id-ID')}</span>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 border-b">
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <Button variant="outline" size="icon" className="w-8 h-8 p-0 flex items-center justify-center">
-                                                    <span className="sr-only">Aksi</span>
-                                                    <ChevronRight className="w-5 h-5" />
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-40 p-2">
-                                                <div className="flex flex-col gap-1">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="justify-start text-blue-700 hover:bg-blue-50"
-                                                        onClick={() => openViewModal(item)}
-                                                    >
-                                                        View
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="justify-start text-yellow-700 hover:bg-yellow-50"
-                                                        onClick={() => openEditModal(item)}
-                                                    >
-                                                        Edit
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="justify-start text-red-700 hover:bg-red-50"
-                                                        onClick={() => {
-                                                            setDeletingId(item.id);
-                                                            setDeleteModalOpen(true);
-                                                        }}
-                                                    >
-                                                        Delete
-                                                    </Button>
-                                                </div>
-                                            </PopoverContent>
-                                        </Popover>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-                {/* Pagination */}
-                {donasi.length > itemsPerPage && (
-                    <div className="py-4 flex justify-center">
-                        <Pagination>
-                            <PaginationContent>
-                                <PaginationItem>
-                                    <PaginationPrevious
-                                        href="#"
-                                        onClick={e => { e.preventDefault(); setCurrentPage(p => Math.max(1, p - 1)); }}
-                                        aria-disabled={currentPage === 1}
-                                    />
-                                </PaginationItem>
-                                {Array.from({ length: totalPages }, (_, i) => (
-                                    <PaginationItem key={i}>
-                                        <PaginationLink
-                                            href="#"
-                                            isActive={currentPage === i + 1}
-                                            onClick={e => { e.preventDefault(); setCurrentPage(i + 1); }}
-                                        >
-                                            {i + 1}
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                ))}
-                                <PaginationItem>
-                                    <PaginationNext
-                                        href="#"
-                                        onClick={e => { e.preventDefault(); setCurrentPage(p => Math.min(totalPages, p + 1)); }}
-                                        aria-disabled={currentPage === totalPages}
-                                    />
-                                </PaginationItem>
-                            </PaginationContent>
-                        </Pagination>
+            {/* Donasi Cards Grid */}
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {loading ? (
+                    <div className="col-span-full flex flex-col items-center justify-center py-8">
+                        Loading...
                     </div>
+                ) : donasi.length === 0 ? (
+                    <div className="col-span-full flex flex-col items-center justify-center py-8 border rounded-2xl bg-white/95 shadow-md">
+                        <img src="/globe.svg" alt="No donasi" className="w-20 h-20 mb-4 opacity-80 mx-auto" />
+                        <h4 className="text-lg font-semibold mb-1">Belum ada donasi</h4>
+                        <p className="text-muted-foreground text-sm">Donasi belum tersedia. Mulai tambahkan donasi baru.</p>
+                    </div>
+                ) : (
+                    paginatedDonasi.map((item, idx) => (
+                        <Card
+                            key={item.id}
+                            className="relative p-0 bg-white/95 rounded-2xl border border-gray-100 transition-all duration-300 group flex flex-col overflow-hidden"
+                        >
+                            <div className="flex flex-col h-full">
+                                <div className="relative w-full aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
+                                    {/* Badge Status */}
+                                    <span className={`absolute top-2 left-2 px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full z-10 transition-colors duration-200 ${item.status === 'open' ? 'bg-green-100 text-green-800' : item.status === 'closed' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-600'}`}>{item.status.charAt(0).toUpperCase() + item.status.slice(1)}</span>
+                                    {item.image_url ? (
+                                        <img src={item.image_url} alt={item.title} className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 z-0" style={{ aspectRatio: '4/3' }} />
+                                    ) : (
+                                        <span className="text-gray-400">No image</span>
+                                    )}
+                                </div>
+                                <div className="flex-1 flex flex-col gap-2 p-4">
+                                    <span className="text-base font-semibold text-gray-900 truncate max-w-[180px]">{item.title}</span>
+                                    <div className="flex flex-wrap gap-2 text-sm text-gray-700">
+                                        <span>Target: <span className="font-medium">Rp{Number(item.target_amount).toLocaleString()}</span></span>
+                                        <span>Terkumpul: <span className="font-medium">Rp{Number(item.current_amount).toLocaleString()}</span></span>
+                                    </div>
+                                    <span className="text-xs text-gray-500">Deadline: {item.deadline ? new Date(item.deadline).toLocaleDateString('id-ID') : '-'}</span>
+                                    <span className="text-xs text-gray-500">Dibuat: {new Date(item.created_at).toLocaleDateString('id-ID')}</span>
+                                    <div className="flex flex-row gap-2 mt-3">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="flex-1 min-w-[80px]"
+                                            onClick={() => openViewModal(item)}
+                                        >
+                                            View
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="flex-1 min-w-[80px]"
+                                            onClick={() => openEditModal(item)}
+                                        >
+                                            Edit
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="flex-1 min-w-[80px]"
+                                            onClick={() => {
+                                                setDeletingId(item.id);
+                                                setDeleteModalOpen(true);
+                                            }}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </Card>
+                    ))
                 )}
             </div>
+            {/* Pagination */}
+            {donasi.length > itemsPerPage && (
+                <div className="py-4 flex justify-center">
+                    <Pagination>
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious
+                                    href="#"
+                                    onClick={e => { e.preventDefault(); setCurrentPage(p => Math.max(1, p - 1)); }}
+                                    aria-disabled={currentPage === 1}
+                                />
+                            </PaginationItem>
+                            {Array.from({ length: totalPages }, (_, i) => (
+                                <PaginationItem key={i}>
+                                    <PaginationLink
+                                        href="#"
+                                        isActive={currentPage === i + 1}
+                                        onClick={e => { e.preventDefault(); setCurrentPage(i + 1); }}
+                                    >
+                                        {i + 1}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            ))}
+                            <PaginationItem>
+                                <PaginationNext
+                                    href="#"
+                                    onClick={e => { e.preventDefault(); setCurrentPage(p => Math.min(totalPages, p + 1)); }}
+                                    aria-disabled={currentPage === totalPages}
+                                />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                </div>
+            )}
             <DeleteModal
                 open={deleteModalOpen}
                 onOpenChange={setDeleteModalOpen}

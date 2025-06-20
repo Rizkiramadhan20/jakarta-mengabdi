@@ -6,30 +6,32 @@ import { supabase } from "@/utils/supabase/supabase";
 
 import imagekitInstance from "@/utils/imagekit/imagekit";
 
-import type { Volunteer } from "@/types/volunteer";
+import { Volunteer } from "@/types/volunteer";
+
+const defaultForm: Omit<Volunteer, "id" | "created_at" | "updated_at"> = {
+  img_url: "",
+  title: "",
+  detail: "",
+  goals: [],
+  category: "pilar cerdas",
+  quota_available: 0,
+  time: "",
+  location: "",
+  tasks: "",
+  criteria: "",
+  file_document: "",
+  price: 0,
+};
 
 export function useManagamentVolunteer() {
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [loading, setLoading] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [form, setForm] = useState<
-    Volunteer | Omit<Volunteer, "id" | "created_at" | "updated_at">
-  >({
-    img_url: "",
-    title: "",
-    detail: "",
-    goals: [],
-    category: "pilar cerdas",
-    quota_available: 0,
-    time: "",
-    location: "",
-    tasks: "",
-    criteria: "",
-    file_document: "",
-    price: 0,
+  const [modal, setModal] = useState({
+    open: false,
+    editMode: false,
+    editingId: null as number | null,
   });
+  const [form, setForm] = useState({ ...defaultForm });
   const [creating, setCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -40,8 +42,6 @@ export function useManagamentVolunteer() {
     total: number;
   }>({ done: 0, total: 0 });
   const [pendingImages, setPendingImages] = useState<File[]>([]);
-  const [draggedImageIdx, setDraggedImageIdx] = useState<number | null>(null);
-  const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -63,60 +63,29 @@ export function useManagamentVolunteer() {
     fetchVolunteers();
   }, [creating]);
 
-  const openCreateModal = () => {
-    setForm({
-      img_url: "",
-      title: "",
-      detail: "",
-      goals: [],
-      category: "pilar cerdas",
-      quota_available: 0,
-      time: "",
-      location: "",
-      tasks: "",
-      criteria: "",
-      file_document: "",
-      price: 0,
-    });
-    setImagePreviews([]);
-    setIsEditMode(false);
-    setEditingId(null);
-    setModalOpen(true);
-  };
-  const openEditModal = (volunteer: Volunteer) => {
-    setForm({
-      img_url: volunteer.img_url,
-      title: volunteer.title,
-      detail: volunteer.detail,
-      goals: volunteer.goals,
-      category: volunteer.category,
-      quota_available: volunteer.quota_available,
-      time: volunteer.time,
-      location: volunteer.location,
-      tasks: volunteer.tasks,
-      criteria: volunteer.criteria,
-      file_document: volunteer.file_document,
-      price: volunteer.price,
-    });
-    setImagePreviews(volunteer.img_url ? [volunteer.img_url] : []);
-    setIsEditMode(true);
-    setEditingId(volunteer.id);
-    setModalOpen(true);
-  };
-  const closeModal = () => {
-    setModalOpen(false);
-    setIsEditMode(false);
-    setEditingId(null);
-    setImagePreviews([]);
-  };
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
+  const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
+
+  const openCreateModal = () => {
+    setForm({ ...defaultForm });
+    setImagePreviews([]);
+    setModal({ open: true, editMode: false, editingId: null });
+  };
+
+  const openEditModal = (volunteer: Volunteer) => {
+    setForm({ ...volunteer });
+    setImagePreviews(volunteer.img_url ? [volunteer.img_url] : []);
+    setModal({ open: true, editMode: true, editingId: volunteer.id });
+  };
+
+  const closeModal = () => {
+    setModal({ open: false, editMode: false, editingId: null });
+    setForm({ ...defaultForm });
+    setImagePreviews([]);
+  };
+
   const handleFilesUpload = async (files: FileList) => {
     setPendingImages(Array.from(files));
     setImagePreviews(
@@ -124,11 +93,13 @@ export function useManagamentVolunteer() {
     );
     setForm({ ...form, img_url: "" });
   };
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       await handleFilesUpload(e.target.files);
     }
   };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setCreating(true);
@@ -144,29 +115,31 @@ export function useManagamentVolunteer() {
       setUploadProgress({ done: 0, total: 0 });
     }
     let finalImgUrl = uploadedUrl;
-    if (isEditMode && form.img_url && form.img_url.length > 0) {
+    if (modal.editMode && form.img_url && form.img_url.length > 0) {
       finalImgUrl = form.img_url;
     }
     let fileDocumentUrl = "";
     if (form.file_document && typeof form.file_document === "object") {
       const file = form.file_document as File;
-      const formData = new FormData();
-      formData.append("file", file);
-
       try {
-        const res = await fetch("/api/upload-volunteer-doc", {
-          method: "POST",
-          body: formData,
+        const reader = new FileReader();
+        const base64Promise = new Promise<string>((resolve, reject) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
         });
-        const data = await res.json();
-        if (res.ok && data.url) {
-          fileDocumentUrl = data.url;
-        } else {
-          toast.error("Gagal upload dokumen!");
-          setCreating(false);
-          return;
+        const base64 = await base64Promise;
+        const result = await imagekitInstance.upload({
+          file: base64,
+          fileName: `volunteer-doc-${Date.now()}-${file.name}`,
+          folder: "/volunteer-docs",
+        });
+        if (!result || !result.url) {
+          throw new Error("Failed to upload document");
         }
-      } catch (err) {
+        fileDocumentUrl = result.url;
+      } catch (error) {
+        console.error("ImageKit upload error:", error);
         toast.error("Gagal upload dokumen!");
         setCreating(false);
         return;
@@ -174,7 +147,7 @@ export function useManagamentVolunteer() {
     } else if (typeof form.file_document === "string") {
       fileDocumentUrl = form.file_document;
     }
-    if (isEditMode && editingId) {
+    if (modal.editMode && modal.editingId) {
       const res = await supabase
         .from(process.env.NEXT_PUBLIC_VOLUNTEERS as string)
         .update({
@@ -191,7 +164,7 @@ export function useManagamentVolunteer() {
           file_document: fileDocumentUrl,
           price: form.price,
         })
-        .eq("id", editingId);
+        .eq("id", modal.editingId);
       error = res.error;
       if (!error) {
         toast.success("Volunteer berhasil diupdate!");
@@ -233,6 +206,7 @@ export function useManagamentVolunteer() {
       if (data) setVolunteers(data as Volunteer[]);
     }
   };
+
   const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -242,6 +216,7 @@ export function useManagamentVolunteer() {
       setDragActive(false);
     }
   };
+
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -250,6 +225,7 @@ export function useManagamentVolunteer() {
       await handleFilesUpload(e.dataTransfer.files);
     }
   };
+
   const uploadImage = async (file: File): Promise<string> => {
     try {
       const reader = new FileReader();
@@ -273,6 +249,7 @@ export function useManagamentVolunteer() {
       throw new Error("Failed to upload image");
     }
   };
+
   const handleDelete = async (id: number) => {
     setDeleting(true);
     // Ambil volunteer yang akan dihapus
@@ -298,47 +275,17 @@ export function useManagamentVolunteer() {
     }
     setDeleting(false);
   };
-  const handleImageDragStart = (idx: number) => {
-    setDraggedImageIdx(idx);
-    setIsDraggingImage(true);
-  };
-  const handleImageDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDraggingImage(true);
-  };
-  const handleImageDrop = (
-    e: React.DragEvent<HTMLDivElement>,
-    targetIdx: number
-  ) => {
-    e.preventDefault();
-    setIsDraggingImage(false);
-    if (draggedImageIdx === null || draggedImageIdx === targetIdx) return;
-    const newPreviews = [...imagePreviews];
-    const [removed] = newPreviews.splice(draggedImageIdx, 1);
-    newPreviews.splice(targetIdx, 0, removed);
-    setImagePreviews(newPreviews);
-    if (pendingImages.length > 0) {
-      const newPending = [...pendingImages];
-      const [removedFile] = newPending.splice(draggedImageIdx, 1);
-      newPending.splice(targetIdx, 0, removedFile);
-      setPendingImages(newPending);
-    } else {
-      setForm({ ...form, img_url: newPreviews[0] });
-    }
-    setDraggedImageIdx(null);
-  };
-  const handleImageDragEnd = () => {
-    setIsDraggingImage(false);
-    setDraggedImageIdx(null);
-  };
+
   const openViewModal = (volunteer: Volunteer) => {
     setViewingVolunteer(volunteer);
     setViewModalOpen(true);
   };
+
   const closeViewModal = () => {
     setViewingVolunteer(null);
     setViewModalOpen(false);
   };
+
   const handleDeleteFileDocument = async (fileUrl: string) => {
     if (typeof fileUrl === "string" && fileUrl) {
       try {
@@ -363,12 +310,8 @@ export function useManagamentVolunteer() {
     setVolunteers,
     loading,
     setLoading,
-    modalOpen,
-    setModalOpen,
-    isEditMode,
-    setIsEditMode,
-    editingId,
-    setEditingId,
+    modal,
+    setModal,
     form,
     setForm,
     creating,
@@ -384,10 +327,6 @@ export function useManagamentVolunteer() {
     setUploadProgress,
     pendingImages,
     setPendingImages,
-    draggedImageIdx,
-    setDraggedImageIdx,
-    isDraggingImage,
-    setIsDraggingImage,
     deleteModalOpen,
     setDeleteModalOpen,
     deletingId,
@@ -407,10 +346,6 @@ export function useManagamentVolunteer() {
     handleDrop,
     uploadImage,
     handleDelete,
-    handleImageDragStart,
-    handleImageDragOver,
-    handleImageDrop,
-    handleImageDragEnd,
     openViewModal,
     closeViewModal,
     handleDeleteFileDocument,

@@ -12,6 +12,8 @@ import { formatIDR, getRawNumberFromIDR } from '@/base/helper/FormatPrice';
 
 import { UploadCloud, Trash2 } from 'lucide-react';
 
+import Image from 'next/image';
+
 import {
     Select,
     SelectTrigger,
@@ -20,38 +22,13 @@ import {
     SelectItem
 } from '@/components/ui/select';
 
-import type { Volunteer } from '@/types/volunteer';
 import { Textarea } from '@/components/ui/textarea';
+
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
 import { Calendar } from '@/components/ui/calendar';
 
-interface FormModalProps {
-    isEditMode: boolean;
-    form: Volunteer | Omit<Volunteer, 'id' | 'created_at' | 'updated_at'>;
-    setForm: (form: any) => void;
-    creating: boolean;
-    uploading: boolean;
-    imagePreviews: string[];
-    dragActive: boolean;
-    inputRef: React.RefObject<HTMLInputElement | null>;
-    uploadProgress: { done: number; total: number };
-    pendingImages: File[];
-    setPendingImages: (imgs: File[]) => void;
-    draggedImageIdx: number | null;
-    isDraggingImage: boolean;
-    handleChange: (e: React.ChangeEvent<any>) => void;
-    handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-    handleDrag: (e: React.DragEvent<HTMLDivElement>) => void;
-    handleDrop: (e: React.DragEvent<HTMLDivElement>) => void;
-    handleImageDragStart: (idx: number) => void;
-    handleImageDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
-    handleImageDrop: (e: React.DragEvent<HTMLDivElement>, idx: number) => void;
-    handleImageDragEnd: () => void;
-    closeModal: () => void;
-    setImagePreviews: (imgs: string[]) => void;
-    handleDeleteFileDocument: (fileUrl: string) => Promise<void>;
-}
+import { FormModalProps } from '@/types/volunteer'
 
 const CATEGORIES = [
     'pilar cerdas',
@@ -70,24 +47,14 @@ const FormModal: React.FC<FormModalProps> = ({
     dragActive,
     inputRef,
     uploadProgress,
-    pendingImages,
-    setPendingImages,
-    draggedImageIdx,
-    isDraggingImage,
     handleChange,
-    handleImageChange,
     handleSubmit,
     handleDrag,
     handleDrop,
-    handleImageDragStart,
-    handleImageDragOver,
-    handleImageDrop,
-    handleImageDragEnd,
     closeModal,
     setImagePreviews,
     handleDeleteFileDocument,
 }) => {
-    // Custom handler for price input
     const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = getRawNumberFromIDR(e.target.value);
         setForm({ ...form, price: rawValue === '' ? 0 : Number(rawValue) });
@@ -95,13 +62,20 @@ const FormModal: React.FC<FormModalProps> = ({
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4 space-y-4 w-full max-w-full">
-            <div className='flex flex-col gap-2'>
-                <Label htmlFor="title">Judul Volunteer</Label>
-                <Input id="title" name="title" value={form.title} onChange={handleChange} required />
-            </div>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <div className='flex flex-col gap-2'>
-                    <Label htmlFor="category">Kategori</Label>
+                    <div className="flex items-center gap-2 mb-1">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="#E0E7FF" /><path d="M7 9h10M7 13h5" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" /></svg>
+                        <Label htmlFor="title">Judul Volunteer</Label>
+                    </div>
+                    <Input id="title" name="title" value={form.title} onChange={handleChange} required />
+                </div>
+
+                <div className='flex flex-col gap-2'>
+                    <div className="flex items-center gap-2 mb-1">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#E0E7FF" /><path d="M12 8v4l3 3" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" /></svg>
+                        <Label htmlFor="category">Kategori</Label>
+                    </div>
                     <Select
                         value={form.category}
                         onValueChange={value => setForm({ ...form, category: value })}
@@ -116,28 +90,22 @@ const FormModal: React.FC<FormModalProps> = ({
                         </SelectContent>
                     </Select>
                 </div>
+
                 <div className='flex flex-col gap-2'>
-                    <Label htmlFor="quota_available">Kuota</Label>
+                    <div className="flex items-center gap-2 mb-1">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="10" rx="2" fill="#E0E7FF" /><path d="M8 11h8M8 15h8" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" /></svg>
+                        <Label htmlFor="quota_available">Kuota</Label>
+                    </div>
                     <Input id="quota_available" name="quota_available" type="number" value={form.quota_available} onChange={handleChange} required min="0" />
                 </div>
-                <div className='flex flex-col gap-2'>
-                    <Label htmlFor="price">Harga</Label>
-                    <Input
-                        id="price"
-                        name="price"
-                        type="text"
-                        value={form.price === 0 ? '' : formatIDR(Number(form.price))}
-                        onChange={handlePriceChange}
-                        required
-                        min="0"
-                        inputMode="numeric"
-                        pattern="[0-9.]*"
-                    />
-                </div>
             </div>
+
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <div className='flex flex-col gap-2'>
-                    <Label htmlFor="time">Waktu</Label>
+                    <div className="flex items-center gap-2 mb-1">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#E0E7FF" /><path d="M12 8v4l3 3" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" /></svg>
+                        <Label htmlFor="time">Waktu</Label>
+                    </div>
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
@@ -161,12 +129,18 @@ const FormModal: React.FC<FormModalProps> = ({
                     </Popover>
                 </div>
                 <div className='flex flex-col gap-2'>
-                    <Label htmlFor="location">Lokasi</Label>
+                    <div className="flex items-center gap-2 mb-1">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="10" r="4" fill="#E0E7FF" /><path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.5 11 9 11s9-5.75 9-11c0-4.97-4.03-9-9-9z" stroke="#6366F1" strokeWidth="2" /></svg>
+                        <Label htmlFor="location">Lokasi</Label>
+                    </div>
                     <Input id="location" name="location" value={form.location} onChange={handleChange} required />
                 </div>
 
                 <div className='flex flex-col gap-2'>
-                    <Label htmlFor="file_document">File Dokumen</Label>
+                    <div className="flex items-center gap-2 mb-1">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16" rx="2" fill="#E0E7FF" /><path d="M9 8h6M9 12h6M9 16h3" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" /></svg>
+                        <Label htmlFor="file_document">File Dokumen</Label>
+                    </div>
                     <Input
                         id="file_document"
                         name="file_document"
@@ -208,6 +182,35 @@ const FormModal: React.FC<FormModalProps> = ({
                     )}
                 </div>
             </div>
+
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div className='flex flex-col gap-2'>
+                    <div className="flex items-center gap-2 mb-1">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="10" rx="2" fill="#E0E7FF" /><path d="M12 8v8M8 12h8" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" /></svg>
+                        <Label htmlFor="price">Harga</Label>
+                    </div>
+                    <Input
+                        id="price"
+                        name="price"
+                        type="text"
+                        value={form.price === 0 ? '' : formatIDR(Number(form.price))}
+                        onChange={handlePriceChange}
+                        required
+                        min="0"
+                        inputMode="numeric"
+                        pattern="[0-9.]*"
+                    />
+                </div>
+
+                <div className='flex flex-col gap-2'>
+                    <div className="flex items-center gap-2 mb-1">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#E0E7FF" /><path d="M12 8v4l3 3" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" /></svg>
+                        <Label htmlFor="goals">Goals (pisahkan dengan koma)</Label>
+                    </div>
+                    <Input id="goals" name="goals" value={Array.isArray(form.goals) ? form.goals.join(', ') : form.goals} onChange={e => setForm({ ...form, goals: e.target.value.split(',').map((g: string) => g.trim()) })} required />
+                </div>
+            </div>
+
             <div className='flex flex-col gap-2'>
                 <Label htmlFor="img_url">Gambar</Label>
                 {imagePreviews.length === 0 && (
@@ -223,16 +226,6 @@ const FormModal: React.FC<FormModalProps> = ({
                         `}
                         style={{ minHeight: 120 }}
                     >
-                        <input
-                            id="img_url"
-                            name="img_url"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            disabled={uploading}
-                            ref={inputRef}
-                            style={{ display: 'none' }}
-                        />
                         <UploadCloud className="w-8 h-8 text-muted-foreground mb-1" />
                         <span className="text-muted-foreground font-medium">
                             {dragActive ? 'Drop image here...' : 'Click or drag image here'}
@@ -252,25 +245,19 @@ const FormModal: React.FC<FormModalProps> = ({
                     </div>
                 )}
                 {imagePreviews.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-3">
+                    <div className="grid gap-3 mt-3">
                         {imagePreviews.map((url: string, idx: number) => (
                             <div
                                 key={idx}
-                                className={`relative group cursor-move ${isDraggingImage && draggedImageIdx === idx ? 'opacity-50' : ''}`}
-                                draggable
-                                onDragStart={() => handleImageDragStart(idx)}
-                                onDragOver={handleImageDragOver}
-                                onDrop={e => handleImageDrop(e, idx)}
-                                onDragEnd={handleImageDragEnd}
+                                className="relative group aspect-[1/1] w-full max-w-xs"
                             >
-                                <img src={url} alt={`Preview ${idx + 1}`} className="w-full h-24 object-cover rounded-md border border-border shadow-sm" />
+                                <Image width={1080} height={1080} src={url} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover rounded-md border border-border shadow-sm aspect-[1/1]" />
                                 <button
                                     type="button"
                                     className="absolute top-1 right-1 bg-white/80 hover:bg-red-100 text-red-500 rounded-full p-1 shadow transition-opacity opacity-0 group-hover:opacity-100"
                                     style={{ transition: 'opacity 0.2s' }}
                                     onClick={e => {
                                         e.stopPropagation();
-                                        setPendingImages([]);
                                         setImagePreviews([]);
                                         setForm({ ...form, img_url: '' });
                                     }}
@@ -283,30 +270,44 @@ const FormModal: React.FC<FormModalProps> = ({
                     </div>
                 )}
             </div>
-            <div className='flex flex-col gap-2'>
-                <Label htmlFor="detail">Detail</Label>
-                <Textarea
-                    id="detail"
-                    name="detail"
-                    className="min-h-[80px]"
-                    value={form.detail}
-                    onChange={handleChange}
-                    required
-                />
+
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div className='flex flex-col gap-2'>
+                    <div className="flex items-center gap-2 mb-1">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="10" rx="2" fill="#E0E7FF" /><path d="M8 11h8M8 15h8" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" /></svg>
+                        <Label htmlFor="detail">Detail</Label>
+                    </div>
+                    <Textarea
+                        id="detail"
+                        name="detail"
+                        className="min-h-[80px]"
+                        value={form.detail}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+
+                <div className='flex flex-col gap-2'>
+                    <div className="flex items-center gap-2 mb-1">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="10" rx="2" fill="#E0E7FF" /><path d="M8 11h8M8 15h8" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" /></svg>
+                        <Label htmlFor="criteria">Kriteria</Label>
+                    </div>
+                    <Textarea
+                        id="criteria"
+                        name="criteria"
+                        className="min-h-[80px]"
+                        value={form.criteria}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
             </div>
+
             <div className='flex flex-col gap-2'>
-                <Label htmlFor="criteria">Kriteria</Label>
-                <Textarea
-                    id="criteria"
-                    name="criteria"
-                    className="min-h-[60px]"
-                    value={form.criteria}
-                    onChange={handleChange}
-                    required
-                />
-            </div>
-            <div className='flex flex-col gap-2'>
-                <Label htmlFor="tasks">Tugas</Label>
+                <div className="flex items-center gap-2 mb-1">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="10" rx="2" fill="#E0E7FF" /><path d="M8 11h8M8 15h8" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" /></svg>
+                    <Label htmlFor="tasks">Tugas</Label>
+                </div>
                 <Textarea
                     id="tasks"
                     name="tasks"
@@ -315,10 +316,6 @@ const FormModal: React.FC<FormModalProps> = ({
                     onChange={handleChange}
                     required
                 />
-            </div>
-            <div className='flex flex-col gap-2'>
-                <Label htmlFor="goals">Goals (pisahkan dengan koma)</Label>
-                <Input id="goals" name="goals" value={Array.isArray(form.goals) ? form.goals.join(', ') : form.goals} onChange={e => setForm({ ...form, goals: e.target.value.split(',').map((g: string) => g.trim()) })} required />
             </div>
 
             <DialogFooter>
