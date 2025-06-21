@@ -10,9 +10,9 @@ import { useRouter } from 'next/navigation'
 
 import toast from 'react-hot-toast'
 
-import { AuthContextType } from '@/types/auth'
+import { AuthContextType } from '@/interface/auth'
 
-import { Profile } from '@/types/profile'
+import { Profile } from '@/interface/profile'
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 

@@ -8,4 +8,5 @@ export interface Product {
   image_urls?: string[];
   created_at: string;
   status: string;
+  slug: string;
 }

@@ -10,7 +10,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from 
 
 import { supabase } from '@/utils/supabase/supabase'
 
-import type { KakaSaku } from '@/types/kakaSaku'
+import type { KakaSaku } from '@/interface/kakaSaku'
 
 import { useManagamentKakaSaku } from '@/hooks/dashboard/kaka-saku/utils/useManagamentKakaSaku';
 

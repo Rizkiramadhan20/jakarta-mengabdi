@@ -4,13 +4,13 @@ import React, { useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
 
-import { ChevronRight, Image as ImageIcon, } from "lucide-react"
+import { ChevronRight, Search } from "lucide-react"
 
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 import { supabase } from '@/utils/supabase/supabase'
 
-import type { Donasi } from '@/types/donasi'
+import type { Donasi } from '@/interface/donasi'
 
 import { useManagamentDonasi } from '@/hooks/dashboard/donasi/utils/useManagamentDonasi';
 
@@ -24,6 +24,12 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 
 import { Card } from '@/components/ui/card'
 
+import DonasiSkeleton from "@/hooks/dashboard/donasi/DonasiSkelaton"
+
+import { Input } from '@/components/ui/input'
+
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
+
 export default function DonasiLayout() {
     const {
         donasi, setDonasi,
@@ -34,12 +40,8 @@ export default function DonasiLayout() {
         creating,
         uploading,
         imagePreview, setImagePreview,
-        dragActive,
         inputRef,
         uploadProgress,
-        pendingImages, setPendingImages,
-        draggedImageIdx,
-        isDraggingImage,
         deleteModalOpen, setDeleteModalOpen,
         deletingId, setDeletingId,
         viewModalOpen,
@@ -50,21 +52,24 @@ export default function DonasiLayout() {
         handleChange,
         handleImageChange,
         handleSubmit,
-        handleDrag,
-        handleDrop,
         handleDelete,
-        handleImageDragStart,
-        handleImageDragOver,
-        handleImageDrop,
-        handleImageDragEnd,
         closeViewModal,
         openViewModal,
     } = useManagamentDonasi();
 
     const [currentPage, setCurrentPage] = React.useState(1);
-    const itemsPerPage = 10;
-    const totalPages = Math.ceil(donasi.length / itemsPerPage);
-    const paginatedDonasi = donasi.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const itemsPerPage = 5;
+    const [search, setSearch] = React.useState("");
+    const [statusFilter, setStatusFilter] = React.useState("all");
+
+    // Filter donasi berdasarkan search dan status
+    const filteredDonasi = donasi.filter(item => {
+        const matchTitle = item.title.toLowerCase().includes(search.toLowerCase());
+        const matchStatus = statusFilter && statusFilter !== "all" ? item.status === statusFilter : true;
+        return matchTitle && matchStatus;
+    });
+    const totalPages = Math.ceil(filteredDonasi.length / itemsPerPage);
+    const paginatedDonasi = filteredDonasi.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     useEffect(() => {
         const fetchDonasi = async () => {
@@ -115,39 +120,78 @@ export default function DonasiLayout() {
                             creating={creating}
                             uploading={uploading}
                             imagePreviews={imagePreview ? [imagePreview] : []}
-                            dragActive={dragActive}
                             inputRef={inputRef}
                             uploadProgress={uploadProgress}
-                            pendingImages={pendingImages}
-                            setPendingImages={setPendingImages}
-                            draggedImageIdx={draggedImageIdx}
-                            isDraggingImage={isDraggingImage}
                             handleChange={handleChange}
                             handleImageChange={handleImageChange}
                             handleSubmit={handleSubmit}
-                            handleDrag={handleDrag}
-                            handleDrop={handleDrop}
-                            handleImageDragStart={handleImageDragStart}
-                            handleImageDragOver={handleImageDragOver}
-                            handleImageDrop={handleImageDrop}
-                            handleImageDragEnd={handleImageDragEnd}
                             closeModal={closeModal}
                             setImagePreviews={imgs => setImagePreview(imgs[0] || null)}
                         />
                     </DialogContent>
                 </Dialog>
             </div>
+
+            {/* Filter/Search Bar */}
+            <div className="mt-6 mb-4 w-full md:w-fit flex flex-row items-center gap-3 md:gap-6 bg-white/80 border border-gray-200 rounded-xl shadow-sm px-4 py-3">
+                <div className="relative w-full md:w-72">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <Search className="w-5 h-5" />
+                    </span>
+                    <Input
+                        type="text"
+                        placeholder="Cari donasi berdasarkan judul..."
+                        value={search}
+                        onChange={e => {
+                            setSearch(e.target.value);
+                            setCurrentPage(1);
+                        }}
+                        className="w-full h-10 pl-10 pr-3 bg-white border border-gray-300 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition placeholder:text-gray-400"
+                    />
+                </div>
+
+                <Select
+                    value={statusFilter}
+                    onValueChange={value => {
+                        setStatusFilter(value);
+                        setCurrentPage(1);
+                    }}
+                >
+                    <SelectTrigger className="w-full md:w-48 h-10 bg-white border border-gray-300 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition">
+                        <SelectValue placeholder="Filter status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">Semua Status</SelectItem>
+                        <SelectItem value="open">Open</SelectItem>
+                        <SelectItem value="closed">Closed</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
             {/* Donasi Cards Grid */}
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {loading ? (
-                    <div className="col-span-full flex flex-col items-center justify-center py-8">
-                        Loading...
-                    </div>
+                    <DonasiSkeleton />
                 ) : donasi.length === 0 ? (
                     <div className="col-span-full flex flex-col items-center justify-center py-8 border rounded-2xl bg-white/95 shadow-md">
-                        <img src="/globe.svg" alt="No donasi" className="w-20 h-20 mb-4 opacity-80 mx-auto" />
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" className="w-20 h-20 mb-4 opacity-80 mx-auto" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#888" strokeWidth="2" fill="#f3f4f6" />
+                            <path d="M8 15c1.333-2 6.667-2 8 0" stroke="#888" strokeWidth="1.5" strokeLinecap="round" />
+                            <circle cx="9" cy="10" r="1" fill="#888" />
+                            <circle cx="15" cy="10" r="1" fill="#888" />
+                        </svg>
                         <h4 className="text-lg font-semibold mb-1">Belum ada donasi</h4>
                         <p className="text-muted-foreground text-sm">Donasi belum tersedia. Mulai tambahkan donasi baru.</p>
+                    </div>
+                ) : filteredDonasi.length === 0 ? (
+                    <div className="col-span-full flex flex-col items-center justify-center py-8 border rounded-2xl bg-white/95 shadow-md">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" className="w-20 h-20 mb-4 opacity-80 mx-auto" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#888" strokeWidth="2" fill="#f3f4f6" />
+                            <path d="M8 15c1.333-2 6.667-2 8 0" stroke="#888" strokeWidth="1.5" strokeLinecap="round" />
+                            <circle cx="9" cy="10" r="1" fill="#888" />
+                            <circle cx="15" cy="10" r="1" fill="#888" />
+                        </svg>
+                        <h4 className="text-lg font-semibold mb-1">Tidak ada donasi yang sesuai</h4>
+                        <p className="text-muted-foreground text-sm">Coba ubah kata kunci pencarian atau filter status.</p>
                     </div>
                 ) : (
                     paginatedDonasi.map((item, idx) => (
@@ -158,7 +202,15 @@ export default function DonasiLayout() {
                             <div className="flex flex-col h-full">
                                 <div className="relative w-full aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
                                     {/* Badge Status */}
-                                    <span className={`absolute top-2 left-2 px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full z-10 transition-colors duration-200 ${item.status === 'open' ? 'bg-green-100 text-green-800' : item.status === 'closed' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-600'}`}>{item.status.charAt(0).toUpperCase() + item.status.slice(1)}</span>
+                                    <div className='flex gap-4'>
+                                        <span className={`absolute bottom-2 left-2 px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full z-10 transition-colors duration-200 ${item.status === 'open' ? 'bg-green-100 text-green-800' : item.status === 'closed' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-600'}`}>{item.status.charAt(0).toUpperCase() + item.status.slice(1)}</span>
+
+                                        {/* Deadline Badge */}
+                                        <span className="absolute bottom-2 left-[63px] px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full z-10 bg-blue-100 text-blue-800">
+                                            Deadline: {item.deadline ? new Date(item.deadline).toLocaleDateString('id-ID') : '-'}
+                                        </span>
+                                    </div>
+
                                     {item.image_url ? (
                                         <img src={item.image_url} alt={item.title} className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 z-0" style={{ aspectRatio: '4/3' }} />
                                     ) : (
@@ -166,13 +218,23 @@ export default function DonasiLayout() {
                                     )}
                                 </div>
                                 <div className="flex-1 flex flex-col gap-2 p-4">
+                                    <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-1 rounded w-fit inline-block shadow-sm">
+                                        Dibuat: {new Date(item.created_at).toLocaleDateString('id-ID')}
+                                    </span>
+
                                     <span className="text-base font-semibold text-gray-900 truncate max-w-[180px]">{item.title}</span>
-                                    <div className="flex flex-wrap gap-2 text-sm text-gray-700">
-                                        <span>Target: <span className="font-medium">Rp{Number(item.target_amount).toLocaleString()}</span></span>
-                                        <span>Terkumpul: <span className="font-medium">Rp{Number(item.current_amount).toLocaleString()}</span></span>
+                                    <div className="flex flex-wrap gap-4 text-sm text-gray-700 items-center">
+                                        <span>
+                                            <span className="font-semibold text-gray-600">🎯 Target Donasi:</span>
+                                            <span className="font-bold text-primary ml-1">Rp{Number(item.target_amount).toLocaleString()}</span>
+                                        </span>
+                                        <span className="mx-2 text-gray-300">|</span>
+                                        <span>
+                                            <span className="font-semibold text-gray-600">💰 Dana Terkumpul:</span>
+                                            <span className="font-bold text-green-600 ml-1">Rp{Number(item.current_amount).toLocaleString()}</span>
+                                        </span>
                                     </div>
-                                    <span className="text-xs text-gray-500">Deadline: {item.deadline ? new Date(item.deadline).toLocaleDateString('id-ID') : '-'}</span>
-                                    <span className="text-xs text-gray-500">Dibuat: {new Date(item.created_at).toLocaleDateString('id-ID')}</span>
+
                                     <div className="flex flex-row gap-2 mt-3">
                                         <Button
                                             variant="outline"
@@ -210,7 +272,7 @@ export default function DonasiLayout() {
             </div>
             {/* Pagination */}
             {donasi.length > itemsPerPage && (
-                <div className="py-4 flex justify-center">
+                <div className="py-4 mt-5 flex justify-center">
                     <Pagination>
                         <PaginationContent>
                             <PaginationItem>

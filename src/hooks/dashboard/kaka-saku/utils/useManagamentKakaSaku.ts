@@ -6,7 +6,9 @@ import { supabase } from "@/utils/supabase/supabase";
 
 import imagekitInstance from "@/utils/imagekit/imagekit";
 
-import type { KakaSaku, Timeline } from "@/types/kakaSaku";
+import type { KakaSaku, Timeline } from "@/interface/kakaSaku";
+
+import { slugify } from "@/base/helper/slugify";
 
 export function useManagamentKakaSaku() {
   const [kakasaku, setKakasaku] = useState<KakaSaku[]>([]);
@@ -16,6 +18,7 @@ export function useManagamentKakaSaku() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState({
     title: "",
+    slug: "",
     description: "",
     target_amount: 0,
     current_amount: 0,
@@ -75,6 +78,7 @@ export function useManagamentKakaSaku() {
   const openCreateModal = () => {
     setForm({
       title: "",
+      slug: "",
       description: "",
       target_amount: 0,
       current_amount: 0,
@@ -89,21 +93,22 @@ export function useManagamentKakaSaku() {
     setEditingId(null);
     setModalOpen(true);
   };
-  const openEditModal = (kakasaku: KakaSaku) => {
+  const openEditModal = (kakaSaku: KakaSaku) => {
     setForm({
-      title: kakasaku.title,
-      description: kakasaku.description || "",
-      target_amount: kakasaku.target_amount,
-      current_amount: kakasaku.current_amount,
-      status: kakasaku.status,
-      deadline: kakasaku.deadline || "",
-      image_url: kakasaku.image_url || "",
-      message_template: kakasaku.message_template || "",
-      timeline: kakasaku.timeline || [],
+      title: kakaSaku.title,
+      slug: kakaSaku.slug,
+      description: kakaSaku.description || "",
+      target_amount: kakaSaku.target_amount,
+      current_amount: kakaSaku.current_amount,
+      status: kakaSaku.status,
+      deadline: kakaSaku.deadline || "",
+      image_url: kakaSaku.image_url || "",
+      message_template: kakaSaku.message_template || "",
+      timeline: kakaSaku.timeline || [],
     });
-    setImagePreview(kakasaku.image_url || null);
+    setImagePreview(kakaSaku.image_url || null);
     setIsEditMode(true);
-    setEditingId(kakasaku.id);
+    setEditingId(kakaSaku.id);
     setModalOpen(true);
   };
   const closeModal = () => {
@@ -125,6 +130,8 @@ export function useManagamentKakaSaku() {
     } else if (name === "current_amount") {
       const num = value === "" ? 0 : Number(value.replace(/[^\d.]/g, ""));
       setForm({ ...form, current_amount: isNaN(num) ? 0 : num });
+    } else if (name === "title") {
+      setForm({ ...form, title: value, slug: slugify(value) });
     } else {
       setForm({ ...form, [name]: value });
     }
@@ -164,6 +171,7 @@ export function useManagamentKakaSaku() {
         .from(process.env.NEXT_PUBLIC_KAKA_SAKU as string)
         .update({
           title: form.title,
+          slug: form.slug,
           description: form.description,
           target_amount: parseFloat(form.target_amount.toString()),
           current_amount: parseInt(form.current_amount.toString()),
@@ -185,6 +193,7 @@ export function useManagamentKakaSaku() {
         .from(process.env.NEXT_PUBLIC_KAKA_SAKU as string)
         .insert({
           title: form.title,
+          slug: form.slug,
           description: form.description,
           target_amount: parseFloat(form.target_amount.toString()),
           current_amount: parseInt(form.current_amount.toString()),

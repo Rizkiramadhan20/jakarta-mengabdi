@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogC
 
 import { Button } from '@/components/ui/button';
 
-import type { Product } from '@/types/products';
+import type { Product } from '@/interface/products';
 
 interface ViewModalProps {
     open: boolean;

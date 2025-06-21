@@ -1,9 +1,15 @@
 import React from 'react';
+
 import { Button } from '@/components/ui/button';
+
 import { DialogFooter, DialogClose } from '@/components/ui/dialog';
+
 import { Label } from '@/components/ui/label';
+
 import { UploadCloud, Trash2 } from 'lucide-react';
+
 import Image from 'next/image';
+
 import {
     Select,
     SelectTrigger,
@@ -12,24 +18,7 @@ import {
     SelectItem
 } from '@/components/ui/select';
 
-interface TimelineModalProps {
-    isEditMode: boolean;
-    form: any;
-    setForm: (form: any) => void;
-    uploading: boolean;
-    imagePreview: string | null;
-    dragActive: boolean;
-    inputRef: React.RefObject<HTMLInputElement | null>;
-    pendingImages: File[];
-    setPendingImages: (imgs: File[]) => void;
-    handleChange: (e: React.ChangeEvent<any>) => void;
-    handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-    handleDrag: (e: React.DragEvent<HTMLDivElement>) => void;
-    handleDrop: (e: React.DragEvent<HTMLDivElement>) => void;
-    closeModal: () => void;
-    setImagePreview: (img: string | null) => void;
-}
+import { TimelineModalProps } from "@/interface/kakaSaku"
 
 const TimelineModal: React.FC<TimelineModalProps> = ({
     isEditMode,
@@ -39,9 +28,7 @@ const TimelineModal: React.FC<TimelineModalProps> = ({
     imagePreview,
     dragActive,
     inputRef,
-    pendingImages,
     setPendingImages,
-    handleChange,
     handleImageChange,
     handleSubmit,
     handleDrag,

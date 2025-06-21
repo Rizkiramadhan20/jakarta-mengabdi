@@ -4,14 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogC
 
 import { Button } from '@/components/ui/button';
 
-interface DeleteModalProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    deletingId: number | null;
-    setDeleteModalOpen: (open: boolean) => void;
-    setDeletingId: (id: number | null) => void;
-    handleDelete: (id: number) => Promise<void>;
-}
+import { DeleteModalProps } from "@/interface/kakaSaku"
 
 const DeleteModal: React.FC<DeleteModalProps> = ({
     open,

@@ -4,18 +4,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogC
 
 import { Button } from '@/components/ui/button';
 
-import type { KakaSaku } from '@/types/kakaSaku';
+import type { KakaSaku } from '@/interface/kakaSaku';
 
 import Image from 'next/image';
 
-import { Calendar, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
-interface ViewModalProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    viewingProduct: KakaSaku | null;
-    onClose: () => void;
-}
+import { ViewModalProps } from "@/interface/kakaSaku"
 
 export default function ViewModal({ open, onOpenChange, viewingProduct, onClose }: ViewModalProps) {
     return (

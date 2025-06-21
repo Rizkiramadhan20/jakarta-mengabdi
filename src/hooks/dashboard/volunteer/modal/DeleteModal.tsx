@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogC
 
 import { Button } from '@/components/ui/button';
 
-import { DeleteModalProps } from '@/types/volunteer'
+import { DeleteModalProps } from '@/interface/volunteer'
 
 const DeleteModal: React.FC<DeleteModalProps> = ({
     open,

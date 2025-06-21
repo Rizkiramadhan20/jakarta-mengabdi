@@ -10,7 +10,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from 
 
 import { supabase } from '@/utils/supabase/supabase'
 
-import { Volunteer } from '@/types/volunteer'
+import { Volunteer } from '@/interface/volunteer'
 
 import { useManagamentVolunteer } from '@/hooks/dashboard/volunteer/utils/useManagamentVolunteer'
 

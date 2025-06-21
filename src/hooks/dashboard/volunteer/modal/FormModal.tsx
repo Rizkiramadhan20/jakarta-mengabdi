@@ -28,7 +28,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 
 import { Calendar } from '@/components/ui/calendar';
 
-import { FormModalProps } from '@/types/volunteer'
+import { FormModalProps } from '@/interface/volunteer'
+
+import { slugify } from '@/base/helper/slugify';
 
 const CATEGORIES = [
     'pilar cerdas',
@@ -62,15 +64,18 @@ const FormModal: React.FC<FormModalProps> = ({
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4 space-y-4 w-full max-w-full">
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div className='flex flex-col gap-2'>
-                    <div className="flex items-center gap-2 mb-1">
-                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="#E0E7FF" /><path d="M7 9h10M7 13h5" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" /></svg>
-                        <Label htmlFor="title">Judul Volunteer</Label>
-                    </div>
+                    <Label htmlFor="title">Title</Label>
                     <Input id="title" name="title" value={form.title} onChange={handleChange} required />
                 </div>
+                <div className='flex flex-col gap-2'>
+                    <Label htmlFor="slug">Slug</Label>
+                    <Input id="slug" name="slug" value={form.slug} readOnly required placeholder="contoh: volunteer-anak-yatim" />
+                </div>
+            </div>
 
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <div className='flex flex-col gap-2'>
                     <div className="flex items-center gap-2 mb-1">
                         <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#E0E7FF" /><path d="M12 8v4l3 3" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" /></svg>

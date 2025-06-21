@@ -6,7 +6,9 @@ import { supabase } from "@/utils/supabase/supabase";
 
 import imagekitInstance from "@/utils/imagekit/imagekit";
 
-import type { Product } from "@/types/products";
+import type { Product } from "@/interface/products";
+
+import { slugify } from "@/base/helper/slugify";
 
 export function useManagamentProducts() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -16,6 +18,7 @@ export function useManagamentProducts() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState({
     name: "",
+    slug: "",
     content: "",
     price: 0,
     stock: 0,
@@ -55,6 +58,7 @@ export function useManagamentProducts() {
   const openCreateModal = () => {
     setForm({
       name: "",
+      slug: "",
       content: "",
       price: 0,
       stock: 0,
@@ -69,11 +73,12 @@ export function useManagamentProducts() {
   const openEditModal = (product: Product) => {
     setForm({
       name: product.name,
-      content: product.content,
+      slug: product.slug,
+      content: product.content || "",
       price: product.price,
       stock: product.stock,
       image_urls: product.image_urls || [],
-      status: product.status,
+      status: product.status || "tersedia",
     });
     setImagePreviews(product.image_urls || []);
     setIsEditMode(true);
@@ -93,12 +98,13 @@ export function useManagamentProducts() {
   ) => {
     const { name, value } = e.target;
     if (name === "price") {
-      const raw = value.replace(/\D/g, "");
-      const num = raw === "" ? 0 : Number(raw);
+      const num = value === "" ? 0 : Number(value.replace(/[^\d.]/g, ""));
       setForm({ ...form, price: isNaN(num) ? 0 : num });
     } else if (name === "stock") {
-      const num = value === "" ? 0 : Number(value.replace(/[^\d.]/g, ""));
+      const num = value === "" ? 0 : Number(value.replace(/\D/g, ""));
       setForm({ ...form, stock: isNaN(num) ? 0 : num });
+    } else if (name === "name") {
+      setForm({ ...form, name: value, slug: slugify(value) });
     } else {
       setForm({ ...form, [name]: value });
     }
@@ -140,6 +146,7 @@ export function useManagamentProducts() {
         .from(process.env.NEXT_PUBLIC_PRODUCTS as string)
         .update({
           name: form.name,
+          slug: form.slug,
           content: form.content,
           price: parseFloat(form.price.toString()),
           stock: parseInt(form.stock.toString()),
@@ -158,6 +165,7 @@ export function useManagamentProducts() {
         .from(process.env.NEXT_PUBLIC_PRODUCTS as string)
         .insert({
           name: form.name,
+          slug: form.slug,
           content: form.content,
           price: parseFloat(form.price.toString()),
           stock: parseInt(form.stock.toString()),

@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 import { formatIDR, getRawNumberFromIDR } from '@/base/helper/FormatPrice';
 
-import { UploadCloud, Trash2, Plus, Edit, Calendar, Clock } from 'lucide-react';
+import { UploadCloud, Trash2, Plus, Edit, Clock } from 'lucide-react';
 
 import Image from 'next/image';
 
@@ -34,32 +34,7 @@ import {
     Calendar as CalendarComponent,
 } from '@/components/ui/calendar';
 
-import type { Timeline } from '@/types/kakaSaku';
-
-interface FormModalProps {
-    isEditMode: boolean;
-    form: any;
-    setForm: (form: any) => void;
-    creating: boolean;
-    uploading: boolean;
-    imagePreviews: string[];
-    dragActive: boolean;
-    inputRef: React.RefObject<HTMLInputElement | null>;
-    uploadProgress: { done: number; total: number };
-    pendingImages: File[];
-    setPendingImages: (imgs: File[]) => void;
-    handleChange: (e: React.ChangeEvent<any>) => void;
-    handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-    handleDrag: (e: React.DragEvent<HTMLDivElement>) => void;
-    handleDrop: (e: React.DragEvent<HTMLDivElement>) => void;
-    closeModal: () => void;
-    setImagePreviews: (imgs: string[]) => void;
-    // Timeline props
-    openTimelineModal: () => void;
-    openEditTimelineModal: (timeline: Timeline) => void;
-    deleteTimelineItem: (id: string) => void;
-}
+import type { Timeline, FormModalProps } from '@/interface/kakaSaku';
 
 const FormModal: React.FC<FormModalProps> = ({
     isEditMode,
@@ -100,9 +75,15 @@ const FormModal: React.FC<FormModalProps> = ({
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4 space-y-4 w-full max-w-full">
-            <div className='flex flex-col gap-2'>
-                <Label htmlFor="title">Title</Label>
-                <Input id="title" name="title" value={form.title} onChange={handleChange} required />
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div className='flex flex-col gap-2'>
+                    <Label htmlFor="title">Title</Label>
+                    <Input id="title" name="title" value={form.title} onChange={handleChange} required />
+                </div>
+                <div className='flex flex-col gap-2'>
+                    <Label htmlFor="slug">Slug</Label>
+                    <Input id="slug" name="slug" value={form.slug} readOnly required placeholder="contoh: kaka-saku-anak-yatim" />
+                </div>
             </div>
             <div className='flex flex-col gap-2'>
                 <Label htmlFor="description">Description</Label>

@@ -6,7 +6,7 @@ import { supabase } from "@/utils/supabase/supabase";
 
 import imagekitInstance from "@/utils/imagekit/imagekit";
 
-import type { Donasi } from "@/types/donasi";
+import type { Donasi } from "@/interface/donasi";
 
 export function useManagamentDonasi() {
   const [donasi, setDonasi] = useState<Donasi[]>([]);
@@ -16,6 +16,7 @@ export function useManagamentDonasi() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState({
     title: "",
+    slug: "",
     description: "",
     target_amount: 0,
     current_amount: 0,
@@ -27,15 +28,11 @@ export function useManagamentDonasi() {
   const [creating, setCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [uploadProgress, setUploadProgress] = useState<{
     done: number;
     total: number;
   }>({ done: 0, total: 0 });
-  const [pendingImages, setPendingImages] = useState<File[]>([]);
-  const [draggedImageIdx, setDraggedImageIdx] = useState<number | null>(null);
-  const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -57,6 +54,7 @@ export function useManagamentDonasi() {
   const openCreateModal = () => {
     setForm({
       title: "",
+      slug: "",
       description: "",
       target_amount: 0,
       current_amount: 0,
@@ -73,6 +71,7 @@ export function useManagamentDonasi() {
   const openEditModal = (donasi: Donasi) => {
     setForm({
       title: donasi.title,
+      slug: donasi.slug,
       description: donasi.description || "",
       target_amount: donasi.target_amount,
       current_amount: donasi.current_amount,
@@ -110,8 +109,8 @@ export function useManagamentDonasi() {
     }
   };
   const handleFilesUpload = async (files: FileList) => {
-    setPendingImages(Array.from(files));
-    setImagePreview(URL.createObjectURL(files[0]));
+    const file = files[0];
+    setImagePreview(URL.createObjectURL(file));
     setForm({ ...form, image_url: "" });
   };
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,31 +122,28 @@ export function useManagamentDonasi() {
     e.preventDefault();
     setCreating(true);
     let error = null;
-    let uploadedUrls: string[] = [];
-    if (pendingImages.length > 0) {
+    let uploadedUrl = "";
+    if (imagePreview && form.image_url === "") {
       setUploading(true);
-      setUploadProgress({ done: 0, total: pendingImages.length });
-      for (let i = 0; i < pendingImages.length; i++) {
-        const url = await uploadImage(pendingImages[i]);
-        uploadedUrls.push(url);
-        setUploadProgress((prev) => ({ ...prev, done: prev.done + 1 }));
-      }
+      setUploadProgress({ done: 0, total: 1 });
+      uploadedUrl = await uploadImage(
+        (await fetch(imagePreview).then((r) => r.blob())) as any
+      );
+      setUploadProgress({ done: 1, total: 1 });
       setUploading(false);
       setUploadProgress({ done: 0, total: 0 });
     }
-    let finalImageUrls = uploadedUrls;
-    if (isEditMode && form.image_url && form.image_url.length > 0) {
-      finalImageUrls = [form.image_url, ...uploadedUrls];
-    }
+    let finalImageUrl = uploadedUrl || form.image_url;
     if (isEditMode && editingId) {
       const res = await supabase
         .from(process.env.NEXT_PUBLIC_DONATIONS as string)
         .update({
           title: form.title,
+          slug: form.slug,
           description: form.description,
           target_amount: parseFloat(form.target_amount.toString()),
           current_amount: parseInt(form.current_amount.toString()),
-          image_url: finalImageUrls[0],
+          image_url: finalImageUrl,
           status: form.status,
           deadline: form.deadline,
           message_template: form.message_template,
@@ -164,10 +160,11 @@ export function useManagamentDonasi() {
         .from(process.env.NEXT_PUBLIC_DONATIONS as string)
         .insert({
           title: form.title,
+          slug: form.slug,
           description: form.description,
           target_amount: parseFloat(form.target_amount.toString()),
           current_amount: parseInt(form.current_amount.toString()),
-          image_url: finalImageUrls[0],
+          image_url: finalImageUrl,
           status: form.status,
           deadline: form.deadline,
           message_template: form.message_template,
@@ -180,7 +177,7 @@ export function useManagamentDonasi() {
       }
     }
     setCreating(false);
-    setPendingImages([]);
+    setImagePreview(null);
     if (!error) {
       closeModal();
       const { data } = await supabase
@@ -188,23 +185,6 @@ export function useManagamentDonasi() {
         .select("*")
         .order("created_at", { ascending: false });
       if (data) setDonasi(data as Donasi[]);
-    }
-  };
-  const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      await handleFilesUpload(e.dataTransfer.files);
     }
   };
   const uploadImage = async (file: File): Promise<string> => {
@@ -242,39 +222,6 @@ export function useManagamentDonasi() {
       toast.error("Gagal menghapus produk!");
     }
   };
-  const handleImageDragStart = (idx: number) => {
-    setDraggedImageIdx(idx);
-    setIsDraggingImage(true);
-  };
-  const handleImageDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDraggingImage(true);
-  };
-  const handleImageDrop = (
-    e: React.DragEvent<HTMLDivElement>,
-    targetIdx: number
-  ) => {
-    e.preventDefault();
-    setIsDraggingImage(false);
-    if (draggedImageIdx === null || draggedImageIdx === targetIdx) return;
-    const newPreviews = [...(imagePreview ? [imagePreview] : [])];
-    const [removed] = newPreviews.splice(draggedImageIdx, 1);
-    newPreviews.splice(targetIdx, 0, removed);
-    setImagePreview(newPreviews[0]);
-    if (pendingImages.length > 0) {
-      const newPending = [...pendingImages];
-      const [removedFile] = newPending.splice(draggedImageIdx, 1);
-      newPending.splice(targetIdx, 0, removedFile);
-      setPendingImages(newPending);
-    } else {
-      setForm({ ...form, image_url: newPreviews[0] });
-    }
-    setDraggedImageIdx(null);
-  };
-  const handleImageDragEnd = () => {
-    setIsDraggingImage(false);
-    setDraggedImageIdx(null);
-  };
   const openViewModal = (product: Donasi) => {
     setViewingProduct(product);
     setViewModalOpen(true);
@@ -303,17 +250,9 @@ export function useManagamentDonasi() {
     setUploading,
     imagePreview,
     setImagePreview,
-    dragActive,
-    setDragActive,
     inputRef,
     uploadProgress,
     setUploadProgress,
-    pendingImages,
-    setPendingImages,
-    draggedImageIdx,
-    setDraggedImageIdx,
-    isDraggingImage,
-    setIsDraggingImage,
     deleteModalOpen,
     setDeleteModalOpen,
     deletingId,
@@ -329,14 +268,8 @@ export function useManagamentDonasi() {
     handleFilesUpload,
     handleImageChange,
     handleSubmit,
-    handleDrag,
-    handleDrop,
     uploadImage,
     handleDelete,
-    handleImageDragStart,
-    handleImageDragOver,
-    handleImageDrop,
-    handleImageDragEnd,
     openViewModal,
     closeViewModal,
   };

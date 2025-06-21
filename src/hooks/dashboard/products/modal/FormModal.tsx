@@ -77,9 +77,15 @@ const FormModal: React.FC<FormModalProps> = ({
 }) => {
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4 space-y-4 w-full max-w-full">
-            <div className='flex flex-col gap-2'>
-                <Label htmlFor="name">Nama Produk</Label>
-                <Input id="name" name="name" value={form.name} onChange={handleChange} required />
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div className='flex flex-col gap-2'>
+                    <Label htmlFor="name">Name</Label>
+                    <Input id="name" name="name" value={form.name} onChange={handleChange} required />
+                </div>
+                <div className='flex flex-col gap-2'>
+                    <Label htmlFor="slug">Slug</Label>
+                    <Input id="slug" name="slug" value={form.slug} readOnly required placeholder="contoh: produk-anak-yatim" />
+                </div>
             </div>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <div className='flex flex-col gap-2'>

@@ -6,11 +6,14 @@ import { supabase } from "@/utils/supabase/supabase";
 
 import imagekitInstance from "@/utils/imagekit/imagekit";
 
-import { Volunteer } from "@/types/volunteer";
+import { Volunteer } from "@/interface/volunteer";
+
+import { slugify } from "@/base/helper/slugify";
 
 const defaultForm: Omit<Volunteer, "id" | "created_at" | "updated_at"> = {
   img_url: "",
   title: "",
+  slug: "",
   detail: "",
   goals: [],
   category: "pilar cerdas",
@@ -63,9 +66,23 @@ export function useManagamentVolunteer() {
     fetchVolunteers();
   }, [creating]);
 
-  const handleChange = (e: React.ChangeEvent<any>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === "price") {
+      const num = value === "" ? 0 : Number(value.replace(/[^\d.]/g, ""));
+      setForm({ ...form, price: isNaN(num) ? 0 : num });
+    } else if (name === "quota_available") {
+      const num = value === "" ? 0 : Number(value.replace(/\D/g, ""));
+      setForm({ ...form, quota_available: isNaN(num) ? 0 : num });
+    } else if (name === "title") {
+      setForm({ ...form, title: value, slug: slugify(value) });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   const openCreateModal = () => {
@@ -153,6 +170,7 @@ export function useManagamentVolunteer() {
         .update({
           img_url: finalImgUrl,
           title: form.title,
+          slug: form.slug,
           detail: form.detail,
           goals: form.goals,
           category: form.category,
@@ -177,6 +195,7 @@ export function useManagamentVolunteer() {
         .insert({
           img_url: finalImgUrl,
           title: form.title,
+          slug: form.slug,
           detail: form.detail,
           goals: form.goals,
           category: form.category,

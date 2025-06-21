@@ -10,7 +10,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from 
 
 import { supabase } from '@/utils/supabase/supabase'
 
-import type { Product } from '@/types/products'
+import type { Product } from '@/interface/products'
 
 import { useManagamentProducts } from '@/hooks/dashboard/products/utils/useManagamentProducts';
 

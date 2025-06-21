@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 
 import { Button } from '@/components/ui/button';
 
-import type { Volunteer } from '@/types/volunteer';
+import type { Volunteer } from '@/interface/volunteer';
 
 import Image from 'next/image';
 

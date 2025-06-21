@@ -2,6 +2,7 @@ export type Volunteer = {
   id: number;
   img_url: string;
   title: string;
+  slug: string;
   detail: string;
   goals: any; // JSONB, dapat diketik lebih ketat jika diperlukan
   category: "pilar cerdas" | "pilar sehat" | "pilar lestari" | "pilar peduli";
