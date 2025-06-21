@@ -5,7 +5,7 @@ import DonasiLayout from '@/hooks/dashboard/donasi/DonasiLayout'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: 'Donasi | Jakarta Mengabdi',
+    title: 'Donasi - Jakarta Mengabdi',
     description: 'Dashboard',
 }
 

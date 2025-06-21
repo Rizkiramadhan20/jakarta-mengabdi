@@ -130,6 +130,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setTimeout(() => {
                 if (userRole === 'admin') {
                     router.push('/dashboard');
+                } else if (userRole === 'user') {
+                    router.push('/profile');
                 } else {
                     router.push('/');
                 }

@@ -1,12 +1,12 @@
 import React from 'react'
 
-import VolunteerLayout from '@/hooks/dashboard/volunteer/VolunteerLayout'
+import VolunteerLayout from '@/hooks/pages/volunteer/VolunteerLayout'
 
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
     title: 'Volunteer - Jakarta Mengabdi',
-    description: 'Dashboard',
+    description: 'hallo',
 }
 
 export default function page() {

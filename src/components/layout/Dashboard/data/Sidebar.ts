@@ -1,13 +1,11 @@
 import {
   House,
   Users,
-  FileText,
   LayoutDashboard,
   Building2,
-  Images,
   UserRoundPen,
-  CircleUserRound,
   ArrowLeftRight,
+  HandCoins,
   Gift,
 } from "lucide-react";
 
@@ -16,43 +14,6 @@ export const menuItems = [
     href: "/dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
-  },
-
-  {
-    href: "/dashboard/pages",
-    label: "Pages",
-    icon: FileText,
-    subItems: [
-      {
-        href: "/dashboard/pages/home",
-        label: "Home",
-      },
-
-      {
-        href: "/dashboard/pages/about",
-        label: "About",
-      },
-
-      {
-        href: "/dashboard/pages/services",
-        label: "Services",
-      },
-
-      {
-        href: "/dashboard/pages/daily",
-        label: "Daily",
-      },
-
-      {
-        href: "/dashboard/pages/apps",
-        label: "Apps",
-      },
-
-      {
-        href: "/dashboard/pages/ongkir",
-        label: "Ongkir",
-      },
-    ],
   },
 
   {
@@ -71,6 +32,12 @@ export const menuItems = [
     href: "/dashboard/volunteer",
     label: "Volunteer",
     icon: Users,
+  },
+
+  {
+    href: "/dashboard/kakak-saku",
+    label: "Kakak Saku",
+    icon: HandCoins,
   },
 
   {
@@ -98,18 +65,6 @@ export const menuItems = [
         label: "Selesai",
       },
     ],
-  },
-
-  {
-    href: "/dashboard/testimonials",
-    label: "Testimonials",
-    icon: Users,
-  },
-
-  {
-    href: "/dashboard/users",
-    label: "Users",
-    icon: CircleUserRound,
   },
 
   {
