@@ -71,6 +71,13 @@ export default function ViewModal({ open, onOpenChange, viewingProduct, onClose 
                                         <div className="font-semibold text-green-700 text-base">Rp{viewingProduct.current_amount.toLocaleString()}</div>
                                     </div>
                                 </div>
+                                <div className="flex items-center gap-3 bg-purple-50 rounded-lg p-4 border border-purple-100">
+                                    <Info className="w-6 h-6 text-purple-500" />
+                                    <div>
+                                        <div className="text-xs text-gray-500">Jumlah Donatur</div>
+                                        <div className="font-semibold text-purple-700 text-base">{viewingProduct.donations || 0}</div>
+                                    </div>
+                                </div>
                                 <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-4 border border-gray-100">
                                     <Info className="w-6 h-6 text-gray-500" />
                                     <div>

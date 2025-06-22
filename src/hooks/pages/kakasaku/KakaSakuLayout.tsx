@@ -54,6 +54,10 @@ export default function KakaSakuLayout({ kakaSakuData }: { kakaSakuData: KakaSak
                                                 <span className='text-sm text-gray-500'>terkumpul dari</span>
                                                 <span className='text-sm text-gray-500'>Rp{formatIDR(item.target_amount)}</span>
                                             </div>
+                                            <div className='flex items-center gap-1'>
+                                                <span className='text-sm text-purple-600 font-semibold'>{item.kakaksaku || 0} kaka saku</span>
+                                                <span className='text-sm text-gray-500'>telah berkontribusi</span>
+                                            </div>
                                         </div>
 
                                         <div className='flex items-center gap-3'>

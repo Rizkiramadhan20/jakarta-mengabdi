@@ -49,6 +49,10 @@ export default function ViewModal({ open, onOpenChange, viewingProduct, onClose 
                                     <span className="font-semibold text-blue-700">Rp{viewingProduct.current_amount.toLocaleString()}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
+                                    <span className="font-medium text-gray-700">Kaka Saku</span>
+                                    <span className="font-semibold text-purple-700">{viewingProduct.kakaksaku || 0}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
                                     <span className="font-medium text-gray-700">Status</span>
                                     <span className="font-semibold text-gray-900">{viewingProduct.status}</span>
                                 </div>

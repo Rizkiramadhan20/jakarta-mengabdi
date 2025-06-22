@@ -4,6 +4,7 @@ export interface Donasi {
   slug: string;
   description?: string;
   image_url?: string;
+  donations: number;
   target_amount: number;
   current_amount: number;
   status: "open" | "closed";

@@ -4,6 +4,7 @@ export interface KakaSaku {
   slug: string;
   description?: string;
   image_url?: string;
+  kakaksaku: number;
   target_amount: number;
   current_amount: number;
   status: "open" | "closed";

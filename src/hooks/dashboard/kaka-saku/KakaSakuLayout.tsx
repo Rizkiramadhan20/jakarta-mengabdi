@@ -182,6 +182,7 @@ export default function DonasiLayout() {
                                     <div className="flex flex-wrap gap-2 text-sm text-gray-700">
                                         <span>Target: <span className="font-medium">Rp{Number(item.target_amount).toLocaleString()}</span></span>
                                         <span>Terkumpul: <span className="font-medium">Rp{Number(item.current_amount).toLocaleString()}</span></span>
+                                        <span>Kaka Saku: <span className="font-medium">{item.kakaksaku || 0}</span></span>
                                     </div>
                                     <span className="text-xs text-gray-500">Deadline: {item.deadline ? new Date(item.deadline).toLocaleDateString('id-ID') : '-'}</span>
                                     <span className="text-xs text-gray-500">Dibuat: {new Date(item.created_at).toLocaleDateString('id-ID')}</span>
