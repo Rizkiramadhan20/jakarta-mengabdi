@@ -19,7 +19,7 @@ export const fetchDonasiData = async (): Promise<Donasi[]> => {
     }
 
     const data = await response.json();
-    return data.data;
+    return data || []; // Return data directly, with fallback to empty array
   } catch (error) {
     console.error("Error fetching donasi data:", error);
     throw error;

@@ -20,6 +20,17 @@ export const menuItems = [
     href: "/dashboard/products",
     label: "Products",
     icon: Building2,
+    subItems: [
+      {
+        href: "/dashboard/products/products",
+        label: "Products",
+      },
+
+      {
+        href: "/dashboard/products/category",
+        label: "Category",
+      },
+    ],
   },
 
   {

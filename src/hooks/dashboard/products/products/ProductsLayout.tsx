@@ -12,15 +12,15 @@ import { supabase } from '@/utils/supabase/supabase'
 
 import type { Product } from '@/interface/products'
 
-import { useManagamentProducts } from '@/hooks/dashboard/products/utils/useManagamentProducts';
+import { useManagamentProducts } from '@/hooks/dashboard/products/products/utils/useManagamentProducts';
 
-import FormModal from '@/hooks/dashboard/products/modal/FormModal';
+import FormModal from '@/hooks/dashboard/products/products/modal/FormModal';
 
-import ViewModal from '@/hooks/dashboard/products/modal/ViewModal';
+import ViewModal from '@/hooks/dashboard/products/products/modal/ViewModal';
 
-import DeleteModal from '@/hooks/dashboard/products/modal/DeleteModal';
+import DeleteModal from '@/hooks/dashboard/products/products/modal/DeleteModal';
 
-import ProductsSkelaton from '@/hooks/dashboard/products/ProductsSkelaton'
+import ProductsSkelaton from '@/hooks/dashboard/products/products/ProductsSkelaton'
 
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination'
 
@@ -147,7 +147,12 @@ export default function ProductsLayout() {
                     <ProductsSkelaton />
                 ) : products.length === 0 ? (
                     <div className="col-span-full flex flex-col items-center justify-center py-8 border rounded-2xl bg-white/95 shadow-md">
-                        <img src="/globe.svg" alt="No products" className="w-20 h-20 mb-4 opacity-80 mx-auto" />
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" className="w-20 h-20 mb-4 opacity-80 mx-auto" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#888" strokeWidth="2" fill="#f3f4f6" />
+                            <path d="M8 15c1.333-2 6.667-2 8 0" stroke="#888" strokeWidth="1.5" strokeLinecap="round" />
+                            <circle cx="9" cy="10" r="1" fill="#888" />
+                            <circle cx="15" cy="10" r="1" fill="#888" />
+                        </svg>
                         <h4 className="text-lg font-semibold mb-1">Belum ada produk</h4>
                         <p className="text-muted-foreground text-sm">Produk belum tersedia. Mulai tambahkan produk baru untuk mengisi toko Anda.</p>
                     </div>

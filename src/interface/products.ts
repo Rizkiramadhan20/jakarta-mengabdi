@@ -10,3 +10,10 @@ export interface Product {
   status: string;
   slug: string;
 }
+
+export interface Category {
+  id: number;
+  name: string;
+  thumbnail?: string;
+  created_at: string;
+}

@@ -1,5 +1,5 @@
 export function formatIDR(value: number) {
-  if (!value) return "";
+  if (value == null) return "";
   return value.toLocaleString("id-ID");
 }
 

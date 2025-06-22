@@ -90,7 +90,21 @@ const FormModal: React.FC<FormModalProps> = ({
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <div className='flex flex-col gap-2'>
                     <Label htmlFor="price">Harga</Label>
-                    <Input id="price" name="price" type="text" value={form.price === 0 ? '' : formatIDR(form.price)} onChange={handleChange} required min="0" />
+                    <Input
+                        id="price"
+                        name="price"
+                        type="text"
+                        value={form.price === 0 ? '' : formatIDR(Number(form.price))}
+                        onChange={e => {
+                            const raw = e.target.value.replace(/\D/g, '');
+                            setForm({ ...form, price: raw === '' ? 0 : Number(raw) });
+                        }}
+                        required
+                        min="0"
+                        placeholder="contoh: 50.000"
+                        inputMode="numeric"
+                        autoComplete="off"
+                    />
                 </div>
                 <div className='flex flex-col gap-2'>
                     <Label htmlFor="stock">Stok</Label>

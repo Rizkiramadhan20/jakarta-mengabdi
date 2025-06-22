@@ -58,7 +58,7 @@ export default function DonasiLayout() {
     } = useManagamentDonasi();
 
     const [currentPage, setCurrentPage] = React.useState(1);
-    const itemsPerPage = 5;
+    const itemsPerPage = 8;
     const [search, setSearch] = React.useState("");
     const [statusFilter, setStatusFilter] = React.useState("all");
 
@@ -168,7 +168,7 @@ export default function DonasiLayout() {
                 </Select>
             </div>
             {/* Donasi Cards Grid */}
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {loading ? (
                     <DonasiSkeleton />
                 ) : donasi.length === 0 ? (
@@ -203,10 +203,10 @@ export default function DonasiLayout() {
                                 <div className="relative w-full aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
                                     {/* Badge Status */}
                                     <div className='flex gap-4'>
-                                        <span className={`absolute bottom-2 left-2 px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full z-10 transition-colors duration-200 ${item.status === 'open' ? 'bg-green-100 text-green-800' : item.status === 'closed' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-600'}`}>{item.status.charAt(0).toUpperCase() + item.status.slice(1)}</span>
+                                        <span className={`absolute bottom-4 left-2 px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full z-10 transition-colors duration-200 ${item.status === 'open' ? 'bg-green-100 text-green-800' : item.status === 'closed' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-600'}`}>{item.status.charAt(0).toUpperCase() + item.status.slice(1)}</span>
 
                                         {/* Deadline Badge */}
-                                        <span className="absolute bottom-2 left-[63px] px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full z-10 bg-blue-100 text-blue-800">
+                                        <span className="absolute bottom-4 left-20 px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full z-10 bg-blue-100 text-blue-800">
                                             Deadline: {item.deadline ? new Date(item.deadline).toLocaleDateString('id-ID') : '-'}
                                         </span>
                                     </div>

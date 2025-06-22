@@ -1,30 +1,30 @@
 import React from 'react'
 
-import { Donasi } from "@/interface/donasi"
+import { KakaSaku } from '@/interface/kakaSaku'
 
-import Image from 'next/image'
-
-import logo from "@/base/assets/Ellipse.png"
-
-import { BadgeCheck } from 'lucide-react'
+import { BadgeCheck, Heart } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+import { Button } from '@/components/ui/button'
 
 import { Progress } from '@/components/ui/progress'
 
 import { formatIDR } from '@/base/helper/FormatPrice'
 
-import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 
 import Link from 'next/link'
 
-export default function DonasiLayout({ donasiData }: { donasiData: Donasi[] }) {
+import logo from "@/base/assets/Ellipse.png"
+
+export default function KakaSakuLayout({ kakaSakuData }: { kakaSakuData: KakaSaku[] }) {
     return (
-        <section className='pb-10'>
+        <section className='pt-28 pb-10'>
             <div className="container px-4 md:px-8">
-                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
                     {
-                        donasiData.map((item, idx) => {
+                        kakaSakuData.map((item, idx) => {
                             const progress = (item.current_amount / item.target_amount) * 100
                             return (
                                 <Card key={idx} className="group overflow-hidden border-0 transition-all duration-300 bg-white rounded-xl">
@@ -36,19 +36,21 @@ export default function DonasiLayout({ donasiData }: { donasiData: Donasi[] }) {
                                                 fill
                                                 className="object-cover group-hover:scale-110 transition-transform duration-300"
                                             />
+
+                                            {/* Overlay gradient */}
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                         </div>
                                     </CardHeader>
 
                                     <CardContent className="flex flex-col space-y-4">
-                                        <CardTitle className="text-xl font-semibold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors duration-200">
+                                        <CardTitle className="text-xl font-semibold text-gray-900 leading-tight group-hover:text-orange-500 transition-colors duration-200">
                                             {item.title}
                                         </CardTitle>
 
                                         <div className='flex flex-col space-y-2'>
                                             <Progress value={progress} className="h-2" />
                                             <div className='flex items-center gap-1'>
-                                                <span className='text-sm text-blue-600 font-semibold'>Rp{formatIDR(item.current_amount)}</span>
+                                                <span className='text-sm text-orange-500 font-semibold'>Rp{formatIDR(item.current_amount)}</span>
                                                 <span className='text-sm text-gray-500'>terkumpul dari</span>
                                                 <span className='text-sm text-gray-500'>Rp{formatIDR(item.target_amount)}</span>
                                             </div>
@@ -56,15 +58,20 @@ export default function DonasiLayout({ donasiData }: { donasiData: Donasi[] }) {
 
                                         <div className='flex items-center gap-3'>
                                             <div className="flex items-center gap-2">
-                                                <Image src={logo} alt={item.title} quality={100} className="w-8 h-8 rounded-full border-2 border-gray-200" />
+                                                <Image
+                                                    src={logo}
+                                                    alt="Jakarta Mengabdi"
+                                                    quality={100}
+                                                    className="w-8 h-8 rounded-full border-2 border-gray-200"
+                                                />
                                                 <span className="text-sm font-medium text-gray-700">Jakarta Mengabdi</span>
                                             </div>
                                             <BadgeCheck className='w-5 h-5 text-blue-500 flex-shrink-0' />
                                         </div>
 
-                                        <Link href={`/donasi/${item.slug}`}>
-                                            <Button className='w-full bg-blue-600 hover:bg-blue-800 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]'>
-                                                Donasi
+                                        <Link href={`/donasi/${item.slug}`} className="block">
+                                            <Button className='w-full bg-orange-400 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]'>
+                                                Ikut Kontribusi
                                             </Button>
                                         </Link>
                                     </CardContent>

@@ -1,16 +1,16 @@
 import React from 'react'
 
-import ProductsLayout from '@/hooks/dashboard/products/ProductsLayout'
+import CategoryLayout from '@/hooks/dashboard/products/category/CategoryLayout'
 
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: 'Products - Jakarta Mengabdi',
+    title: 'Products Category - Jakarta Mengabdi',
     description: 'Dashboard',
 }
 
 export default function page() {
     return (
-        <ProductsLayout />
+        <CategoryLayout />
     )
 }
