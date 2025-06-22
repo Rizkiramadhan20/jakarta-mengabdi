@@ -44,7 +44,7 @@ export default function Header() {
     };
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 flex py-4 transition-all duration-500 bg-[#403122]">
+        <header className="fixed top-0 left-0 right-0 z-[200] flex py-4 transition-all duration-500 bg-[#403122]">
             <div className="container px-4 md:px-8 flex justify-between items-center">
                 {/* Left Section - Logo */}
                 <div className="flex items-center">
