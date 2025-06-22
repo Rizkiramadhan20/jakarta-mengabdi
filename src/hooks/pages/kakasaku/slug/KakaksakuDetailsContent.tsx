@@ -16,7 +16,7 @@ import { useState, useMemo } from 'react';
 
 import logo from '@/base/assets/Ellipse.png'
 
-interface DonasiDetailsContentProps {
+interface KakasakuDetailsContentProps {
     kakaSakuData: KakaSaku | null;
 }
 
@@ -26,7 +26,7 @@ const recentDonors = [
     { name: "Budi Santoso", amount: "Rp 25.000" },
 ];
 
-export default function DonasiDetailsContent({ kakaSakuData }: DonasiDetailsContentProps) {
+export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetailsContentProps) {
     // Get unique timeline types for filter options (excluding 'all')
     const timelineTypes = useMemo(() => {
         const types = kakaSakuData?.timeline?.map(item => item.type) || [];
@@ -61,7 +61,7 @@ export default function DonasiDetailsContent({ kakaSakuData }: DonasiDetailsCont
         <section className="py-28">
             <div className="container px-4 md:px-8">
                 <div className="text-sm text-gray-500 mb-4">
-                    Beranda &gt; Donasi &gt; {kakaSakuData.title}
+                    Beranda &gt; KakaSaku &gt; {kakaSakuData.title}
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main content */}
@@ -132,7 +132,7 @@ export default function DonasiDetailsContent({ kakaSakuData }: DonasiDetailsCont
                                         <p className="text-xs text-gray-500">Kakak Saku</p>
                                     </div>
                                     <div>
-                                        <p className="font-bold text-lg">10</p>
+                                        <p className="font-bold text-lg">{kakaSakuData.share || 0}</p>
                                         <p className="text-xs text-gray-500">Dibagikan</p>
                                     </div>
                                     <div>

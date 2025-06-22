@@ -1,12 +1,12 @@
 import type { Metadata } from 'next'
 
-import DonasiDetailsContent from '@/hooks/pages/slug/DonasiDetailsContent'
+import DonasiDetailsContent from '@/hooks/pages/donasi/slug/DonasiDetailsContent'
 
-import { generateMetadata as getKakaSakuMetadata } from '@/hooks/pages/slug/meta/Metadata'
+import { generateMetadata as getDonasiMetadata } from '@/hooks/pages/donasi/slug/meta/Metadata'
 
-import { fetchKakaSakuBySlug } from "@/lib/FetchKakakSaku"
+import { fetchDonasiBySlug } from "@/lib/FetchDonasi"
 
-import DonasiSlugSkeleton from '@/hooks/pages/slug/DonasiSlugSkeleton';
+import DonasiSlugSkeleton from '@/hooks/pages/donasi/slug/DonasiSlugSkeleton';
 
 type Props = {
     params: Promise<{ slug: string }>
@@ -16,22 +16,22 @@ export async function generateMetadata(
     { params }: Props,
 ): Promise<Metadata> {
     const resolvedParams = await params
-    return getKakaSakuMetadata({ params: { slug: resolvedParams.slug } })
+    return getDonasiMetadata({ params: { slug: resolvedParams.slug } })
 }
 
 export default async function Page({ params }: Props) {
     try {
         const resolvedParams = await params
 
-        const kakaSakuData = await fetchKakaSakuBySlug(resolvedParams.slug)
+        const donasiData = await fetchDonasiBySlug(resolvedParams.slug)
 
         return (
             <DonasiDetailsContent
-                kakaSakuData={kakaSakuData}
+                donasiData={donasiData}
             />
         );
     } catch (error) {
-        console.error('Error fetching kaka saku data:', error);
+        console.error('Error fetching donasi data:', error);
         return (
             <DonasiSlugSkeleton />
         );

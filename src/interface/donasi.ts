@@ -5,6 +5,7 @@ export interface Donasi {
   description?: string;
   image_url?: string;
   donations: number;
+  share: number;
   target_amount: number;
   current_amount: number;
   status: "open" | "closed";

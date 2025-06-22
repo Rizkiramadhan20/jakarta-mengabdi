@@ -58,6 +58,10 @@ export default function KakaSakuLayout({ kakaSakuData }: { kakaSakuData: KakaSak
                                                 <span className='text-sm text-purple-600 font-semibold'>{item.kakaksaku || 0} kaka saku</span>
                                                 <span className='text-sm text-gray-500'>telah berkontribusi</span>
                                             </div>
+                                            <div className='flex items-center gap-1'>
+                                                <span className='text-sm text-orange-600 font-semibold'>{item.share || 0} share</span>
+                                                <span className='text-sm text-gray-500'>telah dibagikan</span>
+                                            </div>
                                         </div>
 
                                         <div className='flex items-center gap-3'>
@@ -73,7 +77,7 @@ export default function KakaSakuLayout({ kakaSakuData }: { kakaSakuData: KakaSak
                                             <BadgeCheck className='w-5 h-5 text-blue-500 flex-shrink-0' />
                                         </div>
 
-                                        <Link href={`/donasi/${item.slug}`} className="block">
+                                        <Link href={`/kakaksaku/${item.slug}`} className="block">
                                             <Button className='w-full bg-orange-400 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]'>
                                                 Ikut Kontribusi
                                             </Button>

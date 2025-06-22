@@ -78,6 +78,13 @@ export default function ViewModal({ open, onOpenChange, viewingProduct, onClose 
                                         <div className="font-semibold text-purple-700 text-base">{viewingProduct.donations || 0}</div>
                                     </div>
                                 </div>
+                                <div className="flex items-center gap-3 bg-orange-50 rounded-lg p-4 border border-orange-100">
+                                    <Info className="w-6 h-6 text-orange-500" />
+                                    <div>
+                                        <div className="text-xs text-gray-500">Share</div>
+                                        <div className="font-semibold text-orange-700 text-base">{viewingProduct.share || 0}</div>
+                                    </div>
+                                </div>
                                 <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-4 border border-gray-100">
                                     <Info className="w-6 h-6 text-gray-500" />
                                     <div>

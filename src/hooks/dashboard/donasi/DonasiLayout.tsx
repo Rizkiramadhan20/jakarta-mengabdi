@@ -238,6 +238,11 @@ export default function DonasiLayout() {
                                             <span className="font-semibold text-gray-600">📊 Jumlah Donatur:</span>
                                             <span className="font-bold text-blue-600 ml-1">{item.donations || 0}</span>
                                         </span>
+                                        <span className="mx-2 text-gray-300">|</span>
+                                        <span>
+                                            <span className="font-semibold text-gray-600">📤 Share:</span>
+                                            <span className="font-bold text-orange-600 ml-1">{item.share || 0}</span>
+                                        </span>
                                     </div>
 
                                     <div className="flex flex-row gap-2 mt-3">

@@ -53,6 +53,10 @@ export default function ViewModal({ open, onOpenChange, viewingProduct, onClose 
                                     <span className="font-semibold text-purple-700">{viewingProduct.kakaksaku || 0}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
+                                    <span className="font-medium text-gray-700">Share</span>
+                                    <span className="font-semibold text-orange-700">{viewingProduct.share || 0}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
                                     <span className="font-medium text-gray-700">Status</span>
                                     <span className="font-semibold text-gray-900">{viewingProduct.status}</span>
                                 </div>
