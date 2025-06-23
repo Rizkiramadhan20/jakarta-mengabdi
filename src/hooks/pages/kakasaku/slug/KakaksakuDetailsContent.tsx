@@ -28,6 +28,10 @@ import toast from 'react-hot-toast';
 
 import { supabase } from '@/utils/supabase/supabase';
 
+import { Input } from '@/components/ui/input';
+import { Button as UIButton } from '@/components/ui/button';
+import { Banknote } from 'lucide-react';
+
 interface KakasakuDetailsContentProps {
     kakaSakuData: KakaSaku | null;
 }
@@ -46,6 +50,8 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
     const [showModal, setShowModal] = useState(false);
     const [price, setPrice] = useState<number>(10000); // default 10.000
     const [recentDonors, setRecentDonors] = useState<any[]>([]);
+    const [donationMode, setDonationMode] = useState<'manual' | 'preset'>('preset');
+    const presetOptions = [10000, 25000, 50000, 100000];
 
     // Ambil recent donors dari Supabase
     useEffect(() => {
@@ -81,6 +87,32 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
         await handleDonate(price);
     };
 
+    // Fungsi untuk insert transaksi ke Supabase via API route
+    const insertTransaction = async (result: any, status: string) => {
+        if (!kakaSakuData) return;
+        const order_id = result.order_id || `KAKASAKU-${kakaSakuData.id}-${Date.now()}`;
+        const name = profile?.full_name || 'Donatur';
+        const email = profile?.email || 'donatur@email.com';
+        const photo_url = profile?.photo_url || null;
+        const gross_amount = result.gross_amount || price;
+        await fetch('/api/kakasaku/insert-transaction', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                order_id,
+                kaka_saku_id: kakaSakuData.id,
+                name,
+                email,
+                photo_url,
+                amount: gross_amount,
+                status,
+                payment_type: result.payment_type,
+                transaction_time: (result as any).transaction_time || new Date().toISOString(),
+                midtrans_response: result,
+            }),
+        });
+    };
+
     const handleDonate = async (gross_amount: number) => {
         if (!kakaSakuData) return;
         const order_id = `KAKASAKU-${kakaSakuData.id}-${Date.now()}`;
@@ -98,25 +130,20 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
             // @ts-ignore
             window.snap.pay(data.token, {
                 onSuccess: async function (result) {
-                    await fetch('/api/kakasaku/insert-transaction', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            order_id,
-                            kaka_saku_id: kakaSakuData.id,
-                            name,
-                            email,
-                            photo_url,
-                            amount: gross_amount,
-                            status: result.transaction_status,
-                            payment_type: result.payment_type,
-                            transaction_time: (result as any).transaction_time || new Date().toISOString(),
-                            midtrans_response: result,
-                        }),
-                    });
+                    await insertTransaction(result, 'settlement');
                     window.location.href = `/kakaksaku/${kakaSakuData.slug}?order_id=${order_id}&status_code=200&transaction_status=settlement`;
                 },
-                // ...onPending, onError, onClose
+                onPending: async function (result) {
+                    await insertTransaction(result, 'pending');
+                    toast('Pembayaran Anda sedang diproses');
+                    window.location.href = `/kakaksaku/${kakaSakuData.slug}?order_id=${order_id}&status_code=200&transaction_status=pending`;
+                },
+                onError: function (result) {
+                    toast.error('Pembayaran gagal. Silakan coba lagi.');
+                },
+                onClose: function () {
+                    toast('Anda membatalkan pembayaran.');
+                }
             });
         } else {
             alert('Gagal memulai pembayaran');
@@ -283,29 +310,78 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                 </div>
             </div>
             <Dialog open={showModal} onOpenChange={setShowModal}>
-                <DialogContent>
+                <DialogContent className="transition-all duration-300">
                     <form onSubmit={handleSubmitPrice} className="flex flex-col gap-4">
                         <DialogHeader>
-                            <DialogTitle>Masukkan Nominal Donasi</DialogTitle>
+                            <DialogTitle className="text-center text-xl font-bold mb-2">Pilih Nominal Donasi</DialogTitle>
                         </DialogHeader>
-                        <input
-                            type="text"
-                            min={1000}
-                            required
-                            value={formatIDR(price)}
-                            onChange={e => {
-                                // Ambil angka mentah dari input
-                                const raw = getRawNumberFromIDR(e.target.value);
-                                setPrice(Number(raw));
-                            }}
-                            className="border rounded px-3 py-2"
-                            placeholder="Nominal (Rp)"
-                        />
-                        <DialogFooter>
+
+                        <div className="flex gap-4 justify-center mb-2">
+                            <label className={`cursor-pointer px-3 py-1 rounded-full text-sm font-medium ${donationMode === 'preset' ? 'bg-orange-100 text-orange-600 border border-orange-400' : 'bg-gray-100 text-gray-500'}`}>
+                                <input
+                                    type="radio"
+                                    name="donationMode"
+                                    value="preset"
+                                    checked={donationMode === 'preset'}
+                                    onChange={() => setDonationMode('preset')}
+                                    className="hidden"
+                                /> Pilih Nominal
+                            </label>
+                            <label className={`cursor-pointer px-3 py-1 rounded-full text-sm font-medium ${donationMode === 'manual' ? 'bg-orange-100 text-orange-600 border border-orange-400' : 'bg-gray-100 text-gray-500'}`}>
+                                <input
+                                    type="radio"
+                                    name="donationMode"
+                                    value="manual"
+                                    checked={donationMode === 'manual'}
+                                    onChange={() => setDonationMode('manual')}
+                                    className="hidden"
+                                /> Input Manual
+                            </label>
+                        </div>
+                        {donationMode === 'preset' ? (
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-2">
+                                {presetOptions.map(opt => (
+                                    <UIButton
+                                        type="button"
+                                        key={opt}
+                                        className={`w-full py-3 rounded-lg font-semibold shadow-sm border transition-all duration-150
+                                            ${price === opt ? 'bg-orange-500 text-white border-orange-500 scale-105 hover:bg-orange-600' : 'bg-white border-gray-300 hover:bg-orange-50 hover:border-orange-400 text-orange-500'}`}
+                                        onClick={() => setPrice(opt)}
+                                    >
+                                        Rp {formatIDR(opt)}
+                                    </UIButton>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-1">
+                                <label className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                                    <Banknote className="text-orange-400 w-5 h-5" /> Nominal Donasi
+                                </label>
+                                <Input
+                                    type="text"
+                                    min={1000}
+                                    required
+                                    value={formatIDR(price)}
+                                    onChange={e => {
+                                        const raw = getRawNumberFromIDR(e.target.value);
+                                        setPrice(Number(raw));
+                                    }}
+                                    className="border-2 border-orange-200 focus:border-orange-400 focus:ring-orange-200 rounded-lg px-4 py-2 text-lg font-semibold"
+                                    placeholder="Masukkan nominal (Rp)"
+                                />
+                                <span className="text-xs text-gray-400">Minimal Rp 10.000</span>
+                            </div>
+                        )}
+                        <div className="flex items-center gap-2 my-2">
+                            <div className="flex-1 h-px bg-gray-200" />
+                            <span className="text-xs text-gray-400">atau</span>
+                            <div className="flex-1 h-px bg-gray-200" />
+                        </div>
+                        <DialogFooter className="mt-2 flex-row gap-2">
                             <DialogClose asChild>
-                                <button type="button" className="px-4 py-2 rounded bg-gray-200">Batal</button>
+                                <UIButton type="button" variant="outline" className="w-1/2">Batal</UIButton>
                             </DialogClose>
-                            <button type="submit" className="px-4 py-2 rounded bg-orange-500 text-white">Donasi</button>
+                            <UIButton type="submit" className="w-1/2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg shadow-md transition-all duration-150">Donasi</UIButton>
                         </DialogFooter>
                     </form>
                 </DialogContent>
