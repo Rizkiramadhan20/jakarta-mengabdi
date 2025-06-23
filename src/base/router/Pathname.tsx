@@ -10,6 +10,8 @@ import Header from "@/components/layout/Header/Header";
 
 import Footer from "@/components/layout/Footer/Footer";
 
+import Script from "next/script";
+
 const Pathname = ({ children }: { children: React.ReactNode }) => {
     const pathname = usePathname();
 
@@ -41,6 +43,14 @@ const Pathname = ({ children }: { children: React.ReactNode }) => {
                             color: '#fff',
                         },
                     },
+                }}
+            />
+            <Script
+                src="https://app.sandbox.midtrans.com/snap/snap.js"
+                data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
+                strategy="lazyOnload"
+                onLoad={() => {
+                    console.log("Snap script loaded");
                 }}
             />
             {!isAdminRoute && <Header />}

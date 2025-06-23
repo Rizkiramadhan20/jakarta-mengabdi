@@ -12,21 +12,30 @@ import { Separator } from '@/components/ui/separator';
 
 import Image from 'next/image';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 import logo from '@/base/assets/Ellipse.png'
+
+import { useAuth } from '@/utils/context/AuthContext';
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
+
+import { formatIDR, getRawNumberFromIDR } from '@/base/helper/FormatPrice';
+
+import { useRouter } from 'next/navigation';
+
+import toast from 'react-hot-toast';
+
+import { supabase } from '@/utils/supabase/supabase';
 
 interface KakasakuDetailsContentProps {
     kakaSakuData: KakaSaku | null;
 }
 
-const recentDonors = [
-    { name: "Andorra kumargi", amount: "Rp 50.000" },
-    { name: "Siti Aisyah", amount: "Rp 100.000" },
-    { name: "Budi Santoso", amount: "Rp 25.000" },
-];
-
 export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetailsContentProps) {
+    const { profile } = useAuth();
+    const router = useRouter();
+
     // Get unique timeline types for filter options (excluding 'all')
     const timelineTypes = useMemo(() => {
         const types = kakaSakuData?.timeline?.map(item => item.type) || [];
@@ -34,6 +43,85 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
     }, [kakaSakuData?.timeline]);
 
     const [selectedType, setSelectedType] = useState<string>(timelineTypes[0] || '');
+    const [showModal, setShowModal] = useState(false);
+    const [price, setPrice] = useState<number>(10000); // default 10.000
+    const [recentDonors, setRecentDonors] = useState<any[]>([]);
+
+    // Ambil recent donors dari Supabase
+    useEffect(() => {
+        const fetchRecentDonors = async () => {
+            if (!kakaSakuData?.id) return;
+            const { data, error } = await supabase
+                .from('kakasaku_transactions')
+                .select('name, amount, photo_url')
+                .eq('kaka_saku_id', Number(kakaSakuData.id))
+                .order('transaction_time', { ascending: false })
+                .limit(5);
+            if (!error && data) setRecentDonors(data);
+        };
+        fetchRecentDonors();
+    }, [kakaSakuData?.id]);
+
+
+    const handleOpenModal = () => {
+        if (!profile) {
+            toast.error('Anda harus login untuk melakukan donasi.');
+            setTimeout(() => {
+                router.push('/signin');
+            }, 1000);
+            return;
+        }
+        setShowModal(true);
+    };
+    const handleCloseModal = () => setShowModal(false);
+
+    const handleSubmitPrice = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setShowModal(false);
+        await handleDonate(price);
+    };
+
+    const handleDonate = async (gross_amount: number) => {
+        if (!kakaSakuData) return;
+        const order_id = `KAKASAKU-${kakaSakuData.id}-${Date.now()}`;
+        const name = profile?.full_name || 'Donatur';
+        const email = profile?.email || 'donatur@email.com';
+        const photo_url = profile?.photo_url || null;
+
+        const res = await fetch('/api/kakasaku/payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_id, gross_amount, name, email }),
+        });
+        const data = await res.json();
+        if (data.token) {
+            // @ts-ignore
+            window.snap.pay(data.token, {
+                onSuccess: async function (result) {
+                    await fetch('/api/kakasaku/insert-transaction', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            order_id,
+                            kaka_saku_id: kakaSakuData.id,
+                            name,
+                            email,
+                            photo_url,
+                            amount: gross_amount,
+                            status: result.transaction_status,
+                            payment_type: result.payment_type,
+                            transaction_time: (result as any).transaction_time || new Date().toISOString(),
+                            midtrans_response: result,
+                        }),
+                    });
+                    window.location.href = `/kakaksaku/${kakaSakuData.slug}?order_id=${order_id}&status_code=200&transaction_status=settlement`;
+                },
+                // ...onPending, onError, onClose
+            });
+        } else {
+            alert('Gagal memulai pembayaran');
+        }
+    };
 
     if (!kakaSakuData) {
         return (
@@ -143,7 +231,7 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                             </CardContent>
 
                             <CardFooter className="flex gap-3 w-full">
-                                <Button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg flex-1 transition-all duration-200 shadow-md hover:shadow-lg">
+                                <Button onClick={handleOpenModal} className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg flex-1 transition-all duration-200 shadow-md hover:shadow-lg">
                                     Jadi Kakak Saku
                                 </Button>
                                 <Button variant="outline" className="border-orange-300 text-orange-600 hover:bg-orange-50 hover:border-orange-400 font-medium py-3 px-6 rounded-lg flex-1 transition-all duration-200">
@@ -167,25 +255,61 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                                 <CardTitle>Dukungan dari Kakak Saku</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                {recentDonors.map((donor, index) => (
-                                    <div key={index}>
-                                        <div className="flex items-center gap-4 py-2">
-                                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-500">
-                                                {donor.name.charAt(0)}
+                                {recentDonors.length === 0 ? (
+                                    <p className="text-gray-500 text-sm">Belum ada donasi.</p>
+                                ) : (
+                                    recentDonors.map((donor, index) => (
+                                        <div key={index}>
+                                            <div className="flex items-center gap-4 py-2">
+                                                {donor.photo_url ? (
+                                                    <img src={donor.photo_url} alt={donor.name} className="w-10 h-10 rounded-full object-cover" />
+                                                ) : (
+                                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-500">
+                                                        {donor.name.charAt(0)}
+                                                    </div>
+                                                )}
+                                                <div>
+                                                    <p className="font-semibold">{donor.name}</p>
+                                                    <p className="text-sm text-gray-500">Ikut donasi Rp {formatIDR(Number(donor.amount))}</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="font-semibold">{donor.name}</p>
-                                                <p className="text-sm text-gray-500">Ikut donasi {donor.amount}</p>
-                                            </div>
+                                            {index < recentDonors.length - 1 && <Separator />}
                                         </div>
-                                        {index < recentDonors.length - 1 && <Separator />}
-                                    </div>
-                                ))}
+                                    ))
+                                )}
                             </CardContent>
                         </Card>
                     </div>
                 </div>
             </div>
+            <Dialog open={showModal} onOpenChange={setShowModal}>
+                <DialogContent>
+                    <form onSubmit={handleSubmitPrice} className="flex flex-col gap-4">
+                        <DialogHeader>
+                            <DialogTitle>Masukkan Nominal Donasi</DialogTitle>
+                        </DialogHeader>
+                        <input
+                            type="text"
+                            min={1000}
+                            required
+                            value={formatIDR(price)}
+                            onChange={e => {
+                                // Ambil angka mentah dari input
+                                const raw = getRawNumberFromIDR(e.target.value);
+                                setPrice(Number(raw));
+                            }}
+                            className="border rounded px-3 py-2"
+                            placeholder="Nominal (Rp)"
+                        />
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <button type="button" className="px-4 py-2 rounded bg-gray-200">Batal</button>
+                            </DialogClose>
+                            <button type="submit" className="px-4 py-2 rounded bg-orange-500 text-white">Donasi</button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </section>
     );
 }

@@ -77,7 +77,7 @@ export default function SignupLayout() {
                                     type="text"
                                     placeholder="Budi Santoso"
                                     required
-                                    className="mt-2 pl-10"
+                                    className="mt-2 pl-10 bg-white"
                                     value={formData.fullName}
                                     onChange={handleChange}
                                 />
@@ -96,7 +96,7 @@ export default function SignupLayout() {
                                     type="email"
                                     placeholder="anda@email.com"
                                     required
-                                    className="mt-2 pl-10"
+                                    className="mt-2 pl-10 bg-white"
                                     value={formData.email}
                                     onChange={handleChange}
                                 />
@@ -115,7 +115,7 @@ export default function SignupLayout() {
                                     type="tel"
                                     placeholder="08xxxxxxxxxx"
                                     required
-                                    className="mt-2 pl-10"
+                                    className="mt-2 pl-10 bg-white"
                                     value={formData.phone}
                                     onChange={handleChange}
                                 />
@@ -133,7 +133,7 @@ export default function SignupLayout() {
                                     id="password"
                                     type={showPassword ? "text" : "password"}
                                     required
-                                    className="mt-2 pl-10"
+                                    className="mt-2 pl-10 bg-white"
                                     value={formData.password}
                                     onChange={handleChange}
                                 />
@@ -158,7 +158,7 @@ export default function SignupLayout() {
                                     id="confirmPassword"
                                     type={showConfirmPassword ? "text" : "password"}
                                     required
-                                    className="mt-2 pl-10"
+                                    className="mt-2 pl-10 bg-white"
                                     value={formData.confirmPassword}
                                     onChange={handleChange}
                                 />

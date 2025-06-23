@@ -72,7 +72,7 @@ export default function SigninLayout() {
                                 type="email"
                                 placeholder="you@example.com"
                                 required
-                                className="mt-2 bg-gray-800 border-gray-600  placeholder:text-gray-400 focus:border-[#45cad1] focus:ring-[#45cad1]"
+                                className="mt-2 bg-white border-gray-600  placeholder:text-gray-400 focus:border-[#45cad1] focus:ring-[#45cad1]"
                                 value={formData.email}
                                 onChange={handleChange}
                             />
@@ -86,7 +86,7 @@ export default function SigninLayout() {
                                     id="password"
                                     type={showPassword ? "text" : "password"}
                                     required
-                                    className="mt-2 bg-gray-800 border-gray-600  placeholder:text-gray-400 focus:border-[#45cad1] focus:ring-[#45cad1] pr-10"
+                                    className="mt-2 bg-white border-gray-600  placeholder:text-gray-400 focus:border-[#45cad1] focus:ring-[#45cad1] pr-10"
                                     value={formData.password}
                                     onChange={handleChange}
                                 />
@@ -105,7 +105,7 @@ export default function SigninLayout() {
                                     id="remember"
                                     checked={formData.remember}
                                     onCheckedChange={handleCheckboxChange}
-                                    className="text-[#45cad1] focus:ring-[#45cad1] data-[state=checked]:bg-[#45cad1] data-[state=checked]:border-[#45cad1]"
+                                    className="text-[#45cad1] focus:ring-[#45cad1] data-[state=checked]:bg-[#45cad1] data-[state=checked]:border-[#45cad1] bg-white"
                                 />
                                 <Label htmlFor="remember">Ingat aku</Label>
                             </div>
