@@ -36,6 +36,12 @@ export default function CategoryLayout() {
         handleChange,
         handleSubmit,
         handleDelete,
+        imagePreviews,
+        setImagePreviews,
+        uploading,
+        uploadProgress,
+        inputRef,
+        handleImageChange,
     } = useManagamentProductsCategory();
 
     const [currentPage, setCurrentPage] = React.useState(1);
@@ -51,7 +57,7 @@ export default function CategoryLayout() {
     const paginatedCategories = filteredCategories.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     return (
-        <section>
+        <section className='overflow-hidden'>
             <div className='flex flex-col md:flex-row justify-between items-start md:items-center p-4 md:p-6 border rounded-2xl border-border bg-card shadow-sm gap-4'>
                 <div className='flex flex-col gap-3'>
                     <h3 className='text-2xl md:text-3xl font-bold'>
@@ -90,6 +96,12 @@ export default function CategoryLayout() {
                             handleChange={handleChange}
                             handleSubmit={handleSubmit}
                             closeModal={closeModal}
+                            imagePreviews={imagePreviews}
+                            setImagePreviews={setImagePreviews}
+                            uploading={uploading}
+                            uploadProgress={uploadProgress}
+                            inputRef={inputRef}
+                            handleImageChange={handleImageChange}
                         />
                     </DialogContent>
                 </Dialog>
@@ -133,26 +145,36 @@ export default function CategoryLayout() {
                         <p className="text-muted-foreground text-sm">Kategori belum tersedia. Mulai tambahkan kategori baru.</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto rounded-xl border border-gray-300 bg-white">
-                        <Table className="min-w-[600px]">
+                    <div className="overflow-x-auto rounded-xl border border-border bg-card stacked-table-container">
+                        <Table className="min-w-[600px] md:table-auto stacked-table">
                             <TableHeader>
                                 <TableRow className="bg-gray-100">
                                     <TableHead className="w-12 font-bold text-gray-700 px-4 py-3">No</TableHead>
+                                    <TableHead className="font-bold text-gray-700 px-4 py-3">Gambar</TableHead>
                                     <TableHead className="font-bold text-gray-700 px-4 py-3">Nama Kategori</TableHead>
                                     <TableHead className="font-bold text-gray-700 px-4 py-3">Tanggal Dibuat</TableHead>
                                     <TableHead className="w-40 font-bold text-gray-700 px-4 py-3">Aksi</TableHead>
                                 </TableRow>
                             </TableHeader>
-                            <TableBody>
+                            <TableBody className='overflow-auto'>
                                 {paginatedCategories.map((category, idx) => (
                                     <TableRow
                                         key={category.id}
                                         className="hover:bg-gray-50 transition-colors"
                                     >
-                                        <TableCell className="px-4 py-2">{(currentPage - 1) * itemsPerPage + idx + 1}</TableCell>
-                                        <TableCell className="px-4 py-2">{category.name}</TableCell>
-                                        <TableCell className="px-4 py-2">{new Date(category.created_at).toLocaleDateString('id-ID')}</TableCell>
-                                        <TableCell className="px-4 py-2">
+                                        <TableCell data-label="No" className="px-4 py-2">{(currentPage - 1) * itemsPerPage + idx + 1}</TableCell>
+                                        <TableCell data-label="Gambar" className="px-4 py-2">
+                                            {category.thumbnail ? (
+                                                <img src={category.thumbnail} alt={category.name} className="w-16 h-16 object-cover rounded-md" />
+                                            ) : (
+                                                <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center">
+                                                    <span className="text-xs text-gray-500">No Image</span>
+                                                </div>
+                                            )}
+                                        </TableCell>
+                                        <TableCell data-label="Nama Kategori" className="px-4 py-2">{category.name}</TableCell>
+                                        <TableCell data-label="Tanggal Dibuat" className="px-4 py-2">{new Date(category.created_at).toLocaleDateString('id-ID')}</TableCell>
+                                        <TableCell data-label="Aksi" className="px-4 py-2">
                                             <div className="flex flex-row gap-2">
                                                 <Button
                                                     variant="outline"

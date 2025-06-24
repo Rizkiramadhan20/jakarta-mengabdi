@@ -167,6 +167,7 @@ const FormModal: React.FC<FormModalProps> = ({
                 <Label htmlFor="message_template">Message Template</Label>
                 <Textarea id="message_template" name="message_template" value={form.message_template || ''} onChange={handleChange} className="h-32 resize-none" />
             </div>
+
             <div className='flex flex-col gap-2'>
                 <Label htmlFor="images">Image</Label>
                 {imagePreviews.length === 0 && (

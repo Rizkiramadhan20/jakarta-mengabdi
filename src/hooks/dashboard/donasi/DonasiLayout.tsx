@@ -30,6 +30,8 @@ import { Input } from '@/components/ui/input'
 
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 
+import Image from 'next/image'
+
 export default function DonasiLayout() {
     const {
         donasi, setDonasi,
@@ -106,12 +108,12 @@ export default function DonasiLayout() {
                             className="w-full md:w-auto px-6 py-2.5 font-medium shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105"
                             onClick={openCreateModal}
                         >
-                            Create Donasi
+                            Buat Donasi
                         </Button>
                     </DialogTrigger>
                     <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto'>
                         <DialogHeader>
-                            <DialogTitle>{isEditMode ? 'Edit Donasi' : 'Create Donasi'}</DialogTitle>
+                            <DialogTitle>{isEditMode ? 'Edit Data Donasi' : 'Buat Data Donasi'}</DialogTitle>
                         </DialogHeader>
                         <FormModal
                             isEditMode={isEditMode}
@@ -133,7 +135,7 @@ export default function DonasiLayout() {
             </div>
 
             {/* Filter/Search Bar */}
-            <div className="mt-6 mb-4 w-full md:w-fit flex flex-row items-center gap-3 md:gap-6 bg-white/80 border border-gray-200 rounded-xl shadow-sm px-4 py-3">
+            <div className="mt-6 mb-4 w-full md:w-fit flex flex-col md:flex-row items-center gap-3 md:gap-6 bg-white/80 border border-gray-200 rounded-xl shadow-sm px-4 py-3">
                 <div className="relative w-full md:w-72">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                         <Search className="w-5 h-5" />
@@ -214,7 +216,7 @@ export default function DonasiLayout() {
                                     </div>
 
                                     {item.image_url ? (
-                                        <img src={item.image_url} alt={item.title} className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 z-0" style={{ aspectRatio: '4/3' }} />
+                                        <Image src={item.image_url} fill alt={item.title} className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 z-0" style={{ aspectRatio: '4/3' }} />
                                     ) : (
                                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                                             <span className="text-gray-400">No image</span>
@@ -259,7 +261,7 @@ export default function DonasiLayout() {
                                             className="flex-1 min-w-[70px] hover:bg-gray-100"
                                             onClick={() => openViewModal(item)}
                                         >
-                                            View
+                                            Details
                                         </Button>
                                         <Button
                                             variant="outline"
@@ -278,7 +280,7 @@ export default function DonasiLayout() {
                                                 setDeleteModalOpen(true);
                                             }}
                                         >
-                                            Delete
+                                            Hapus
                                         </Button>
                                     </div>
                                 </div>

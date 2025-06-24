@@ -1,34 +1,46 @@
 import React from 'react'
 
 import { Skeleton } from '@/components/ui/skeleton'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 
-export default function DonasiSkeleton() {
+export default function CategorySkelaton() {
     return (
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, idx) => (
-                <div key={idx} className="relative p-0 bg-white/95 rounded-2xl border border-gray-100 transition-all duration-300 flex flex-col overflow-hidden">
-                    <div className="flex flex-col h-full">
-                        <div className="relative w-full aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
-                            <Skeleton className="absolute top-2 left-2 w-20 h-6 rounded-full" />
-                            <Skeleton className="w-full h-full" style={{ aspectRatio: '4/3' }} />
-                        </div>
-                        <div className="flex-1 flex flex-col gap-2 p-4">
-                            <Skeleton className="h-6 w-32 mb-2" />
-                            <div className="flex flex-wrap gap-2">
-                                <Skeleton className="h-4 w-24" />
-                                <Skeleton className="h-4 w-24" />
-                            </div>
-                            <Skeleton className="h-4 w-28 mt-2" />
-                            <Skeleton className="h-4 w-24" />
-                            <div className="flex flex-row gap-2 mt-3">
-                                <Skeleton className="h-8 w-20 rounded-xl" />
-                                <Skeleton className="h-8 w-20 rounded-xl" />
-                                <Skeleton className="h-8 w-20 rounded-xl" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            ))}
+        <div className="overflow-x-auto rounded-xl border border-border bg-card stacked-table-container">
+            <Table className="min-w-[600px] md:table-auto stacked-table">
+                <TableHeader>
+                    <TableRow className="bg-gray-100 hover:bg-gray-100">
+                        <TableHead className="w-12 font-bold text-gray-700 px-4 py-3">No</TableHead>
+                        <TableHead className="font-bold text-gray-700 px-4 py-3">Gambar</TableHead>
+                        <TableHead className="font-bold text-gray-700 px-4 py-3">Nama Kategori</TableHead>
+                        <TableHead className="font-bold text-gray-700 px-4 py-3">Tanggal Dibuat</TableHead>
+                        <TableHead className="w-40 font-bold text-gray-700 px-4 py-3">Aksi</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {Array.from({ length: 10 }).map((_, index) => (
+                        <TableRow key={index} className="hover:bg-gray-50 transition-colors">
+                            <TableCell className="px-4 py-2" data-label="No">
+                                <Skeleton className="h-5 w-5" />
+                            </TableCell>
+                            <TableCell className="px-4 py-2" data-label="Gambar">
+                                <Skeleton className="h-16 w-16 rounded-md" />
+                            </TableCell>
+                            <TableCell className="px-4 py-2" data-label="Nama Kategori">
+                                <Skeleton className="h-5 w-32" />
+                            </TableCell>
+                            <TableCell className="px-4 py-2" data-label="Tanggal Dibuat">
+                                <Skeleton className="h-5 w-24" />
+                            </TableCell>
+                            <TableCell className="px-4 py-2" data-label="Aksi">
+                                <div className="flex flex-row gap-2">
+                                    <Skeleton className="h-9 w-[70px] rounded-md" />
+                                    <Skeleton className="h-9 w-[70px] rounded-md" />
+                                </div>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
         </div>
     )
 }
