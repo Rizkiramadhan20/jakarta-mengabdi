@@ -38,6 +38,8 @@ import { slugify } from '@/base/helper/slugify';
 
 import { FormModalProps } from "@/interface/donasi"
 
+import QuillEditor from '@/base/helper/QuilEditor';
+
 const FormModal: React.FC<FormModalProps> = ({
     isEditMode,
     form,
@@ -84,11 +86,6 @@ const FormModal: React.FC<FormModalProps> = ({
                     <Label htmlFor="slug">Slug</Label>
                     <Input id="slug" name="slug" value={form.slug} readOnly required placeholder="contoh: donasi-anak-yatim" />
                 </div>
-            </div>
-
-            <div className='flex flex-col gap-2'>
-                <Label htmlFor="description">Description</Label>
-                <Textarea id="description" name="description" value={form.description} onChange={handleChange} required className="h-32 resize-none" />
             </div>
 
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
@@ -148,6 +145,22 @@ const FormModal: React.FC<FormModalProps> = ({
                         </SelectContent>
                     </Select>
                 </div>
+            </div>
+
+            <div className='flex flex-col gap-2'>
+                <Label htmlFor="description">Description</Label>
+                <Textarea id="description" name="description" value={form.description} onChange={handleChange} required className="h-32 resize-none" />
+            </div>
+
+            <div className='flex flex-col gap-2'>
+                <Label htmlFor="content">Content</Label>
+                <QuillEditor
+                    value={form.content || ''}
+                    onChange={(val: string) => setForm({ ...form, content: val })}
+                    placeholder="Tulis konten lengkap donasi di sini..."
+                    className="bg-white"
+                    height="250px"
+                />
             </div>
 
             <div className='flex flex-col gap-2'>

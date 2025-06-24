@@ -3,6 +3,7 @@ export interface Donasi {
   title: string;
   slug: string;
   description?: string;
+  content?: string;
   image_url?: string;
   donations: number;
   share: number;
@@ -14,9 +15,24 @@ export interface Donasi {
   message_template?: string;
 }
 
+export type DonasiFormData = {
+  title: string;
+  slug: string;
+  description: string;
+  content?: string;
+  donations: number;
+  share: number;
+  target_amount: number;
+  current_amount: number;
+  status: "open" | "closed";
+  deadline: string;
+  image_url: string;
+  message_template?: string;
+};
+
 export interface FormModalProps {
   isEditMode: boolean;
-  form: any;
+  form: DonasiFormData;
   setForm: (form: any) => void;
   creating: boolean;
   uploading: boolean;

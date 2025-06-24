@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Jika status settlement, update current_amount pada tabel kakasaku
+  // Jika status settlement, update current_amount dan kakaksaku pada tabel kakasaku
   if (status === "settlement") {
     // Ambil current_amount dan kakaksaku lama
     const { data: kakaSaku, error: getError } = await supabase

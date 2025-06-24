@@ -6,7 +6,7 @@ import { supabase } from "@/utils/supabase/supabase";
 
 import imagekitInstance from "@/utils/imagekit/imagekit";
 
-import type { Donasi } from "@/interface/donasi";
+import type { Donasi, DonasiFormData } from "@/interface/donasi";
 
 export function useManagamentDonasi() {
   const [donasi, setDonasi] = useState<Donasi[]>([]);
@@ -14,10 +14,11 @@ export function useManagamentDonasi() {
   const [modalOpen, setModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<DonasiFormData>({
     title: "",
     slug: "",
     description: "",
+    content: "",
     donations: 0,
     share: 0,
     target_amount: 0,
@@ -58,6 +59,7 @@ export function useManagamentDonasi() {
       title: "",
       slug: "",
       description: "",
+      content: "",
       donations: 0,
       share: 0,
       target_amount: 0,
@@ -77,6 +79,7 @@ export function useManagamentDonasi() {
       title: donasi.title,
       slug: donasi.slug,
       description: donasi.description || "",
+      content: donasi.content || "",
       donations: donasi.donations || 0,
       share: donasi.share || 0,
       target_amount: donasi.target_amount,
@@ -147,6 +150,7 @@ export function useManagamentDonasi() {
           title: form.title,
           slug: form.slug,
           description: form.description,
+          content: form.content,
           donations: form.donations,
           share: form.share,
           target_amount: parseFloat(form.target_amount.toString()),
@@ -170,6 +174,7 @@ export function useManagamentDonasi() {
           title: form.title,
           slug: form.slug,
           description: form.description,
+          content: form.content,
           donations: form.donations,
           share: form.share,
           target_amount: parseFloat(form.target_amount.toString()),

@@ -197,59 +197,66 @@ export default function DonasiLayout() {
                     paginatedDonasi.map((item, idx) => (
                         <Card
                             key={item.id}
-                            className="relative p-0 bg-white/95 rounded-2xl border border-gray-100 transition-all duration-300 group flex flex-col overflow-hidden"
+                            className="relative p-0 bg-white/95 rounded-2xl border border-gray-100 transition-all duration-300 group flex flex-col overflow-hidden shadow-sm hover:shadow-lg"
                         >
                             <div className="flex flex-col h-full">
                                 <div className="relative w-full aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
-                                    {/* Badge Status */}
-                                    <div className='flex gap-4'>
-                                        <span className={`absolute bottom-4 left-2 px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full z-10 transition-colors duration-200 ${item.status === 'open' ? 'bg-green-100 text-green-800' : item.status === 'closed' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-600'}`}>{item.status.charAt(0).toUpperCase() + item.status.slice(1)}</span>
-
-                                        {/* Deadline Badge */}
-                                        <span className="absolute bottom-4 left-20 px-3 py-1.5 inline-flex text-xs leading-5 font-semibold rounded-full z-10 bg-blue-100 text-blue-800">
-                                            Deadline: {item.deadline ? new Date(item.deadline).toLocaleDateString('id-ID') : '-'}
+                                    {/* Badge Status & Deadline */}
+                                    <div className="absolute top-2 right-2 flex flex-col items-end gap-2 z-10">
+                                        <span className={`px-2 py-1 text-xs font-semibold rounded-md ${item.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                            {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                                         </span>
+                                        {item.deadline && (
+                                            <span className="px-2 py-1 text-xs font-semibold rounded-md bg-blue-100 text-blue-800">
+                                                Deadline: {new Date(item.deadline).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                            </span>
+                                        )}
                                     </div>
 
                                     {item.image_url ? (
                                         <img src={item.image_url} alt={item.title} className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 z-0" style={{ aspectRatio: '4/3' }} />
                                     ) : (
-                                        <span className="text-gray-400">No image</span>
+                                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                            <span className="text-gray-400">No image</span>
+                                        </div>
                                     )}
                                 </div>
-                                <div className="flex-1 flex flex-col gap-2 p-4">
-                                    <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-1 rounded w-fit inline-block shadow-sm">
-                                        Dibuat: {new Date(item.created_at).toLocaleDateString('id-ID')}
-                                    </span>
+                                <div className="flex-1 flex flex-col gap-3 p-4">
+                                    <h3 className="font-bold text-lg text-gray-800 leading-snug group-hover:text-primary transition-colors">{item.title}</h3>
 
-                                    <span className="text-base font-semibold text-gray-900 truncate max-w-[180px]">{item.title}</span>
-                                    <div className="flex flex-wrap gap-4 text-sm text-gray-700 items-center">
-                                        <span>
-                                            <span className="font-semibold text-gray-600">🎯 Target Donasi:</span>
-                                            <span className="font-bold text-primary ml-1">Rp{Number(item.target_amount).toLocaleString()}</span>
-                                        </span>
-                                        <span className="mx-2 text-gray-300">|</span>
-                                        <span>
-                                            <span className="font-semibold text-gray-600">💰 Dana Terkumpul:</span>
-                                            <span className="font-bold text-green-600 ml-1">Rp{Number(item.current_amount).toLocaleString()}</span>
-                                        </span>
-                                        <span className="mx-2 text-gray-300">|</span>
-                                        <span>
-                                            <span className="font-semibold text-gray-600">📊 Jumlah Donatur:</span>
-                                            <span className="font-bold text-blue-600 ml-1">{item.donations || 0}</span>
-                                        </span>
-                                        <span className="mx-2 text-gray-300">|</span>
-                                        <span>
-                                            <span className="font-semibold text-gray-600">📤 Share:</span>
-                                            <span className="font-bold text-orange-600 ml-1">{item.share || 0}</span>
-                                        </span>
+                                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm mt-1">
+                                        <div className="flex flex-col">
+                                            <span className="text-gray-500">Terkumpul</span>
+                                            <span className="font-bold text-green-600">Rp{Number(item.current_amount).toLocaleString('id-ID')}</span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-gray-500">Target</span>
+                                            <span className="font-bold text-primary">Rp{Number(item.target_amount).toLocaleString('id-ID')}</span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-gray-500">Donatur</span>
+                                            <span className="font-bold">{item.donations || 0}</span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-gray-500">Dibuat</span>
+                                            <span className="font-bold">{new Date(item.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}</span>
+                                        </div>
                                     </div>
 
-                                    <div className="flex flex-row gap-2 mt-3">
+                                    <div className="mt-2">
+                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                            <div className="bg-primary h-2 rounded-full" style={{ width: `${Math.min((item.current_amount / (item.target_amount || 1)) * 100, 100)}%` }}></div>
+                                        </div>
+                                        <div className="flex justify-between text-xs mt-1.5">
+                                            <span className="font-medium text-gray-600">{Math.floor(Math.min((item.current_amount / (item.target_amount || 1)) * 100, 100))}% tercapai</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-row gap-2 mt-auto pt-3">
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            className="flex-1 min-w-[80px]"
+                                            className="flex-1 min-w-[70px] hover:bg-gray-100"
                                             onClick={() => openViewModal(item)}
                                         >
                                             View
@@ -257,15 +264,15 @@ export default function DonasiLayout() {
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            className="flex-1 min-w-[80px]"
+                                            className="flex-1 min-w-[70px] hover:bg-gray-100"
                                             onClick={() => openEditModal(item)}
                                         >
                                             Edit
                                         </Button>
                                         <Button
-                                            variant="outline"
+                                            variant="destructive"
                                             size="sm"
-                                            className="flex-1 min-w-[80px]"
+                                            className="flex-1 min-w-[70px]"
                                             onClick={() => {
                                                 setDeletingId(item.id);
                                                 setDeleteModalOpen(true);

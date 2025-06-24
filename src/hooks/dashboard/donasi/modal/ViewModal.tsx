@@ -56,6 +56,9 @@ export default function ViewModal({ open, onOpenChange, viewingProduct, onClose 
                                 </span>
                             </div>
                             <p className="text-gray-600 mb-2 whitespace-pre-line leading-relaxed">{viewingProduct.description}</p>
+                            {viewingProduct.content && (
+                                <div className="prose prose-blue max-w-none mb-2" dangerouslySetInnerHTML={{ __html: viewingProduct.content }} />
+                            )}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="flex items-center gap-3 bg-blue-50 rounded-lg p-4 border border-blue-100">
                                     <Target className="w-6 h-6 text-blue-500" />

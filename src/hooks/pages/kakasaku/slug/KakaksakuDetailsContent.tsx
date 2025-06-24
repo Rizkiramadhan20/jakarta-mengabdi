@@ -29,7 +29,9 @@ import toast from 'react-hot-toast';
 import { supabase } from '@/utils/supabase/supabase';
 
 import { Input } from '@/components/ui/input';
+
 import { Button as UIButton } from '@/components/ui/button';
+
 import { Banknote } from 'lucide-react';
 
 interface KakasakuDetailsContentProps {
@@ -51,7 +53,8 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
     const [price, setPrice] = useState<number>(10000); // default 10.000
     const [recentDonors, setRecentDonors] = useState<any[]>([]);
     const [donationMode, setDonationMode] = useState<'manual' | 'preset'>('preset');
-    const presetOptions = [10000, 25000, 50000, 100000];
+    const presetOptions = [10000, 25000, 50000, 100000, 150000];
+    const [activeTab, setActiveTab] = useState<'deskripsi' | 'doa' | 'dukungan'>('deskripsi');
 
     // Ambil recent donors dari Supabase
     useEffect(() => {
@@ -194,12 +197,12 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
 
                         {/* Timeline Filter */}
                         <div className="mt-6">
-                            <div className="flex justify-between items-center gap-2 p-6 border-2 border-orange-400 rounded-lg bg-white z-50 relative">
+                            <div className="flex justify-between items-center gap-2 p-6 border-2 border-orange-400 rounded-lg bg-white z-50 relative overflow-x-auto flex-nowrap scrollbar-thin scrollbar-thumb-orange-200 scrollbar-track-transparent">
                                 {timelineTypes.map((type) => (
                                     <div
                                         key={type}
                                         onClick={() => setSelectedType(selectedType === type ? '' : type)}
-                                        className={`${selectedType === type ? "font-bold" : ""} text-md cursor-pointer`}
+                                        className={`${selectedType === type ? "font-bold" : ""} text-md cursor-pointer whitespace-nowrap px-3 py-1`}
                                     >
                                         {type}
                                     </div>
@@ -230,14 +233,15 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                     </div>
 
                     {/* Sidebar */}
-                    <div className="space-y-6 sticky top-20 self-start">
+                    <div className="space-y-6 sticky top-24 self-start">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="mb-2">Donasi Terkumpul</CardTitle>
+                                <CardTitle className="mb-2">Dana Terkumpul</CardTitle>
                                 <CardDescription className="text-3xl font-bold text-orange-500">Rp {kakaSakuData.current_amount.toLocaleString('id-ID')}</CardDescription>
 
                                 <span className="text-sm text-gray-500">Dari: Rp {kakaSakuData.target_amount.toLocaleString('id-ID')}</span>
                             </CardHeader>
+
                             <CardContent>
                                 <Progress value={progress} className="h-2" />
 
@@ -273,38 +277,76 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                                 </div>
                             </CardFooter>
 
-                            <CardFooter className="flex gap-3 w-full">
-                                <p className="text-md text-gray-700">{kakaSakuData.description}</p>
-                            </CardFooter>
-                        </Card>
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Dukungan dari Kakak Saku</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {recentDonors.length === 0 ? (
-                                    <p className="text-gray-500 text-sm">Belum ada donasi.</p>
-                                ) : (
-                                    recentDonors.map((donor, index) => (
-                                        <div key={index}>
-                                            <div className="flex items-center gap-4 py-2">
-                                                {donor.photo_url ? (
-                                                    <img src={donor.photo_url} alt={donor.name} className="w-10 h-10 rounded-full object-cover" />
-                                                ) : (
-                                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-500">
-                                                        {donor.name.charAt(0)}
-                                                    </div>
-                                                )}
-                                                <div>
-                                                    <p className="font-semibold">{donor.name}</p>
-                                                    <p className="text-sm text-gray-500">Ikut donasi Rp {formatIDR(Number(donor.amount))}</p>
-                                                </div>
-                                            </div>
-                                            {index < recentDonors.length - 1 && <Separator />}
-                                        </div>
-                                    ))
+                            <CardFooter className="flex flex-col justify-start items-start gap-3 w-full">
+                                <div className="flex gap-3 border-b border-gray-200 mb-2">
+                                    <button
+                                        type="button"
+                                        className={`text-sm px-4 py-2 font-semibold transition-all duration-200 focus:outline-none relative cursor-pointer
+                                            ${activeTab === 'deskripsi' ?
+                                                'text-orange-600 border-b-4 border-orange-500 shadow-[0_2px_8px_-2px_rgba(255,145,0,0.10)] bg-transparent' :
+                                                'text-gray-500 hover:text-orange-500 border-b-4 border-transparent bg-transparent'}`}
+                                        onClick={() => setActiveTab('deskripsi')}
+                                    >
+                                        Deskripsi
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className={`text-sm px-4 py-2 font-semibold transition-all duration-200 focus:outline-none relative cursor-pointer
+                                            ${activeTab === 'doa' ?
+                                                'text-orange-600 border-b-4 border-orange-500 shadow-[0_2px_8px_-2px_rgba(255,145,0,0.10)] bg-transparent' :
+                                                'text-gray-500 hover:text-orange-500 border-b-4 border-transparent bg-transparent'}`}
+                                        onClick={() => setActiveTab('doa')}
+                                    >
+                                        Doa
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className={`text-sm px-4 py-2 font-semibold transition-all duration-200 focus:outline-none relative cursor-pointer
+                                            ${activeTab === 'dukungan' ?
+                                                'text-orange-600 border-b-4 border-orange-500 shadow-[0_2px_8px_-2px_rgba(255,145,0,0.10)] bg-transparent' :
+                                                'text-gray-500 hover:text-orange-500 border-b-4 border-transparent bg-transparent'}`}
+                                        onClick={() => setActiveTab('dukungan')}
+                                    >
+                                        Dukungan
+                                    </button>
+                                </div>
+                                {/* Konten tab */}
+                                {activeTab === 'deskripsi' && (
+                                    <p className="text-md text-gray-700">{kakaSakuData.description}</p>
                                 )}
-                            </CardContent>
+                                {activeTab === 'doa' && (
+                                    <div className="text-md text-gray-700 italic mb-4">Belum ada doa dari donatur.</div>
+                                )}
+                                {activeTab === 'dukungan' && (
+                                    <div className="w-full mt-4">
+                                        <CardTitle className="mb-2">Dukungan dari Kakak Saku</CardTitle>
+                                        {recentDonors.length === 0 ? (
+                                            <p className="text-gray-500 text-sm">Belum ada donasi.</p>
+                                        ) : (
+                                            recentDonors.map((donor, index) => (
+                                                <div key={index}>
+                                                    <div className="flex items-center gap-4 py-2">
+                                                        {donor.photo_url ? (
+                                                            <img src={donor.photo_url} alt={donor.name} className="w-10 h-10 rounded-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-500">
+                                                                {donor.name.charAt(0)}
+                                                            </div>
+                                                        )}
+                                                        <div>
+                                                            <p className="font-semibold">{donor.name}</p>
+                                                            <p className="text-sm text-gray-500">Ikut donasi Rp {formatIDR(Number(donor.amount))}</p>
+                                                        </div>
+                                                    </div>
+                                                    {index < recentDonors.length - 1 && <Separator />}
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                )}
+                            </CardFooter>
                         </Card>
                     </div>
                 </div>
