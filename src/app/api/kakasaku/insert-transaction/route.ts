@@ -23,19 +23,21 @@ export async function POST(req: NextRequest) {
   // Gunakan waktu sekarang jika transaction_time tidak ada
   const trxTime = transaction_time ? new Date(transaction_time) : new Date();
 
-  const { error } = await supabase.from("kakasaku_transactions").insert([
-    {
-      order_id,
-      kaka_saku_id,
-      name,
-      email,
-      amount,
-      status,
-      payment_type,
-      transaction_time: trxTime,
-      midtrans_response,
-    },
-  ]);
+  const { error } = await supabase
+    .from(process.env.NEXT_PUBLIC_KAKASAKU_TRANSACTION as string)
+    .insert([
+      {
+        order_id,
+        kaka_saku_id,
+        name,
+        email,
+        amount,
+        status,
+        payment_type,
+        transaction_time: trxTime,
+        midtrans_response,
+      },
+    ]);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -45,7 +47,7 @@ export async function POST(req: NextRequest) {
   if (status === "settlement") {
     // Ambil current_amount dan kakaksaku lama
     const { data: kakaSaku, error: getError } = await supabase
-      .from("kakasaku")
+      .from(process.env.NEXT_PUBLIC_KAKA_SAKU as string)
       .select("current_amount, kakaksaku")
       .eq("id", kaka_saku_id)
       .single();
@@ -54,7 +56,7 @@ export async function POST(req: NextRequest) {
       const newAmount = Number(kakaSaku.current_amount) + Number(amount);
       const newKakaksaku = Number(kakaSaku.kakaksaku || 0) + 1;
       await supabase
-        .from("kakasaku")
+        .from(process.env.NEXT_PUBLIC_KAKA_SAKU as string)
         .update({ current_amount: newAmount, kakaksaku: newKakaksaku })
         .eq("id", kaka_saku_id);
     }

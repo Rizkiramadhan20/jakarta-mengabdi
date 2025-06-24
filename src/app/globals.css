@@ -205,3 +205,11 @@ html {
     height: 4rem;
   }
 }
+
+.prose blockquote {
+  border-left: 4px solid #fb923c;
+  padding-left: 1rem;
+  font-style: italic;
+  color: #4b5563;
+  background-color: #fff7ed;
+}

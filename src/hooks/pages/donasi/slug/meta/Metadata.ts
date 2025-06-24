@@ -10,9 +10,6 @@ export async function getDonasi(slug: string): Promise<Donasi | null> {
         headers: {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_SECRET}`,
         },
-        next: {
-          revalidate: 5, // Validasi ulang setiap 5 detik
-        },
       }
     );
 

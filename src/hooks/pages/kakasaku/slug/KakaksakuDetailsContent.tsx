@@ -34,6 +34,8 @@ import { Button as UIButton } from '@/components/ui/button';
 
 import { Banknote } from 'lucide-react';
 
+import { Textarea } from '@/components/ui/textarea';
+
 interface KakasakuDetailsContentProps {
     kakaSakuData: KakaSaku | null;
 }
@@ -55,6 +57,10 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
     const [donationMode, setDonationMode] = useState<'manual' | 'preset'>('preset');
     const presetOptions = [10000, 25000, 50000, 100000, 150000];
     const [activeTab, setActiveTab] = useState<'deskripsi' | 'doa' | 'dukungan'>('deskripsi');
+    const [prayers, setPrayers] = useState<any[]>([]);
+    const [loadingPrayers, setLoadingPrayers] = useState(false);
+    const [showPrayerModal, setShowPrayerModal] = useState(false);
+    const [prayer, setPrayer] = useState("");
 
     // Ambil recent donors dari Supabase
     useEffect(() => {
@@ -71,6 +77,21 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
         fetchRecentDonors();
     }, [kakaSakuData?.id]);
 
+    useEffect(() => {
+        async function fetchPrayers() {
+            if (!kakaSakuData?.id) return;
+            setLoadingPrayers(true);
+            const res = await fetch(`/api/kakasaku/prayer?kaka_saku_id=${kakaSakuData.id}`, {
+                headers: {
+                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_SECRET}`,
+                },
+            });
+            const data = await res.json();
+            setPrayers(data.prayers || []);
+            setLoadingPrayers(false);
+        }
+        fetchPrayers();
+    }, [kakaSakuData?.id]);
 
     const handleOpenModal = () => {
         if (!profile) {
@@ -82,7 +103,6 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
         }
         setShowModal(true);
     };
-    const handleCloseModal = () => setShowModal(false);
 
     const handleSubmitPrice = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -134,12 +154,11 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
             window.snap.pay(data.token, {
                 onSuccess: async function (result) {
                     await insertTransaction(result, 'settlement');
-                    window.location.href = `/kakaksaku/${kakaSakuData.slug}?order_id=${order_id}&status_code=200&transaction_status=settlement`;
+                    setShowPrayerModal(true);
                 },
                 onPending: async function (result) {
                     await insertTransaction(result, 'pending');
                     toast('Pembayaran Anda sedang diproses');
-                    window.location.href = `/kakaksaku/${kakaSakuData.slug}?order_id=${order_id}&status_code=200&transaction_status=pending`;
                 },
                 onError: function (result) {
                     toast.error('Pembayaran gagal. Silakan coba lagi.');
@@ -151,6 +170,28 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
         } else {
             alert('Gagal memulai pembayaran');
         }
+    };
+
+    const handleSubmitPrayer = async () => {
+        if (!prayer.trim()) {
+            toast.error('Doa tidak boleh kosong.');
+            return;
+        }
+        if (!kakaSakuData) return;
+        await fetch('/api/kakasaku/prayer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                kaka_saku_id: kakaSakuData.id,
+                name: profile?.full_name,
+                email: profile?.email,
+                photo_url: profile?.photo_url,
+                prayer,
+            }),
+        });
+        setShowPrayerModal(false);
+        setPrayer("");
+        window.location.href = `/kakaksaku/${kakaSakuData.slug}?success=1`;
     };
 
     if (!kakaSakuData) {
@@ -298,7 +339,7 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                                                 'text-gray-500 hover:text-orange-500 border-b-4 border-transparent bg-transparent'}`}
                                         onClick={() => setActiveTab('doa')}
                                     >
-                                        Doa
+                                        Doa ({prayers.length})
                                     </button>
 
                                     <button
@@ -309,7 +350,7 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                                                 'text-gray-500 hover:text-orange-500 border-b-4 border-transparent bg-transparent'}`}
                                         onClick={() => setActiveTab('dukungan')}
                                     >
-                                        Dukungan
+                                        Dukungan ({recentDonors.length})
                                     </button>
                                 </div>
                                 {/* Konten tab */}
@@ -317,7 +358,33 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                                     <p className="text-md text-gray-700">{kakaSakuData.description}</p>
                                 )}
                                 {activeTab === 'doa' && (
-                                    <div className="text-md text-gray-700 italic mb-4">Belum ada doa dari donatur.</div>
+                                    <div className="flex flex-col items-center justify-center w-full text-md text-gray-700 mb-4 gap-2">
+                                        {loadingPrayers ? (
+                                            <span>Loading...</span>
+                                        ) : prayers.length === 0 ? (
+                                            <>
+                                                {/* SVG Amplop untuk empty state doa */}
+                                                <span className="text-center">Belum ada doa dari donatur.</span>
+                                            </>
+                                        ) : (
+                                            <div className="w-full flex flex-col gap-4">
+                                                {prayers.map((pr, idx) => (
+                                                    <div key={idx} className="flex items-start gap-3 p-4 border rounded-lg bg-orange-50">
+                                                        {pr.photo_url ? (
+                                                            <img src={pr.photo_url} alt={pr.name} className="w-10 h-10 rounded-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-500">{pr.name?.charAt(0) || '?'}</div>
+                                                        )}
+                                                        <div>
+                                                            <div className="font-semibold">{pr.name}</div>
+                                                            <div className="text-xs text-gray-500 mb-1">{pr.email}</div>
+                                                            <div className="italic">{pr.prayer}</div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
                                 {activeTab === 'dukungan' && (
                                     <div className="w-full mt-4">
@@ -426,6 +493,17 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                             <UIButton type="submit" className="w-1/2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg shadow-md transition-all duration-150">Donasi</UIButton>
                         </DialogFooter>
                     </form>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={showPrayerModal} onOpenChange={setShowPrayerModal}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Kirim Doa untuk Penerima KakaSaku</DialogTitle>
+                    </DialogHeader>
+                    <Textarea value={prayer} onChange={e => setPrayer(e.target.value)} placeholder="Tulis doa terbaikmu..." />
+                    <DialogFooter>
+                        <Button onClick={handleSubmitPrayer} className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg shadow-md transition-all duration-150">Kirim Doa</Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </section>
