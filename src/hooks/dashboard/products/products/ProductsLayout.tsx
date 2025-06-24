@@ -4,7 +4,7 @@ import React, { useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
 
-import { ChevronRight, Image as ImageIcon, } from "lucide-react"
+import { ChevronRight, Image as ImageIcon, Search } from "lucide-react"
 
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
@@ -28,6 +28,9 @@ import { Card } from '@/components/ui/card'
 
 import Image from 'next/image'
 
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
 export default function ProductsLayout() {
     const {
         products, setProducts,
@@ -48,6 +51,7 @@ export default function ProductsLayout() {
         deletingId, setDeletingId,
         viewModalOpen,
         viewingProduct,
+        categories,
         openCreateModal,
         openEditModal,
         closeModal,
@@ -66,9 +70,22 @@ export default function ProductsLayout() {
     } = useManagamentProducts();
 
     const [currentPage, setCurrentPage] = React.useState(1);
+    const [searchQuery, setSearchQuery] = React.useState('');
+    const [selectedCategory, setSelectedCategory] = React.useState('');
     const itemsPerPage = 10;
-    const totalPages = Math.ceil(products.length / itemsPerPage);
-    const paginatedProducts = products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    const filteredProducts = products.filter(product => {
+        const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesCategory = selectedCategory ? product.category === selectedCategory : true;
+        return matchesSearch && matchesCategory;
+    });
+
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    const paginatedProducts = filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, selectedCategory]);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -105,10 +122,10 @@ export default function ProductsLayout() {
                             className="w-full md:w-auto px-6 py-2.5 font-medium shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105"
                             onClick={openCreateModal}
                         >
-                            Create Content
+                            Buat Product
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto'>
+                    <DialogContent className='max-w-6xl max-h-[90vh] overflow-y-auto'>
                         <DialogHeader>
                             <DialogTitle>{isEditMode ? 'Edit Product' : 'Create Product'}</DialogTitle>
                         </DialogHeader>
@@ -126,6 +143,7 @@ export default function ProductsLayout() {
                             setPendingImages={setPendingImages}
                             draggedImageIdx={draggedImageIdx}
                             isDraggingImage={isDraggingImage}
+                            categories={categories}
                             handleChange={handleChange}
                             handleImageChange={handleImageChange}
                             handleSubmit={handleSubmit}
@@ -141,6 +159,32 @@ export default function ProductsLayout() {
                     </DialogContent>
                 </Dialog>
             </div>
+            <div className="mt-6 mb-4 w-full md:w-fit flex flex-col md:flex-row items-center gap-3 md:gap-6 bg-white/80 border border-gray-200 rounded-xl shadow-sm px-4 py-3">
+                <div className="relative w-full md:w-72">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <Search className="w-5 h-5" />
+                    </span>
+                    <Input
+                        placeholder="Cari produk..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full h-10 pl-10 pr-3 bg-white border border-gray-300 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition placeholder:text-gray-400"
+                    />
+                </div>
+                <Select value={selectedCategory} onValueChange={(value) => setSelectedCategory(value === 'all' ? '' : value)}>
+                    <SelectTrigger className="w-full md:w-48 h-10 bg-white border border-gray-300 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition">
+                        <SelectValue placeholder="Semua Kategori" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">Semua Kategori</SelectItem>
+                        {categories.map((cat, index) => (
+                            <SelectItem key={index} value={cat.name}>
+                                {cat.name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
             {/* Product Cards Grid */}
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {loading ? (
@@ -155,6 +199,17 @@ export default function ProductsLayout() {
                         </svg>
                         <h4 className="text-lg font-semibold mb-1">Belum ada produk</h4>
                         <p className="text-muted-foreground text-sm">Produk belum tersedia. Mulai tambahkan produk baru untuk mengisi toko Anda.</p>
+                    </div>
+                ) : paginatedProducts.length === 0 ? (
+                    <div className="col-span-full flex flex-col items-center justify-center py-8 border rounded-2xl bg-white/95 shadow-md">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" className="w-20 h-20 mb-4 opacity-80 mx-auto" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#888" strokeWidth="2" fill="#f3f4f6" />
+                            <path d="M8 15c1.333-2 6.667-2 8 0" stroke="#888" strokeWidth="1.5" strokeLinecap="round" />
+                            <circle cx="9" cy="10" r="1" fill="#888" />
+                            <circle cx="15" cy="10" r="1" fill="#888" />
+                        </svg>
+                        <h4 className="text-lg font-semibold mb-1">Produk tidak ditemukan</h4>
+                        <p className="text-muted-foreground text-sm">Tidak ada produk yang cocok dengan kriteria pencarian Anda.</p>
                     </div>
                 ) : (
                     paginatedProducts.map((product, idx) => (
@@ -230,7 +285,7 @@ export default function ProductsLayout() {
                 )}
             </div>
             {/* Pagination */}
-            {products.length > itemsPerPage && (
+            {filteredProducts.length > itemsPerPage && (
                 <div className="py-4 flex justify-center">
                     <Pagination>
                         <PaginationContent>

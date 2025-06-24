@@ -12,6 +12,7 @@ import { slugify } from "@/base/helper/slugify";
 
 export function useManagamentProducts() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<{ name: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -24,6 +25,7 @@ export function useManagamentProducts() {
     stock: 0,
     image_urls: [] as string[],
     status: "tersedia",
+    category: "",
   });
   const [creating, setCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -52,7 +54,16 @@ export function useManagamentProducts() {
       if (!error && data) setProducts(data as Product[]);
       setLoading(false);
     };
+    const fetchCategories = async () => {
+      const { data, error } = await supabase
+        .from("productscategory")
+        .select("name");
+      if (!error && data) {
+        setCategories(data as { name: string }[]);
+      }
+    };
     fetchProducts();
+    fetchCategories();
   }, [creating]);
 
   const openCreateModal = () => {
@@ -64,6 +75,7 @@ export function useManagamentProducts() {
       stock: 0,
       image_urls: [],
       status: "tersedia",
+      category: "",
     });
     setImagePreviews([]);
     setIsEditMode(false);
@@ -79,6 +91,7 @@ export function useManagamentProducts() {
       stock: product.stock,
       image_urls: product.image_urls || [],
       status: product.status || "tersedia",
+      category: product.category || "",
     });
     setImagePreviews(product.image_urls || []);
     setIsEditMode(true);
@@ -152,6 +165,7 @@ export function useManagamentProducts() {
           stock: parseInt(form.stock.toString()),
           image_urls: finalImageUrls,
           status: form.status,
+          category: form.category,
         })
         .eq("id", editingId);
       error = res.error;
@@ -171,6 +185,7 @@ export function useManagamentProducts() {
           stock: parseInt(form.stock.toString()),
           image_urls: finalImageUrls,
           status: form.status,
+          category: form.category,
         });
       error = res.error;
       if (!error) {
@@ -287,6 +302,7 @@ export function useManagamentProducts() {
   return {
     products,
     setProducts,
+    categories,
     loading,
     setLoading,
     modalOpen,

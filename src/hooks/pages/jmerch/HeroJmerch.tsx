@@ -14,7 +14,7 @@ export default function JmerchHero() {
     const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
     return (
-        <div className="relative sm:h-[70vh] mt-20 overflow-hidden">
+        <div className="relative h-[70vh] mt-20 overflow-hidden">
             <motion.div
                 className="absolute inset-0"
                 style={{ y }}
@@ -26,20 +26,20 @@ export default function JmerchHero() {
                     priority
                 />
                 <motion.div
-                    className="absolute inset-0 flex flex-col items-center justify-center gap-12 z-10"
+                    className="absolute inset-0 flex flex-col items-center justify-center gap-8 z-10 p-4 md:gap-12"
                     style={{ opacity }}
                 >
-                    <h3 className='text-4xl md:text-6xl font-bold text-white max-w-3xl text-center'>Tampil Maksimal dengan koleksi produk</h3>
+                    <h3 className='text-3xl font-bold text-white max-w-3xl text-center md:text-5xl lg:text-6xl'>Tampil Maksimal dengan koleksi produk</h3>
 
-                    <div className="flex items-center gap-3 bg-[#ED8002] px-10 py-4 rounded-md -rotate-10">
-                        <span className='text-3xl text-white transition-all duration-300 font-bold' style={{
+                    <div className="flex items-center gap-3 bg-[#ED8002] px-8 py-3 rounded-md -rotate-10 sm:px-10 sm:py-4">
+                        <span className='text-2xl text-white transition-all duration-300 font-bold sm:text-3xl' style={{
                             letterSpacing: 5
                         }}>
                             JMERCH
                         </span>
                     </div>
 
-                    <span className='text-sm md:text-xl text-white/90 max-w-[450px] text-center'>100% keuntungan dari JMerch digunakan untuk operasional kegiatan Jakarta Mengabdi</span>
+                    <span className='text-sm text-white/90 max-w-xs text-center sm:max-w-md md:text-lg'>100% keuntungan dari JMerch digunakan untuk operasional kegiatan Jakarta Mengabdi</span>
                 </motion.div>
             </motion.div>
         </div>

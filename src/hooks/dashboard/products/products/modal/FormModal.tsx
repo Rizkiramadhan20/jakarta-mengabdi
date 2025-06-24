@@ -36,6 +36,7 @@ interface FormModalProps {
     setPendingImages: (imgs: File[]) => void;
     draggedImageIdx: number | null;
     isDraggingImage: boolean;
+    categories: { name: string }[];
     handleChange: (e: React.ChangeEvent<any>) => void;
     handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -63,6 +64,7 @@ const FormModal: React.FC<FormModalProps> = ({
     setPendingImages,
     draggedImageIdx,
     isDraggingImage,
+    categories,
     handleChange,
     handleImageChange,
     handleSubmit,
@@ -87,7 +89,7 @@ const FormModal: React.FC<FormModalProps> = ({
                     <Input id="slug" name="slug" value={form.slug} readOnly required placeholder="contoh: produk-anak-yatim" />
                 </div>
             </div>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+            <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
                 <div className='flex flex-col gap-2'>
                     <Label htmlFor="price">Harga</Label>
                     <Input
@@ -109,6 +111,22 @@ const FormModal: React.FC<FormModalProps> = ({
                 <div className='flex flex-col gap-2'>
                     <Label htmlFor="stock">Stok</Label>
                     <Input id="stock" name="stock" type="text" value={form.stock === 0 ? '' : form.stock.toString()} onChange={handleChange} required min="0" />
+                </div>
+                <div className='flex flex-col gap-2'>
+                    <Label htmlFor="category">Category</Label>
+                    <Select
+                        value={form.category}
+                        onValueChange={value => setForm({ ...form, category: value })}
+                    >
+                        <SelectTrigger className="w-full rounded-md border px-3 py-2 text-sm">
+                            <SelectValue placeholder="Pilih kategori" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {categories.map((cat, index) => (
+                                <SelectItem key={index} value={cat.name}>{cat.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
                 <div className='flex flex-col gap-2'>
                     <Label htmlFor="status">Status</Label>
