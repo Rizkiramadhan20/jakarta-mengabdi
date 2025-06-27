@@ -35,14 +35,14 @@ export default function KakaSakuLayout({ kakaSakuData }: { kakaSakuData: KakaSak
     };
 
     return (
-        <section className='pt-28 pb-10'>
+        <section className='pt-28 py-10'>
             <div className="container px-4 md:px-8">
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
                     {
                         paginatedData.map((item, idx) => {
                             const progress = (item.current_amount / item.target_amount) * 100
                             return (
-                                <Card key={idx} className="group overflow-hidden border-0 transition-all duration-300 bg-white rounded-xl">
+                                <Card key={idx} className="group overflow-hidden border-0 transition-all duration-300 bg-white rounded-xl p-0 pb-6">
                                     <CardHeader className="p-0 relative">
                                         <div className="aspect-[4/3] relative overflow-hidden">
                                             <Image
@@ -54,6 +54,21 @@ export default function KakaSakuLayout({ kakaSakuData }: { kakaSakuData: KakaSak
 
                                             {/* Overlay gradient */}
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                                            <div className="absolute bottom-3 right-3">
+                                                <span className={`px-3 py-1 text-md font-semibold text-white rounded-full shadow-md ${item.status.toLowerCase() === 'open'
+                                                    ? 'bg-orange-500'
+                                                    : 'bg-red-600'
+                                                    }`}>
+                                                    {item.status}
+                                                </span>
+                                            </div>
+                                            {/* Deadline Badge */}
+                                            <div className="absolute bottom-3 left-3">
+                                                <span className="px-3 py-1 text-md font-semibold text-white bg-black/70 rounded-full shadow-md">
+                                                    {item.deadline}
+                                                </span>
+                                            </div>
                                         </div>
                                     </CardHeader>
 
@@ -62,7 +77,7 @@ export default function KakaSakuLayout({ kakaSakuData }: { kakaSakuData: KakaSak
                                             {item.title}
                                         </CardTitle>
 
-                                        <div className='flex flex-col space-y-2'>
+                                        <div className='flex flex-col space-y-4'>
                                             <Progress value={progress} className="h-2" />
                                             <div className='flex items-center gap-1'>
                                                 <span className='text-sm text-orange-500 font-semibold'>Rp{formatIDR(item.current_amount)}</span>

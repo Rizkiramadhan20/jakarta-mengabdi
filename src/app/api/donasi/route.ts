@@ -14,7 +14,9 @@ export async function GET(request: Request) {
   try {
     const { data, error } = await supabase
       .from(process.env.NEXT_PUBLIC_DONATIONS as string)
-      .select("*")
+      .select(
+        "title,slug,image_url,target_amount,current_amount,status,deadline"
+      )
       .order("created_at", { ascending: false });
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

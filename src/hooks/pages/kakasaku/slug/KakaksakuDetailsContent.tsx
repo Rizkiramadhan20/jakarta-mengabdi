@@ -48,6 +48,18 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
     const { profile } = useAuth();
     const router = useRouter();
 
+    // Early return if kakaSakuData is null
+    if (!kakaSakuData) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Data tidak ditemukan</h2>
+                    <p className="text-gray-600">Kaka Saku yang Anda cari tidak ditemukan atau telah dihapus.</p>
+                </div>
+            </div>
+        );
+    }
+
     // Get unique timeline types for filter options (excluding 'all')
     const timelineTypes = useMemo(() => {
         const types = kakaSakuData?.timeline?.map(item => item.type) || [];
@@ -198,26 +210,15 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
         window.location.href = `/kakaksaku/${kakaSakuData.slug}?success=1`;
     };
 
-    if (!kakaSakuData) {
-        return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-4">Data Tidak Ditemukan</h1>
-                    <p className="text-gray-600">KakaSaku yang Anda cari tidak ditemukan.</p>
-                </div>
-            </div>
-        );
-    }
-
     const daysLeft = kakaSakuData.deadline ? Math.ceil((new Date(kakaSakuData.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 30;
     const progress = (kakaSakuData.current_amount / kakaSakuData.target_amount) * 100;
 
     // Filter timeline based on selected type
     const filteredTimeline = useMemo(() => {
         if (!selectedType) {
-            return kakaSakuData.timeline;
+            return kakaSakuData.timeline || [];
         }
-        return kakaSakuData.timeline.filter(item => item.type === selectedType);
+        return (kakaSakuData.timeline || []).filter(item => item.type === selectedType);
     }, [kakaSakuData.timeline, selectedType]);
 
     return (
@@ -243,21 +244,25 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                         {/* Timeline Filter */}
                         <div className="mt-6">
                             <div className="flex justify-between items-center gap-2 p-6 border-2 border-orange-400 rounded-lg bg-white z-50 relative overflow-x-auto flex-nowrap scrollbar-thin scrollbar-thumb-orange-200 scrollbar-track-transparent">
-                                {timelineTypes.map((type) => (
-                                    <div
-                                        key={type}
-                                        onClick={() => setSelectedType(selectedType === type ? '' : type)}
-                                        className={`${selectedType === type ? "font-bold" : ""} text-md cursor-pointer whitespace-nowrap px-3 py-1`}
-                                    >
-                                        {type}
-                                    </div>
-                                ))}
+                                {timelineTypes && timelineTypes.length > 0 ? (
+                                    timelineTypes.map((type) => (
+                                        <div
+                                            key={type}
+                                            onClick={() => setSelectedType(selectedType === type ? '' : type)}
+                                            className={`${selectedType === type ? "font-bold" : ""} text-md cursor-pointer whitespace-nowrap px-3 py-1`}
+                                        >
+                                            {type}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-gray-500">Tidak ada timeline tersedia</div>
+                                )}
                             </div>
                         </div>
 
                         {/* Timeline Display */}
                         <div className="flex justify-between items-center -mt-6 z-10 relative">
-                            {
+                            {filteredTimeline && filteredTimeline.length > 0 ? (
                                 filteredTimeline.map((item, idx) => {
                                     return (
                                         <div key={idx} className="flex items-center gap-2">
@@ -273,7 +278,9 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                                         </div>
                                     )
                                 })
-                            }
+                            ) : (
+                                <div className="text-gray-500">Tidak ada timeline untuk ditampilkan</div>
+                            )}
                         </div>
                     </div>
 

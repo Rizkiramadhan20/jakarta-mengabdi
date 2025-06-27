@@ -2,15 +2,26 @@ import { Category } from "@/interface/products";
 
 export const fetchProductscategoryData = async (): Promise<Category[]> => {
   try {
+    // Lewati pengambilan selama waktu pembuatan jika BASE_URL tidak tersedia
+    if (!process.env.NEXT_PUBLIC_BASE_URL) {
+      console.warn(
+        "NEXT_PUBLIC_BASE_URL tidak tersedia selama waktu pembangunan"
+      );
+      return [];
+    }
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/products-category`,
       {
         headers: {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_SECRET}`,
         },
-        next: {
-          revalidate: 5, // Validasi ulang setiap 5 detik
-        },
+        // Tambahkan validasi ulang hanya jika tidak dalam mode pembuatan
+        ...(process.env.NODE_ENV !== "production" && {
+          next: {
+            revalidate: 5, // Validasi ulang setiap 5 detik
+          },
+        }),
       }
     );
 
@@ -19,9 +30,9 @@ export const fetchProductscategoryData = async (): Promise<Category[]> => {
     }
 
     const data = await response.json();
-    return data || []; // Return data directly, with fallback to empty array
+    return data || []; // Mengembalikan data secara langsung, dengan fallback ke array kosong
   } catch (error) {
     console.error("Error fetching products category data:", error);
-    throw error;
+    return [];
   }
 };

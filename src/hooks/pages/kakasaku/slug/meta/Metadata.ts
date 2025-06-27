@@ -4,15 +4,19 @@ import { KakaSaku } from "@/interface/kakaSaku";
 
 export async function getKakaSaku(slug: string): Promise<KakaSaku | null> {
   try {
+    // Skip fetch during build time if BASE_URL is not available
+    if (!process.env.NEXT_PUBLIC_BASE_URL) {
+      console.warn("NEXT_PUBLIC_BASE_URL not available during build time");
+      return null;
+    }
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/kakasaku`,
       {
         headers: {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_SECRET}`,
         },
-        next: {
-          revalidate: 5, // Validasi ulang setiap 5 detik
-        },
+        // Remove next.revalidate to prevent build-time fetching
       }
     );
 
@@ -28,6 +32,7 @@ export async function getKakaSaku(slug: string): Promise<KakaSaku | null> {
     return kakaSakuItem || null;
   } catch (error) {
     console.error("Error fetching kaka saku:", error);
+    // Return null instead of throwing to prevent build failures
     return null;
   }
 }
