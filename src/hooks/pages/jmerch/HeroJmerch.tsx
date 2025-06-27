@@ -14,7 +14,7 @@ export default function JmerchHero() {
     const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
     return (
-        <div className="relative h-[70vh] mt-20 overflow-hidden">
+        <div className="relative h-[70vh] mt-14 overflow-hidden">
             <motion.div
                 className="absolute inset-0"
                 style={{ y }}

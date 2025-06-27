@@ -32,6 +32,10 @@ import { Banknote } from 'lucide-react';
 
 import { Textarea } from '@/components/ui/textarea';
 
+import { format } from 'date-fns';
+
+import { id } from 'date-fns/locale';
+
 interface DonasiDetailsContentProps {
     donasiData: Donasi | null;
 }
@@ -380,7 +384,7 @@ export default function DonasiDetailsContent({ donasiData }: DonasiDetailsConten
                                                         )}
                                                         <div>
                                                             <div className="font-semibold">{pr.name}</div>
-                                                            <div className="text-xs text-gray-500 mb-1">{pr.email}</div>
+                                                            <div className="text-xs text-gray-500 mb-1">{pr.created_at ? format(new Date(pr.created_at), 'dd MMMM yyyy, HH:mm', { locale: id }) : ''}</div>
                                                             <div className="italic">{pr.prayer}</div>
                                                         </div>
                                                     </div>
