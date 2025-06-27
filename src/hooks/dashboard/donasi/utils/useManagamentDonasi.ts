@@ -48,7 +48,36 @@ export function useManagamentDonasi() {
         .from(process.env.NEXT_PUBLIC_DONATIONS as string)
         .select("*")
         .order("created_at", { ascending: false });
-      if (!error && data) setDonasi(data as Donasi[]);
+      if (!error && data) {
+        const now = new Date();
+        // Cek donasi yang sudah lewat deadline dan status masih open
+        const toClose = data.filter((d: any) => {
+          if (d.status === "open" && d.deadline) {
+            const deadlineDate = new Date(d.deadline);
+            return deadlineDate < now;
+          }
+          return false;
+        });
+        // Update status di database jika ada yang perlu di-close
+        if (toClose.length > 0) {
+          await Promise.all(
+            toClose.map((d: any) =>
+              supabase
+                .from(process.env.NEXT_PUBLIC_DONATIONS as string)
+                .update({ status: "closed" })
+                .eq("id", d.id)
+            )
+          );
+          // Fetch ulang data setelah update
+          const { data: updatedData } = await supabase
+            .from(process.env.NEXT_PUBLIC_DONATIONS as string)
+            .select("*")
+            .order("created_at", { ascending: false });
+          setDonasi(updatedData as Donasi[]);
+        } else {
+          setDonasi(data as Donasi[]);
+        }
+      }
       setLoading(false);
     };
     fetchDonasi();

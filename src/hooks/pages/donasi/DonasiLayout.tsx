@@ -1,4 +1,6 @@
-import React from 'react'
+"use client"
+
+import React, { useState } from 'react'
 
 import { Donasi } from "@/interface/donasi"
 
@@ -18,13 +20,29 @@ import { Button } from '@/components/ui/button'
 
 import Link from 'next/link'
 
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination'
+
 export default function DonasiLayout({ donasiData }: { donasiData: Donasi[] }) {
+    const ITEMS_PER_PAGE = 8;
+
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const totalPages = Math.ceil(donasiData.length / ITEMS_PER_PAGE);
+
+    const paginatedData = donasiData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
     return (
         <section className='pb-10'>
             <div className="container px-4 md:px-8">
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
                     {
-                        donasiData.map((item, idx) => {
+                        paginatedData.map((item, idx) => {
                             const progress = (item.current_amount / item.target_amount) * 100
                             return (
                                 <Card key={idx} className="group overflow-hidden border-0 transition-all duration-300 bg-white rounded-xl">
@@ -77,6 +95,41 @@ export default function DonasiLayout({ donasiData }: { donasiData: Donasi[] }) {
                         })
                     }
                 </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="mt-8 flex justify-center">
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious
+                                        href="#"
+                                        onClick={e => { e.preventDefault(); handlePageChange(currentPage - 1); }}
+                                        aria-disabled={currentPage === 1}
+                                    />
+                                </PaginationItem>
+                                {Array.from({ length: totalPages }).map((_, idx) => (
+                                    <PaginationItem key={idx}>
+                                        <PaginationLink
+                                            href="#"
+                                            isActive={currentPage === idx + 1}
+                                            onClick={e => { e.preventDefault(); handlePageChange(idx + 1); }}
+                                        >
+                                            {idx + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
+                                <PaginationItem>
+                                    <PaginationNext
+                                        href="#"
+                                        onClick={e => { e.preventDefault(); handlePageChange(currentPage + 1); }}
+                                        aria-disabled={currentPage === totalPages}
+                                    />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
+                )}
             </div>
         </section>
     )

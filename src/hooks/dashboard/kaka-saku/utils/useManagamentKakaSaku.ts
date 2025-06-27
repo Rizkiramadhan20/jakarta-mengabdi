@@ -71,7 +71,36 @@ export function useManagamentKakaSaku() {
         .from(process.env.NEXT_PUBLIC_KAKA_SAKU as string)
         .select("*")
         .order("created_at", { ascending: false });
-      if (!error && data) setKakasaku(data as KakaSaku[]);
+      if (!error && data) {
+        const now = new Date();
+        // Cek yang sudah lewat deadline dan status masih open
+        const toClose = data.filter((d: any) => {
+          if (d.status === "open" && d.deadline) {
+            const deadlineDate = new Date(d.deadline);
+            return deadlineDate < now;
+          }
+          return false;
+        });
+        // Update status di database jika ada yang perlu di-close
+        if (toClose.length > 0) {
+          await Promise.all(
+            toClose.map((d: any) =>
+              supabase
+                .from(process.env.NEXT_PUBLIC_KAKA_SAKU as string)
+                .update({ status: "closed" })
+                .eq("id", d.id)
+            )
+          );
+          // Fetch ulang data setelah update
+          const { data: updatedData } = await supabase
+            .from(process.env.NEXT_PUBLIC_KAKA_SAKU as string)
+            .select("*")
+            .order("created_at", { ascending: false });
+          setKakasaku(updatedData as KakaSaku[]);
+        } else {
+          setKakasaku(data as KakaSaku[]);
+        }
+      }
       setLoading(false);
     };
     fetchKakaSaku();

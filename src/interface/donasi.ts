@@ -30,6 +30,21 @@ export type DonasiFormData = {
   message_template?: string;
 };
 
+export interface DonasiPagination {
+  currentPage: number;
+  hasPrevPage: boolean;
+  prevPage: number | null;
+  hasNextPage: boolean;
+  nextPage: number | null;
+  totalPages: number;
+}
+
+export interface DonasiPaginatedResponse {
+  data: Donasi[];
+  pagination: DonasiPagination;
+  total: number;
+}
+
 export interface FormModalProps {
   isEditMode: boolean;
   form: DonasiFormData;

@@ -1,8 +1,10 @@
-import React from 'react'
+"use client"
+
+import React, { useState } from 'react'
 
 import { KakaSaku } from '@/interface/kakaSaku'
 
-import { BadgeCheck, Heart } from 'lucide-react'
+import { BadgeCheck } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -18,13 +20,26 @@ import Link from 'next/link'
 
 import logo from "@/base/assets/Ellipse.png"
 
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination'
+
 export default function KakaSakuLayout({ kakaSakuData }: { kakaSakuData: KakaSaku[] }) {
+    const ITEMS_PER_PAGE = 8;
+    const [currentPage, setCurrentPage] = useState(1);
+    const totalPages = Math.ceil(kakaSakuData.length / ITEMS_PER_PAGE);
+    const paginatedData = kakaSakuData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
     return (
         <section className='pt-28 pb-10'>
             <div className="container px-4 md:px-8">
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
                     {
-                        kakaSakuData.map((item, idx) => {
+                        paginatedData.map((item, idx) => {
                             const progress = (item.current_amount / item.target_amount) * 100
                             return (
                                 <Card key={idx} className="group overflow-hidden border-0 transition-all duration-300 bg-white rounded-xl">
@@ -80,6 +95,43 @@ export default function KakaSakuLayout({ kakaSakuData }: { kakaSakuData: KakaSak
                         })
                     }
                 </div>
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <>
+                        <div className="text-center text-xs text-gray-500 mt-4 mb-2">KakaSaku of Jakarta Mengabdi</div>
+                        <div className="mt-2 flex justify-center">
+                            <Pagination>
+                                <PaginationContent>
+                                    <PaginationItem>
+                                        <PaginationPrevious
+                                            href="#"
+                                            onClick={e => { e.preventDefault(); handlePageChange(currentPage - 1); }}
+                                            aria-disabled={currentPage === 1}
+                                        />
+                                    </PaginationItem>
+                                    {Array.from({ length: totalPages }).map((_, idx) => (
+                                        <PaginationItem key={idx}>
+                                            <PaginationLink
+                                                href="#"
+                                                isActive={currentPage === idx + 1}
+                                                onClick={e => { e.preventDefault(); handlePageChange(idx + 1); }}
+                                            >
+                                                {idx + 1}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    ))}
+                                    <PaginationItem>
+                                        <PaginationNext
+                                            href="#"
+                                            onClick={e => { e.preventDefault(); handlePageChange(currentPage + 1); }}
+                                            aria-disabled={currentPage === totalPages}
+                                        />
+                                    </PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
+                        </div>
+                    </>
+                )}
             </div>
         </section>
     )
