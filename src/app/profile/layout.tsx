@@ -35,7 +35,7 @@ export default function ProfileLayout({
     }, []);
 
     if (!user) {
-        redirect("/signin");
+        redirect("/");
     }
 
     return (
@@ -62,7 +62,7 @@ export default function ProfileLayout({
                 </SheetContent>
             </Sheet>
 
-            <div className="flex-1 lg:ml-[14%]">
+            <div className="flex-1 lg:ml-72">
                 <main className="p-4 lg:p-6">
                     {children}
                 </main>

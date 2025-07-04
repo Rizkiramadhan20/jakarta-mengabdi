@@ -13,6 +13,8 @@ export async function POST(req: NextRequest) {
     kaka_saku_id,
     name,
     email,
+    photo_url,
+    image_url,
     amount,
     status,
     payment_type,
@@ -31,6 +33,8 @@ export async function POST(req: NextRequest) {
         kaka_saku_id,
         name,
         email,
+        photo_url,
+        image_url,
         amount,
         status,
         payment_type,
@@ -63,4 +67,21 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ success: true });
+}
+
+export async function GET(req: NextRequest) {
+  const kaka_saku_id = req.nextUrl.searchParams.get("kaka_saku_id");
+  if (!kaka_saku_id) {
+    return NextResponse.json({ transactions: [] });
+  }
+  const { data, error } = await supabase
+    .from(process.env.NEXT_PUBLIC_KAKASAKU_TRANSACTION as string)
+    .select("*")
+    .eq("kaka_saku_id", kaka_saku_id)
+    .order("transaction_time", { ascending: false });
+
+  if (error) {
+    return NextResponse.json({ transactions: [] });
+  }
+  return NextResponse.json({ transactions: data });
 }

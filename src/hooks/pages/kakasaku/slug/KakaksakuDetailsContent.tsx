@@ -134,6 +134,7 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
         const email = profile?.email || 'donatur@email.com';
         const photo_url = profile?.photo_url || null;
         const gross_amount = result.gross_amount || price;
+        const image_url = Array.isArray(kakaSakuData.image_url) ? kakaSakuData.image_url[0] : kakaSakuData.image_url || null;
         await fetch('/api/kakasaku/insert-transaction', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -143,6 +144,7 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                 name,
                 email,
                 photo_url,
+                image_url,
                 amount: gross_amount,
                 status,
                 payment_type: result.payment_type,
@@ -207,7 +209,7 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
         });
         setShowPrayerModal(false);
         setPrayer("");
-        window.location.href = `/kakaksaku/${kakaSakuData.slug}?success=1`;
+        router.push(`/kakaksaku/${kakaSakuData.slug}/transaction?status=success`);
     };
 
     const daysLeft = kakaSakuData.deadline ? Math.ceil((new Date(kakaSakuData.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 30;

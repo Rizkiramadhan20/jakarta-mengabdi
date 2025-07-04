@@ -69,7 +69,7 @@ const sidebarNavItems: NavItem[] = [
         href: "/profile/kakasaku",
         icon: CreditCard,
         subItems: [
-            { title: "Tranksaksi", href: "/profile/kakasaku/Kakasaku" },
+            { title: "Tranksaksi", href: "/profile/kakasaku/kakasaku" },
             { title: "Tertunda", href: "/profile/kakasaku/pending" },
             { title: "Selesai", href: "/profile/kakasaku/completed" },
         ],
