@@ -16,12 +16,7 @@ export const fetchProductscategoryData = async (): Promise<Category[]> => {
         headers: {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_SECRET}`,
         },
-        // Tambahkan validasi ulang hanya jika tidak dalam mode pembuatan
-        ...(process.env.NODE_ENV !== "production" && {
-          next: {
-            revalidate: 5, // Validasi ulang setiap 5 detik
-          },
-        }),
+        next: { revalidate: 5 },
       }
     );
 

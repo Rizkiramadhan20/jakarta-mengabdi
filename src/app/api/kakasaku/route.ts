@@ -19,13 +19,19 @@ export async function GET(request: Request) {
       )
       .order("created_at", { ascending: false });
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500, headers: { "Cache-Control": "no-store" } }
+      );
     }
-    return NextResponse.json(data || []);
+    return NextResponse.json(data || [], {
+      status: 200,
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to fetch kaka saku" },
-      { status: 500 }
+      { status: 500, headers: { "Cache-Control": "no-store" } }
     );
   }
 }

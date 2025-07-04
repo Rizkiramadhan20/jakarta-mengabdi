@@ -80,7 +80,7 @@ export default function KakaSakuLayout({ kakaSakuData }: { kakaSakuData: KakaSak
                                         <div className='flex flex-col space-y-4'>
                                             <Progress value={progress} className="h-2" />
                                             <div className='flex items-center gap-1'>
-                                                <span className='text-sm text-orange-500 font-semibold'>Rp{formatIDR(item.current_amount)}</span>
+                                                <span className='text-sm text-orange-500 font-semibold'>Rp{formatIDR(item?.current_amount)}</span>
                                                 <span className='text-sm text-gray-500'>terkumpul dari</span>
                                                 <span className='text-sm text-gray-500'>Rp{formatIDR(item.target_amount)}</span>
                                             </div>

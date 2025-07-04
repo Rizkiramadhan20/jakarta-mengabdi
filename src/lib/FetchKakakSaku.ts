@@ -2,26 +2,13 @@ import { KakaSaku } from "@/interface/kakaSaku";
 
 export const fetchKakakSakuData = async (): Promise<KakaSaku[]> => {
   try {
-    // Lewati pengambilan selama waktu pembuatan jika BASE_URL tidak tersedia
-    if (!process.env.NEXT_PUBLIC_BASE_URL) {
-      console.warn(
-        "NEXT_PUBLIC_BASE_URL tidak tersedia selama waktu pembangunan"
-      );
-      return [];
-    }
-
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/kakasaku`,
       {
         headers: {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_SECRET}`,
         },
-        // Tambahkan validasi ulang hanya jika tidak dalam mode pembuatan
-        ...(process.env.NODE_ENV !== "production" && {
-          next: {
-            revalidate: 5, // Validasi ulang setiap 5 detik
-          },
-        }),
+        next: { revalidate: 5 },
       }
     );
 
@@ -41,26 +28,12 @@ export const fetchKakaSakuBySlug = async (
   slug: string
 ): Promise<KakaSaku | null> => {
   try {
-    // Lewati pengambilan selama waktu pembuatan jika BASE_URL tidak tersedia
-    if (!process.env.NEXT_PUBLIC_BASE_URL) {
-      console.warn(
-        "NEXT_PUBLIC_BASE_URL tidak tersedia selama waktu pembangunan"
-      );
-      return null;
-    }
-
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/kakasaku/${slug}`,
       {
         headers: {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_SECRET}`,
         },
-        // Tambahkan validasi ulang hanya jika tidak dalam mode pembuatan
-        ...(process.env.NODE_ENV !== "production" && {
-          next: {
-            revalidate: 5, // Validasi ulang setiap 5 detik
-          },
-        }),
       }
     );
 

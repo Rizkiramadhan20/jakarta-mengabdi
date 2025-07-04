@@ -14,12 +14,7 @@ export const fetchDonasiData = async (): Promise<Donasi[]> => {
         headers: {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_SECRET}`,
         },
-        // Only add revalidate if not in build mode
-        ...(process.env.NODE_ENV !== "production" && {
-          next: {
-            revalidate: 5, // Validasi ulang setiap 5 detik
-          },
-        }),
+        next: { revalidate: 5 },
       }
     );
 
@@ -52,12 +47,7 @@ export const fetchDonasiBySlug = async (
         headers: {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_SECRET}`,
         },
-        // Only add revalidate if not in build mode
-        ...(process.env.NODE_ENV !== "production" && {
-          next: {
-            revalidate: 5, // Validasi ulang setiap 5 detik
-          },
-        }),
+        next: { revalidate: 5 },
       }
     );
 
