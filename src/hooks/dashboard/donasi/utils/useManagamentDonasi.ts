@@ -46,7 +46,9 @@ export function useManagamentDonasi() {
       setLoading(true);
       const { data, error } = await supabase
         .from(process.env.NEXT_PUBLIC_DONATIONS as string)
-        .select("*")
+        .select(
+          "id,title,description,image_url,donations,share,target_amount,current_amount,status,deadline,created_at,message_template"
+        )
         .order("created_at", { ascending: false });
       if (!error && data) {
         const now = new Date();

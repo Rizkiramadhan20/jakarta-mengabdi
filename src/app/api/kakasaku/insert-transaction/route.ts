@@ -85,3 +85,42 @@ export async function GET(req: NextRequest) {
   }
   return NextResponse.json({ transactions: data });
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { id } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Transaction ID is required" },
+        { status: 400 }
+      );
+    }
+
+    console.log("Attempting to delete transaction with ID:", id);
+
+    // Delete the transaction using service role key
+    const { error: deleteError } = await supabase
+      .from(process.env.NEXT_PUBLIC_KAKASAKU_TRANSACTION as string)
+      .delete()
+      .eq("id", id);
+
+    if (deleteError) {
+      console.error("Error deleting transaction:", deleteError);
+      return NextResponse.json({ error: deleteError.message }, { status: 500 });
+    }
+
+    console.log("Transaction deleted successfully");
+    return NextResponse.json({
+      success: true,
+      message: "Transaction deleted successfully",
+    });
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

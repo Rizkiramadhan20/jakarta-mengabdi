@@ -52,28 +52,45 @@ export const menuItems = [
   },
 
   {
-    href: "/dashboard/transaction",
-    label: "Transaksi",
-    icon: ArrowLeftRight,
+    href: "/dashboard/kakasakutransaction",
+    label: "Kaka Saku Transaction",
+    icon: HandCoins,
     subItems: [
       {
-        href: "/dashboard/transaction/transaction",
-        label: "Transaksi",
+        href: "/dashboard/kakasakutransaction/kakasakutransaction",
+        label: "Kaka Saku Transaction",
       },
 
       {
-        href: "/dashboard/transaction/pending",
-        label: "Tertunda",
+        href: "/dashboard/kakasakutransaction/pending",
+        label: "Pending",
       },
 
       {
-        href: "/dashboard/transaction/delivery",
-        label: "Pengiriman",
+        href: "/dashboard/kakasakutransaction/completed",
+        label: "Completed",
+      },
+    ],
+  },
+
+  {
+    href: "/dashboard/donasitransaction",
+    label: "Donasi Transaction",
+    icon: Gift,
+    subItems: [
+      {
+        href: "/dashboard/donasitransaction/donasitransaction",
+        label: "Donasi Transaction",
       },
 
       {
-        href: "/dashboard/transaction/completed",
-        label: "Selesai",
+        href: "/dashboard/donasitransaction/pending",
+        label: "Pending",
+      },
+
+      {
+        href: "/dashboard/donasitransaction/completed",
+        label: "Completed",
       },
     ],
   },

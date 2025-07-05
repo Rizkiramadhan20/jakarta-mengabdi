@@ -69,7 +69,9 @@ export function useManagamentKakaSaku() {
       setLoading(true);
       const { data, error } = await supabase
         .from(process.env.NEXT_PUBLIC_KAKA_SAKU as string)
-        .select("*")
+        .select(
+          "id,title,description,image_url,kakaksaku,share,target_amount,current_amount,status,deadline,created_at,message_template"
+        )
         .order("created_at", { ascending: false });
       if (!error && data) {
         const now = new Date();
