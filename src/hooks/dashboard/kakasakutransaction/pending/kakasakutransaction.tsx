@@ -57,7 +57,7 @@ export default function Kakasakutransaction() {
     const [kakaSakuList, setKakaSakuList] = useState<KakaSaku[]>([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
-    const [statusFilter, setStatusFilter] = useState<string>('all');
+
     const [kakaSakuFilter, setKakaSakuFilter] = useState<string>('all');
     const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
     const [currentPage, setCurrentPage] = useState(1);
@@ -161,19 +161,22 @@ export default function Kakasakutransaction() {
     };
 
     const filteredTransactions = transactions.filter(trx => {
+        // Hanya tampilkan transaksi dengan status pending
+        if (trx.status !== 'pending') {
+            return false;
+        }
+
         const matchesSearch =
             trx.name.toLowerCase().includes(search.toLowerCase()) ||
             trx.order_id.toLowerCase().includes(search.toLowerCase()) ||
             trx.email.toLowerCase().includes(search.toLowerCase());
-
-        const matchesStatus = statusFilter === 'all' || trx.status === statusFilter;
 
         const matchesKakaSaku = kakaSakuFilter === 'all' || trx.kaka_saku_id.toString() === kakaSakuFilter;
 
         const matchesDate = !dateFilter || (trx.transaction_time &&
             new Date(trx.transaction_time).toDateString() === dateFilter.toDateString());
 
-        return matchesSearch && matchesStatus && matchesKakaSaku && matchesDate;
+        return matchesSearch && matchesKakaSaku && matchesDate;
     });
 
     const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
@@ -215,16 +218,7 @@ export default function Kakasakutransaction() {
                     />
                 </div>
 
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Filter Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">Semua Status</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="settlement">Settlement</SelectItem>
-                    </SelectContent>
-                </Select>
+
 
                 <Select value={kakaSakuFilter} onValueChange={setKakaSakuFilter}>
                     <SelectTrigger>
