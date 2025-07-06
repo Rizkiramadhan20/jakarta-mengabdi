@@ -26,16 +26,16 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 
 import toast from 'react-hot-toast'
 
-import DeleteModal from '@/hooks/dashboard/kakasakutransaction/kakasakutransaction/modal/DeleteModal'
+import DeleteModal from '@/hooks/dashboard/donasitransaction/donasitransaction/modal/DeleteModal'
 
-import ViewModal from '@/hooks/dashboard/kakasakutransaction/kakasakutransaction/modal/ViewModal'
+import ViewModal from '@/hooks/dashboard/donasitransaction/donasitransaction/modal/ViewModal'
 
-import KakasakutransactionSkelaton from "@/hooks/dashboard/kakasakutransaction/kakasakutransaction/kakasakutransactionSkelaton"
+import DonasitransactionSkeleton from "@/hooks/dashboard/donasitransaction/donasitransaction/donasitransactionSkelaton"
 
-interface KakasakuTransaction {
+interface DonasiTransaction {
     id: string;
     order_id: string;
-    kaka_saku_id: number;
+    donasi_id: number;
     name: string;
     email: string;
     photo_url?: string;
@@ -48,63 +48,68 @@ interface KakasakuTransaction {
     created_at?: string;
 }
 
-interface KakaSaku {
+interface Donasi {
     id: number;
     title: string;
     slug: string;
 }
 
-export default function Kakasakutransaction() {
-    const [transactions, setTransactions] = useState<KakasakuTransaction[]>([]);
-    const [kakaSakuList, setKakaSakuList] = useState<KakaSaku[]>([]);
+export default function Donasitransaction() {
+    const [transactions, setTransactions] = useState<DonasiTransaction[]>([]);
+    const [donasiList, setDonasiList] = useState<Donasi[]>([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
 
-    const [kakaSakuFilter, setKakaSakuFilter] = useState<string>('all');
+    const [donasiFilter, setDonasiFilter] = useState<string>('all');
+    const [statusFilter, setStatusFilter] = useState<string>('all');
     const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
     const [currentPage, setCurrentPage] = useState(1);
     const [viewModalOpen, setViewModalOpen] = useState(false);
-    const [selectedTransaction, setSelectedTransaction] = useState<KakasakuTransaction | null>(null);
+    const [selectedTransaction, setSelectedTransaction] = useState<DonasiTransaction | null>(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [deletingTransaction, setDeletingTransaction] = useState<KakasakuTransaction | null>(null);
+    const [deletingTransaction, setDeletingTransaction] = useState<DonasiTransaction | null>(null);
     const [deleting, setDeleting] = useState(false);
     const itemsPerPage = 10;
 
     useEffect(() => {
         fetchTransactions();
-        fetchKakaSakuList();
+        fetchDonasiList();
     }, []);
 
     const fetchTransactions = async () => {
         setLoading(true);
         const { data, error } = await supabase
-            .from('kakasaku_transactions')
+            .from(process.env.NEXT_PUBLIC_DONASI_TRANSACTION as string)
             .select('*')
             .order('transaction_time', { ascending: false });
 
-        if (!error && data) {
-            setTransactions(data);
+        if (error) {
+            toast.error(`Error: ${error.message}`);
+        } else {
+            setTransactions(data || []);
         }
         setLoading(false);
     };
 
-    const fetchKakaSakuList = async () => {
+    const fetchDonasiList = async () => {
         const { data, error } = await supabase
-            .from(process.env.NEXT_PUBLIC_KAKA_SAKU as string)
+            .from(process.env.NEXT_PUBLIC_DONATIONS as string)
             .select('id, title, slug')
             .order('created_at', { ascending: false });
 
-        if (!error && data) {
-            setKakaSakuList(data);
+        if (error) {
+            toast.error(`Error fetching donasi list: ${error.message}`);
+        } else {
+            setDonasiList(data || []);
         }
     };
 
-    const handleViewTransaction = (transaction: KakasakuTransaction) => {
+    const handleViewTransaction = (transaction: DonasiTransaction) => {
         setSelectedTransaction(transaction);
         setViewModalOpen(true);
     };
 
-    const handleDeleteTransaction = (transaction: KakasakuTransaction) => {
+    const handleDeleteTransaction = (transaction: DonasiTransaction) => {
         setDeletingTransaction(transaction);
         setDeleteModalOpen(true);
     };
@@ -114,7 +119,7 @@ export default function Kakasakutransaction() {
 
         setDeleting(true);
         try {
-            const response = await fetch('/api/kakasaku/insert-transaction', {
+            const response = await fetch('/api/donasi/insert-transaction', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -142,9 +147,9 @@ export default function Kakasakutransaction() {
         }
     };
 
-    const getKakaSakuTitle = (kakaSakuId: number) => {
-        const kakaSaku = kakaSakuList.find(ks => ks.id === kakaSakuId);
-        return kakaSaku?.title || `ID: ${kakaSakuId}`;
+    const getDonasiTitle = (donasiId: number) => {
+        const donasi = donasiList.find(d => d.id === donasiId);
+        return donasi?.title || `ID: ${donasiId}`;
     };
 
     const getStatusBadge = (status: string) => {
@@ -163,22 +168,19 @@ export default function Kakasakutransaction() {
     };
 
     const filteredTransactions = transactions.filter(trx => {
-        // Hanya tampilkan transaksi dengan status pending
-        if (trx.status !== 'pending') {
-            return false;
-        }
-
         const matchesSearch =
             trx.name.toLowerCase().includes(search.toLowerCase()) ||
             trx.order_id.toLowerCase().includes(search.toLowerCase()) ||
             trx.email.toLowerCase().includes(search.toLowerCase());
 
-        const matchesKakaSaku = kakaSakuFilter === 'all' || trx.kaka_saku_id.toString() === kakaSakuFilter;
+        const matchesDonasi = donasiFilter === 'all' || trx.donasi_id.toString() === donasiFilter;
+
+        const matchesStatus = statusFilter === 'all' || trx.status === statusFilter;
 
         const matchesDate = !dateFilter || (trx.transaction_time &&
             new Date(trx.transaction_time).toDateString() === dateFilter.toDateString());
 
-        return matchesSearch && matchesKakaSaku && matchesDate;
+        return matchesSearch && matchesDonasi && matchesStatus && matchesDate;
     });
 
     const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
@@ -187,14 +189,12 @@ export default function Kakasakutransaction() {
         currentPage * itemsPerPage
     );
 
-
-
     return (
         <section>
             <div className='flex flex-col md:flex-row justify-between items-start md:items-center p-4 md:p-6 border rounded-2xl border-border bg-card shadow-sm gap-4'>
                 <div className='flex flex-col gap-3'>
                     <h3 className='text-2xl md:text-3xl font-bold'>
-                        Manajemen Kaka Saku Transaction
+                        Manajemen Donasi Transaction
                     </h3>
                     <ol className='flex gap-2 items-center text-sm text-muted-foreground'>
                         <li className='flex items-center hover:text-primary transition-colors'>
@@ -202,7 +202,7 @@ export default function Kakasakutransaction() {
                             <ChevronRight className="w-4 h-4 mx-1 text-muted-foreground" />
                         </li>
                         <li className='flex items-center text-primary font-medium'>
-                            <span>Kaka Saku Transaction</span>
+                            <span>Donasi Transaction</span>
                         </li>
                     </ol>
                 </div>
@@ -222,17 +222,28 @@ export default function Kakasakutransaction() {
 
 
 
-                <Select value={kakaSakuFilter} onValueChange={setKakaSakuFilter}>
+                <Select value={donasiFilter} onValueChange={setDonasiFilter}>
                     <SelectTrigger>
-                        <SelectValue placeholder="Filter Kaka Saku" />
+                        <SelectValue placeholder="Filter Donasi" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">Semua Kaka Saku</SelectItem>
-                        {kakaSakuList.map((kakaSaku) => (
-                            <SelectItem key={kakaSaku.id} value={kakaSaku.id.toString()}>
-                                {kakaSaku.title}
+                        <SelectItem value="all">Semua Donasi</SelectItem>
+                        {donasiList.map((donasi) => (
+                            <SelectItem key={donasi.id} value={donasi.id.toString()}>
+                                {donasi.title}
                             </SelectItem>
                         ))}
+                    </SelectContent>
+                </Select>
+
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Filter Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">Semua Status</SelectItem>
+                        <SelectItem value="settlement">Berhasil</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
                     </SelectContent>
                 </Select>
 
@@ -264,7 +275,7 @@ export default function Kakasakutransaction() {
                 </CardHeader>
                 <CardContent>
                     {loading ? (
-                        <KakasakutransactionSkelaton />
+                        <DonasitransactionSkeleton />
                     ) : filteredTransactions.length === 0 ? (
                         <div className="flex justify-center items-center py-8">
                             <p className="text-gray-400 text-lg">Tidak ada transaksi ditemukan.</p>
@@ -299,8 +310,8 @@ export default function Kakasakutransaction() {
                                             {/* Transaction Details */}
                                             <div className="grid grid-cols-2 gap-4 text-sm">
                                                 <div>
-                                                    <span className="font-medium text-gray-600">Kaka Saku:</span>
-                                                    <p className="mt-1">{getKakaSakuTitle(trx.kaka_saku_id)}</p>
+                                                    <span className="font-medium text-gray-600">Donasi:</span>
+                                                    <p className="mt-1">{getDonasiTitle(trx.donasi_id)}</p>
                                                 </div>
                                                 <div>
                                                     <span className="font-medium text-gray-600">Amount:</span>
@@ -379,7 +390,7 @@ export default function Kakasakutransaction() {
                                     <thead>
                                         <tr className="border-b">
                                             <th className="text-left p-3 font-semibold">Donatur</th>
-                                            <th className="text-left p-3 font-semibold">Kaka Saku</th>
+                                            <th className="text-left p-3 font-semibold">Donasi</th>
                                             <th className="text-left p-3 font-semibold">Order ID</th>
                                             <th className="text-left p-3 font-semibold">Amount</th>
                                             <th className="text-left p-3 font-semibold">Status</th>
@@ -409,7 +420,7 @@ export default function Kakasakutransaction() {
                                                 </td>
                                                 <td className="p-3">
                                                     <div className="text-sm">
-                                                        {getKakaSakuTitle(trx.kaka_saku_id)}
+                                                        {getDonasiTitle(trx.donasi_id)}
                                                     </div>
                                                 </td>
                                                 <td className="p-3">
@@ -503,7 +514,7 @@ export default function Kakasakutransaction() {
                 open={viewModalOpen}
                 onOpenChange={setViewModalOpen}
                 transaction={selectedTransaction}
-                kakaSakuList={kakaSakuList}
+                donasiList={donasiList}
             />
 
             {/* Delete Confirmation Modal */}

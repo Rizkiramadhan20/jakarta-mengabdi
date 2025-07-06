@@ -30,6 +30,8 @@ import DeleteModal from '@/hooks/dashboard/kakasakutransaction/kakasakutransacti
 
 import ViewModal from '@/hooks/dashboard/kakasakutransaction/kakasakutransaction/modal/ViewModal'
 
+import KakasakutransactionSkelaton from "@/hooks/dashboard/kakasakutransaction/kakasakutransaction/kakasakutransactionSkelaton"
+
 interface KakasakuTransaction {
     id: string;
     order_id: string;
@@ -268,9 +270,7 @@ export default function Kakasakutransaction() {
                 </CardHeader>
                 <CardContent>
                     {loading ? (
-                        <div className="flex justify-center items-center py-8">
-                            <span className="text-lg text-gray-500">Loading...</span>
-                        </div>
+                        <KakasakutransactionSkelaton />
                     ) : filteredTransactions.length === 0 ? (
                         <div className="flex justify-center items-center py-8">
                             <p className="text-gray-400 text-lg">Tidak ada transaksi ditemukan.</p>

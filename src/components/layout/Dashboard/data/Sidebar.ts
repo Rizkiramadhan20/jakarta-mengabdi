@@ -4,8 +4,8 @@ import {
   LayoutDashboard,
   Building2,
   UserRoundPen,
-  ArrowLeftRight,
   HandCoins,
+  CircleUser,
   Gift,
 } from "lucide-react";
 
@@ -102,7 +102,13 @@ export const menuItems = [
   },
 
   {
-    href: "/",
+    href: "/dashboard/accounts",
+    label: "Accounts",
+    icon: CircleUser,
+  },
+
+  {
+    href: "/donasi",
     label: "Back Home",
     icon: House,
   },

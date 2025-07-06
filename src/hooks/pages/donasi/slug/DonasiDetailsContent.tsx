@@ -95,6 +95,8 @@ export default function DonasiDetailsContent({ donasiData }: DonasiDetailsConten
     const [recentDonors, setRecentDonors] = useState<any[]>([]);
     const [loadingDonors, setLoadingDonors] = useState(false);
 
+    const [showClosedModal, setShowClosedModal] = useState(false);
+
     useEffect(() => {
         async function fetchPrayers() {
             if (!donasiData?.id) return;
@@ -135,6 +137,13 @@ export default function DonasiDetailsContent({ donasiData }: DonasiDetailsConten
             }, 1000);
             return;
         }
+
+        // Check if donasi status is closed
+        if (donasiData?.status === 'closed') {
+            setShowClosedModal(true);
+            return;
+        }
+
         setShowModal(true);
     };
     const handleSubmitPrice = async (e: React.FormEvent) => {
@@ -151,6 +160,7 @@ export default function DonasiDetailsContent({ donasiData }: DonasiDetailsConten
         const email = profile?.email || 'donatur@email.com';
         const photo_url = profile?.photo_url || null;
         const gross_amount = result.gross_amount || price;
+        const image_url = donasiData.image_url || null;
         await fetch('/api/donasi/insert-transaction', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -160,6 +170,7 @@ export default function DonasiDetailsContent({ donasiData }: DonasiDetailsConten
                 name,
                 email,
                 photo_url,
+                image_url,
                 amount: gross_amount,
                 status,
                 payment_type: result.payment_type,
@@ -286,7 +297,18 @@ export default function DonasiDetailsContent({ donasiData }: DonasiDetailsConten
                     <div className="space-y-6 sticky top-20 self-start">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="mb-2">Donasi Terkumpul</CardTitle>
+                                <div className="flex items-center justify-between mb-2">
+                                    <CardTitle>Donasi Terkumpul</CardTitle>
+                                    {donasiData.status === 'closed' && (
+                                        <div className="flex items-center gap-1 px-2 py-1 bg-red-100 text-red-600 rounded-full text-xs font-medium">
+                                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.5" />
+                                                <path d="M4 4L8 8M8 4L4 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                                            </svg>
+                                            Ditutup
+                                        </div>
+                                    )}
+                                </div>
                                 <CardDescription className="text-3xl font-bold text-orange-500">Rp {donasiData.current_amount.toLocaleString('id-ID')}</CardDescription>
                                 <span className="text-sm text-gray-500">Dari: Rp {donasiData.target_amount.toLocaleString('id-ID')}</span>
                             </CardHeader>
@@ -308,8 +330,15 @@ export default function DonasiDetailsContent({ donasiData }: DonasiDetailsConten
                                 </div>
                             </CardContent>
                             <CardFooter className="flex gap-3 w-full">
-                                <Button onClick={handleOpenModal} className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg flex-1 transition-all duration-200 shadow-md hover:shadow-lg">
-                                    Donasi Sekarang
+                                <Button
+                                    onClick={handleOpenModal}
+                                    className={`font-semibold py-3 px-6 rounded-lg flex-1 transition-all duration-200 shadow-md hover:shadow-lg ${donasiData?.status === 'closed'
+                                        ? 'bg-gray-400 hover:bg-gray-500 text-white cursor-not-allowed'
+                                        : 'bg-orange-500 hover:bg-orange-600 text-white'
+                                        }`}
+                                    disabled={donasiData?.status === 'closed'}
+                                >
+                                    {donasiData?.status === 'closed' ? 'Donasi Ditutup' : 'Donasi Sekarang'}
                                 </Button>
                                 <Button variant="outline" className="border-orange-300 text-orange-600 hover:bg-orange-50 hover:border-orange-400 font-medium py-3 px-6 rounded-lg flex-1 transition-all duration-200">
                                     Bagikan
@@ -518,6 +547,51 @@ export default function DonasiDetailsContent({ donasiData }: DonasiDetailsConten
                     <Textarea value={prayer} onChange={e => setPrayer(e.target.value)} placeholder="Tulis doa terbaikmu..." />
                     <DialogFooter>
                         <Button onClick={handleSubmitPrayer} className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg shadow-md transition-all duration-150">Kirim Doa</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Modal untuk status closed */}
+            <Dialog open={showClosedModal} onOpenChange={setShowClosedModal}>
+                <DialogContent className="transition-all duration-300">
+                    <DialogHeader>
+                        <DialogTitle className="text-center text-xl font-bold mb-2 flex items-center justify-center gap-2">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="24" height="24" rx="12" fill="#FEF3C7" />
+                                <path d="M12 8V12M12 16H12.01" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            Donasi Sudah Ditutup
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="text-center py-4">
+                        <div className="mb-4">
+                            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="64" height="64" rx="16" fill="#FEF3C7" />
+                                <path d="M32 16C23.164 16 16 23.164 16 32C16 40.836 23.164 48 32 48C40.836 48 48 40.836 48 32C48 23.164 40.836 16 32 16ZM32 44C25.373 44 20 38.627 20 32C20 25.373 25.373 20 32 20C36.418 20 40 23.582 40 28H36C36 25.791 34.209 24 32 24C29.791 24 28 25.791 28 28C28 30.209 29.791 32 32 32C33.105 32 34 32.895 34 34V36H30V34C30 31.791 28.209 30 26 30H24C24 32.209 25.791 34 28 34V36C25.791 36 24 37.791 24 40H28C28 38.895 28.895 38 30 38H32C34.209 38 36 39.791 36 42H40C40 38.686 36.314 36 32 36V44Z" fill="#F59E0B" />
+                            </svg>
+                        </div>
+                        <p className="text-gray-700 mb-2 font-medium">
+                            Maaf, donasi "{donasiData?.title}" sudah ditutup.
+                        </p>
+                        <p className="text-gray-500 text-sm mb-4">
+                            Periode penggalangan dana untuk donasi ini telah berakhir.
+                            Anda masih dapat melihat detail donasi dan doa-doa yang telah dikirimkan.
+                        </p>
+                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4">
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-gray-600">Total Terkumpul:</span>
+                                <span className="font-bold text-orange-600">Rp {donasiData?.current_amount.toLocaleString('id-ID')}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm mt-1">
+                                <span className="text-gray-600">Target:</span>
+                                <span className="font-bold text-gray-700">Rp {donasiData?.target_amount.toLocaleString('id-ID')}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter className="flex-row gap-2">
+                        <DialogClose asChild>
+                            <Button variant="outline" className="w-full">Tutup</Button>
+                        </DialogClose>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

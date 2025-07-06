@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
     transaction_time,
     midtrans_response,
     photo_url,
+    image_url,
   } = body;
 
   const trxTime = transaction_time ? new Date(transaction_time) : new Date();
@@ -32,6 +33,7 @@ export async function POST(req: NextRequest) {
         name,
         email,
         photo_url,
+        image_url,
         amount,
         status,
         payment_type,
@@ -65,6 +67,29 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ success: true });
 }
 
+export async function DELETE(req: NextRequest) {
+  const body = await req.json();
+  const { id } = body;
+
+  if (!id) {
+    return NextResponse.json(
+      { error: "Transaction ID is required" },
+      { status: 400 }
+    );
+  }
+
+  const { error } = await supabase
+    .from(process.env.NEXT_PUBLIC_DONASI_TRANSACTION as string)
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true });
+}
+
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.NEXT_PUBLIC_API_SECRET}`) {
@@ -77,7 +102,7 @@ export async function GET(req: NextRequest) {
   }
   const { data, error } = await supabase
     .from(process.env.NEXT_PUBLIC_DONASI_TRANSACTION as string)
-    .select("name, amount, photo_url")
+    .select("name, amount, photo_url, image_url")
     .eq("donasi_id", donasi_id)
     .order("transaction_time", { ascending: false })
     .limit(5);
