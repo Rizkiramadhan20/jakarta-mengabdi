@@ -96,15 +96,15 @@ export const menuItems = [
   },
 
   {
-    href: "/dashboard/profile",
-    label: "Profile",
-    icon: UserRoundPen,
-  },
-
-  {
     href: "/dashboard/accounts",
     label: "Accounts",
     icon: CircleUser,
+  },
+
+  {
+    href: "/dashboard/profile",
+    label: "Profile",
+    icon: UserRoundPen,
   },
 
   {
