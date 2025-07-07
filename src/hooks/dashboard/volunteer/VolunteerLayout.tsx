@@ -173,7 +173,6 @@ export default function VolunteerLayout() {
                                     {volunteer.title}
                                 </CardTitle>
                                 <div className="flex flex-wrap gap-3 text-sm text-gray-700 mb-1">
-                                    <span>Kuota: <span className="font-medium">{volunteer.quota_available}</span></span>
                                     <span>Lokasi: <span className="font-medium">{volunteer.location}</span></span>
                                 </div>
                                 <span className="text-xs text-gray-500">Waktu: {new Date(volunteer.time).toLocaleString("id-ID")}</span>

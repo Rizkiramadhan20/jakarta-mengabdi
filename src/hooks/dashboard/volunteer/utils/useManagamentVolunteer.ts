@@ -17,7 +17,9 @@ const defaultForm: Omit<Volunteer, "id" | "created_at" | "updated_at"> = {
   detail: "",
   goals: [],
   category: "pilar cerdas",
-  quota_available: 0,
+  session_type: "onsite",
+  form_link: "",
+  payment_type: "berbayar",
   time: "",
   location: "",
   tasks: "",
@@ -75,11 +77,10 @@ export function useManagamentVolunteer() {
     if (name === "price") {
       const num = value === "" ? 0 : Number(value.replace(/[^\d.]/g, ""));
       setForm({ ...form, price: isNaN(num) ? 0 : num });
-    } else if (name === "quota_available") {
-      const num = value === "" ? 0 : Number(value.replace(/\D/g, ""));
-      setForm({ ...form, quota_available: isNaN(num) ? 0 : num });
     } else if (name === "title") {
       setForm({ ...form, title: value, slug: slugify(value) });
+    } else if (name === "session_type") {
+      setForm({ ...form, session_type: value as "onsite" | "online" });
     } else {
       setForm({ ...form, [name]: value });
     }
@@ -174,7 +175,9 @@ export function useManagamentVolunteer() {
           detail: form.detail,
           goals: form.goals,
           category: form.category,
-          quota_available: form.quota_available,
+          session_type: form.session_type,
+          form_link: form.form_link,
+          payment_type: form.payment_type,
           time: form.time,
           location: form.location,
           tasks: form.tasks,
@@ -199,7 +202,9 @@ export function useManagamentVolunteer() {
           detail: form.detail,
           goals: form.goals,
           category: form.category,
-          quota_available: form.quota_available,
+          session_type: form.session_type,
+          form_link: form.form_link,
+          payment_type: form.payment_type,
           time: form.time,
           location: form.location,
           tasks: form.tasks,

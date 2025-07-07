@@ -30,8 +30,6 @@ import { Calendar } from '@/components/ui/calendar';
 
 import { FormModalProps } from '@/interface/volunteer'
 
-import { slugify } from '@/base/helper/slugify';
-
 const CATEGORIES = [
     'pilar cerdas',
     'pilar sehat',
@@ -62,6 +60,20 @@ const FormModal: React.FC<FormModalProps> = ({
         setForm({ ...form, price: rawValue === '' ? 0 : Number(rawValue) });
     };
 
+    const handleImageFile = (file: File) => {
+        const url = URL.createObjectURL(file);
+        setImagePreviews([url]);
+        setForm({ ...form, img_url: url });
+    };
+
+    const handleDropImage = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file) {
+            handleImageFile(file);
+        }
+    };
+
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4 space-y-4 w-full max-w-full">
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -72,6 +84,13 @@ const FormModal: React.FC<FormModalProps> = ({
                 <div className='flex flex-col gap-2'>
                     <Label htmlFor="slug">Slug</Label>
                     <Input id="slug" name="slug" value={form.slug} readOnly required placeholder="contoh: volunteer-anak-yatim" />
+                </div>
+            </div>
+
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div className='flex flex-col gap-2'>
+                    <Label htmlFor="form_link">Form Link</Label>
+                    <Input id="form_link" name="form_link" value={form.form_link} onChange={handleChange} required placeholder="https://..." />
                 </div>
             </div>
 
@@ -99,9 +118,39 @@ const FormModal: React.FC<FormModalProps> = ({
                 <div className='flex flex-col gap-2'>
                     <div className="flex items-center gap-2 mb-1">
                         <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="10" rx="2" fill="#E0E7FF" /><path d="M8 11h8M8 15h8" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" /></svg>
-                        <Label htmlFor="quota_available">Kuota</Label>
+                        <Label htmlFor="session_type">Tipe Sesi</Label>
                     </div>
-                    <Input id="quota_available" name="quota_available" type="number" value={form.quota_available} onChange={handleChange} required min="0" />
+                    <Select
+                        value={form.session_type}
+                        onValueChange={value => setForm({ ...form, session_type: value as "onsite" | "online" })}
+                    >
+                        <SelectTrigger className="w-full rounded-md border px-3 py-2 text-sm">
+                            <SelectValue placeholder="Pilih tipe sesi" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="onsite">Onsite</SelectItem>
+                            <SelectItem value="online">Online</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className='flex flex-col gap-2'>
+                    <div className="flex items-center gap-2 mb-1">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="10" rx="2" fill="#E0E7FF" /><path d="M8 11h8M8 15h8" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" /></svg>
+                        <Label htmlFor="payment_type">Tipe Pembayaran</Label>
+                    </div>
+                    <Select
+                        value={form.payment_type}
+                        onValueChange={value => setForm({ ...form, payment_type: value as "berbayar" | "gratis" })}
+                    >
+                        <SelectTrigger className="w-full rounded-md border px-3 py-2 text-sm">
+                            <SelectValue placeholder="Pilih tipe pembayaran" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="berbayar">Berbayar</SelectItem>
+                            <SelectItem value="gratis">Gratis</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 

@@ -58,7 +58,7 @@ export default function DonasiLayout({ donasiData }: { donasiData: Donasi[] }) {
                                             {/* Status Badge */}
                                             <div className="absolute bottom-3 right-3">
                                                 <span className={`px-3 py-1 text-md font-semibold text-white rounded-full shadow-md ${item.status.toLowerCase() === 'open'
-                                                    ? 'bg-blue-600'
+                                                    ? 'bg-orange-500'
                                                     : 'bg-red-600'
                                                     }`}>
                                                     {item.status}
@@ -74,14 +74,14 @@ export default function DonasiLayout({ donasiData }: { donasiData: Donasi[] }) {
                                     </CardHeader>
 
                                     <CardContent className="flex flex-col space-y-4">
-                                        <CardTitle className="text-xl font-semibold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors duration-200">
+                                        <CardTitle className="text-xl font-semibold text-gray-900 leading-tight group-hover:text-orange-500 transition-colors duration-200">
                                             {item.title}
                                         </CardTitle>
 
                                         <div className='flex flex-col space-y-4'>
                                             <Progress value={progress} className="h-2" />
                                             <div className='flex items-center gap-1'>
-                                                <span className='text-sm text-blue-600 font-semibold'>Rp{formatIDR(item.current_amount)}</span>
+                                                <span className='text-sm text-orange-500 font-semibold'>Rp{formatIDR(item.current_amount)}</span>
                                                 <span className='text-sm text-gray-500'>terkumpul dari</span>
                                                 <span className='text-sm text-gray-500'>Rp{formatIDR(item.target_amount)}</span>
                                             </div>
@@ -96,7 +96,7 @@ export default function DonasiLayout({ donasiData }: { donasiData: Donasi[] }) {
                                         </div>
 
                                         <Link href={`/donasi/${item.slug}`}>
-                                            <Button className='w-full bg-blue-600 hover:bg-blue-800 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]'>
+                                            <Button className='w-full bg-orange-400 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]'>
                                                 Donasi
                                             </Button>
                                         </Link>

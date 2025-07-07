@@ -49,10 +49,12 @@ export default function ViewModal({ open, onOpenChange, viewingVolunteer, onClos
                                     <div>{viewingVolunteer.title}</div>
                                     <div className="font-semibold text-gray-700">Kategori:</div>
                                     <div>{viewingVolunteer.category}</div>
-                                    <div className="font-semibold text-gray-700">Kuota:</div>
-                                    <div>{viewingVolunteer.quota_available}</div>
+                                    <div className="font-semibold text-gray-700">Payment Type:</div>
+                                    <div>{viewingVolunteer.payment_type}</div>
                                     <div className="font-semibold text-gray-700">Lokasi:</div>
                                     <div>{viewingVolunteer.location}</div>
+                                    <div className="font-semibold text-gray-700">Sesion Type:</div>
+                                    <div>{viewingVolunteer.session_type}</div>
                                     <div className="font-semibold text-gray-700">Waktu:</div>
                                     <div>{new Date(viewingVolunteer.time).toLocaleString('id-ID')}</div>
                                     <div className="font-semibold text-gray-700">Harga:</div>

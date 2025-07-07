@@ -4,10 +4,10 @@ export type Volunteer = {
   title: string;
   slug: string;
   detail: string;
-  goals: any; // JSONB, dapat diketik lebih ketat jika diperlukan
+  goals: any;
   category: "pilar cerdas" | "pilar sehat" | "pilar lestari" | "pilar peduli";
-  quota_available: number;
-  time: string; // String ISO untuk cap waktu
+  session_type: "onsite" | "online";
+  time: string;
   location: string;
   tasks: string;
   criteria: string;
@@ -15,6 +15,8 @@ export type Volunteer = {
   created_at: string;
   updated_at: string;
   price: number;
+  form_link: string;
+  payment_type: "berbayar" | "gratis";
 };
 
 export interface DeleteModalProps {

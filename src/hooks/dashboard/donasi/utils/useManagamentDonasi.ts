@@ -52,7 +52,6 @@ export function useManagamentDonasi() {
         .order("created_at", { ascending: false });
       if (!error && data) {
         const now = new Date();
-        // Cek donasi yang sudah lewat deadline dan status masih open
         const toClose = data.filter((d: any) => {
           if (d.status === "open" && d.deadline) {
             const deadlineDate = new Date(d.deadline);
@@ -60,7 +59,6 @@ export function useManagamentDonasi() {
           }
           return false;
         });
-        // Update status di database jika ada yang perlu di-close
         if (toClose.length > 0) {
           await Promise.all(
             toClose.map((d: any) =>
