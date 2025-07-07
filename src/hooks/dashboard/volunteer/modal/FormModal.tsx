@@ -54,24 +54,16 @@ const FormModal: React.FC<FormModalProps> = ({
     closeModal,
     setImagePreviews,
     handleDeleteFileDocument,
+    handleImageChange,
 }) => {
     const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = getRawNumberFromIDR(e.target.value);
-        setForm({ ...form, price: rawValue === '' ? 0 : Number(rawValue) });
-    };
-
-    const handleImageFile = (file: File) => {
-        const url = URL.createObjectURL(file);
-        setImagePreviews([url]);
-        setForm({ ...form, img_url: url });
-    };
-
-    const handleDropImage = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        const file = e.dataTransfer.files && e.dataTransfer.files[0];
-        if (file) {
-            handleImageFile(file);
-        }
+        const priceValue = rawValue === '' ? 0 : Number(rawValue);
+        setForm({
+            ...form,
+            price: priceValue,
+            payment_type: priceValue === 0 ? 'gratis' : form.payment_type,
+        });
     };
 
     return (
@@ -141,7 +133,13 @@ const FormModal: React.FC<FormModalProps> = ({
                     </div>
                     <Select
                         value={form.payment_type}
-                        onValueChange={value => setForm({ ...form, payment_type: value as "berbayar" | "gratis" })}
+                        onValueChange={value => {
+                            setForm({
+                                ...form,
+                                payment_type: value as "berbayar" | "gratis",
+                                price: value === "gratis" ? 0 : form.price,
+                            });
+                        }}
                     >
                         <SelectTrigger className="w-full rounded-md border px-3 py-2 text-sm">
                             <SelectValue placeholder="Pilih tipe pembayaran" />
@@ -247,12 +245,13 @@ const FormModal: React.FC<FormModalProps> = ({
                         id="price"
                         name="price"
                         type="text"
-                        value={form.price === 0 ? '' : formatIDR(Number(form.price))}
+                        value={form.payment_type === "gratis" ? "" : (form.price === 0 ? "" : formatIDR(Number(form.price)))}
                         onChange={handlePriceChange}
-                        required
+                        required={form.payment_type === "berbayar"}
                         min="0"
                         inputMode="numeric"
                         pattern="[0-9.]*"
+                        readOnly={form.payment_type === "gratis"}
                     />
                 </div>
 
@@ -267,6 +266,13 @@ const FormModal: React.FC<FormModalProps> = ({
 
             <div className='flex flex-col gap-2'>
                 <Label htmlFor="img_url">Gambar</Label>
+                <input
+                    type="file"
+                    accept="image/*"
+                    ref={inputRef}
+                    style={{ display: 'none' }}
+                    onChange={handleImageChange}
+                />
                 {imagePreviews.length === 0 && (
                     <div
                         onClick={() => inputRef.current?.click()}

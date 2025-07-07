@@ -47,4 +47,5 @@ export interface FormModalProps {
   closeModal: () => void;
   setImagePreviews: (imgs: string[]) => void;
   handleDeleteFileDocument: (fileUrl: string) => Promise<void>;
+  handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }

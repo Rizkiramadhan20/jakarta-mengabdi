@@ -39,8 +39,11 @@ export default function KakaSakuLayout({ kakaSakuData }: { kakaSakuData: KakaSak
     return (
         <section className='pt-28 py-10'>
             <div className="container px-4 md:px-8">
+                <h2 className="text-2xl md:text-3xl font-bold mb-2">KAKAK SAKU</h2>
+                <div className="w-24 h-1 bg-orange-400 rounded mb-8"></div>
+
                 <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 order-2 md:order-1 mt-4 md:mt-0'>
                         {
                             paginatedData.map((item, idx) => {
                                 const progress = (item.current_amount / item.target_amount) * 100

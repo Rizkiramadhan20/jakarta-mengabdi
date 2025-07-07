@@ -8,16 +8,13 @@ export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
 
   if (authHeader !== `Bearer ${process.env.NEXT_PUBLIC_API_SECRET}`) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401, headers: { "Cache-Control": "no-store" } }
-    );
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
     const { data, error } = await supabase
       .from(process.env.NEXT_PUBLIC_VOLUNTEERS as string)
-      .select("*")
+      .select("id,title,category,session_type,location,time,img_url,slug")
       .order("created_at", { ascending: false });
     if (error) {
       return NextResponse.json(

@@ -40,7 +40,7 @@ export default function VolunteerLayout() {
         dragActive,
         inputRef,
         uploadProgress,
-        pendingImages, setPendingImages,
+        setPendingImages,
         deleteModalOpen, setDeleteModalOpen,
         deletingId, setDeletingId,
         viewModalOpen,
@@ -125,6 +125,7 @@ export default function VolunteerLayout() {
                             closeModal={closeModal}
                             setImagePreviews={setImagePreviews}
                             handleDeleteFileDocument={handleDeleteFileDocument}
+                            handleImageChange={handleImageChange}
                         />
                     </DialogContent>
                 </Dialog>

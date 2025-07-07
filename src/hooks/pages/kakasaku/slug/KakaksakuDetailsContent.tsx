@@ -48,7 +48,6 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
     const { profile } = useAuth();
     const router = useRouter();
 
-    // Early return if kakaSakuData is null
     if (!kakaSakuData) {
         return (
             <div className="flex items-center justify-center min-h-screen">
