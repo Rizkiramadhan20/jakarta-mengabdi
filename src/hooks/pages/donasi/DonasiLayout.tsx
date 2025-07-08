@@ -8,7 +8,7 @@ import Image from 'next/image'
 
 import logo from "@/base/assets/Ellipse.png"
 
-import { BadgeCheck } from 'lucide-react'
+import { BadgeCheck, Loader2 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -18,18 +18,31 @@ import { formatIDR } from '@/base/helper/FormatPrice'
 
 import { Button } from '@/components/ui/button'
 
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination'
 
 export default function DonasiLayout({ donasiData }: { donasiData: Donasi[] }) {
     const ITEMS_PER_PAGE = 8;
+    const router = useRouter();
 
     const [currentPage, setCurrentPage] = useState(1);
+    const [loadingButton, setLoadingButton] = useState<string | null>(null);
 
-    const totalPages = Math.ceil(donasiData.length / ITEMS_PER_PAGE);
+    // Sort data: open status first, then others
+    const sortedData = [...donasiData].sort((a, b) => {
+        if (a.status.toLowerCase() === 'open' && b.status.toLowerCase() !== 'open') {
+            return -1; // a comes first
+        }
+        if (a.status.toLowerCase() !== 'open' && b.status.toLowerCase() === 'open') {
+            return 1; // b comes first
+        }
+        return 0; // keep original order for same status
+    });
 
-    const paginatedData = donasiData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(sortedData.length / ITEMS_PER_PAGE);
+
+    const paginatedData = sortedData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
     const handlePageChange = (page: number) => {
         if (page >= 1 && page <= totalPages) {
@@ -37,15 +50,22 @@ export default function DonasiLayout({ donasiData }: { donasiData: Donasi[] }) {
         }
     };
 
+    const handleButtonClick = (slug: string) => {
+        setLoadingButton(slug);
+        // Navigate to the donation detail page immediately
+        router.push(`/donasi/${slug}`);
+    };
+
     return (
         <section className='py-10'>
-            <div className="container px-4 md:px-8">
+            <div className="container px-4 md:px-10">
                 <h2 className="text-2xl md:text-3xl font-bold mb-2">Jakarta Mengabdi Berdonasi</h2>
                 <div className="w-24 h-1 bg-orange-400 rounded mb-8"></div>
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
                     {
                         paginatedData.map((item, idx) => {
                             const progress = (item.current_amount / item.target_amount) * 100
+                            const isLoading = loadingButton === item.slug;
                             return (
                                 <Card key={idx} className="group overflow-hidden border-0 transition-all duration-300 bg-white rounded-xl p-0 pb-6">
                                     <CardHeader className="p-0 relative">
@@ -97,11 +117,20 @@ export default function DonasiLayout({ donasiData }: { donasiData: Donasi[] }) {
                                             <BadgeCheck className='w-5 h-5 text-blue-500 flex-shrink-0' />
                                         </div>
 
-                                        <Link href={`/donasi/${item.slug}`}>
-                                            <Button className='w-full bg-orange-400 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]'>
-                                                Donasi
-                                            </Button>
-                                        </Link>
+                                        <Button
+                                            className='w-full bg-orange-400 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed'
+                                            onClick={() => handleButtonClick(item.slug)}
+                                            disabled={isLoading}
+                                        >
+                                            {isLoading ? (
+                                                <>
+                                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                    Berpindah halaman...
+                                                </>
+                                            ) : (
+                                                'Donasi'
+                                            )}
+                                        </Button>
                                     </CardContent>
                                 </Card>
                             )

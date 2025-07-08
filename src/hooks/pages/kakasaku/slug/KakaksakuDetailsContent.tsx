@@ -223,8 +223,8 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
     }, [kakaSakuData.timeline, selectedType]);
 
     return (
-        <section className="py-24">
-            <div className="container px-4 md:px-8">
+        <section className="py-28">
+            <div className="container px-4 md:px-10">
                 <div className="text-sm text-gray-500 mb-4">
                     Beranda &gt; KakaSaku &gt; {kakaSakuData.title}
                 </div>

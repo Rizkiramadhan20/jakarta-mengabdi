@@ -1,51 +1,111 @@
 import React from 'react';
 
+import {
+    FaFacebookF,
+    FaLinkedinIn,
+    FaInstagram,
+    FaYoutube,
+    FaTwitter,
+    FaTiktok
+} from 'react-icons/fa';
+
+import { BiLogoInstagram, BiLogoTiktok } from 'react-icons/bi';
+
+import { BsShop } from 'react-icons/bs';
+
+import logo from "@/base/assets/logo.png"
+
+import Image from 'next/image';
+
 export default function Footer() {
     return (
-        <footer className="bg-orange-500 text-white py-8 px-4">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-8">
-                {/* Kiri */}
-                <div className="flex-1 flex flex-col gap-4 min-w-[250px]">
-                    {/* Logo dan alamat */}
-                    <div className="flex items-start gap-4">
-                        {/* Logo Placeholder */}
-                        <div className="w-16 h-16 bg-white rounded flex items-center justify-center">
-                            <span className="text-orange-500 font-bold text-2xl">Logo</span>
+        <footer className="bg-[#ed8002] text-white">
+            <div className="container px-4 md:px-10 py-12">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+                    {/* Company Info Section */}
+                    <div className="space-y-6">
+                        {/* Logo and Address */}
+                        <div className="flex items-start gap-4">
+                            <div className="w-16 h-16 flex items-center justify-center">
+                                <Image src={logo} alt="Jakarta Mengabdi Logo" className="w-full h-full object-contain p-2" />
+                            </div>
+                            <div className="text-sm leading-relaxed">
+                                <p className="font-semibold mb-2">Jl. Pertani No. 14 Duren Tiga.</p>
+                                <p>Pancoran, Jakarta Selatan. 12760</p>
+                                <p>Indonesia</p>
+                            </div>
                         </div>
-                        <div className="text-sm">
-                            <div className="font-semibold mb-1">Jl. Pertani No. 14 Duren Tiga.<br />Pancoran, Jakarta Selatan. 12760<br />Indonesia</div>
+
+                        {/* Contact Info */}
+                        <div className="space-y-2 text-sm">
+                            <div className="flex items-center gap-3">
+                                <span className="font-bold text-orange-200">M</span>
+                                <span>+62 856 1312 161</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <span className="font-bold text-orange-200">E</span>
+                                <span>jakartamengabdi@gmail.com</span>
+                            </div>
                         </div>
                     </div>
-                    {/* Kontak */}
-                    <div className="text-sm mt-2">
-                        <div className="mb-1"><span className="font-bold">M</span> &nbsp; +62 856 1312 161</div>
-                        <div><span className="font-bold">E</span> &nbsp; jakartamengabdi@gmail.com</div>
+
+                    {/* Social Media Section */}
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-bold text-orange-100 uppercase tracking-wider">
+                            Ikuti Cerita Kami
+                        </h3>
+                        <div className="flex flex-wrap gap-3">
+                            {[
+                                { icon: FaFacebookF, label: 'Facebook' },
+                                { icon: FaLinkedinIn, label: 'LinkedIn' },
+                                { icon: FaInstagram, label: 'Instagram' },
+                                { icon: FaYoutube, label: 'YouTube' },
+                                { icon: FaTwitter, label: 'Twitter' },
+                                { icon: FaTiktok, label: 'TikTok' }
+                            ].map((social, index) => (
+                                <a
+                                    key={index}
+                                    href="#"
+                                    className="group w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white hover:text-orange-500 transition-all duration-300 transform hover:scale-110 border border-white/20"
+                                    aria-label={social.label}
+                                >
+                                    <social.icon size={16} />
+                                </a>
+                            ))}
+                        </div>
                     </div>
-                    {/* Ikuti Cerita Kami */}
-                    <div className="mt-4">
-                        <div className="uppercase text-xs font-bold mb-2 tracking-widest">Ikuti Cerita Kami</div>
+
+                    {/* JMERCH Section */}
+                    <div className="space-y-4">
+                        <div className="space-y-3">
+                            <h3 className="text-xl font-bold text-orange-100">JMERCH</h3>
+                            <p className="text-sm text-orange-100 leading-relaxed">
+                                Tampil maksimal dengan koleksi produk dari JMerch
+                            </p>
+                        </div>
                         <div className="flex gap-3">
-                            {/* Icon Placeholder */}
-                            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center text-orange-500">F</div>
-                            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center text-orange-500">L</div>
-                            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center text-orange-500">I</div>
-                            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center text-orange-500">Y</div>
-                            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center text-orange-500">T</div>
-                            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center text-orange-500">Tt</div>
+                            {[
+                                { icon: BiLogoInstagram, label: 'Instagram' },
+                                { icon: BiLogoTiktok, label: 'TikTok' },
+                                { icon: BsShop, label: 'Shop' }
+                            ].map((social, index) => (
+                                <a
+                                    key={index}
+                                    href="#"
+                                    className="group w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white hover:text-orange-500 transition-all duration-300 transform hover:scale-110 border border-white/20"
+                                    aria-label={social.label}
+                                >
+                                    <social.icon size={18} />
+                                </a>
+                            ))}
                         </div>
                     </div>
                 </div>
-                {/* Garis pemisah */}
-                <div className="hidden md:block w-px bg-white/30 h-40 mx-8" />
-                {/* Kanan */}
-                <div className="flex-1 flex flex-col gap-4 min-w-[250px]">
-                    <div className="font-bold text-lg mb-2">JMERCH</div>
-                    <div className="text-sm mb-4">Tampil maksimal dengan koleksi produk dari JMerch</div>
-                    <div className="flex gap-3">
-                        {/* Icon Placeholder */}
-                        <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center text-orange-500">I</div>
-                        <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center text-orange-500">Tt</div>
-                        <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center text-orange-500">B</div>
+
+                {/* Bottom Border */}
+                <div className="mt-8 pt-8 border-t border-white/20">
+                    <div className="text-center text-sm text-orange-100">
+                        <p>&copy; 2024 Jakarta Mengabdi. All rights reserved.</p>
                     </div>
                 </div>
             </div>
