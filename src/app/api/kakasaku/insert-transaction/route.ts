@@ -49,10 +49,10 @@ export async function POST(req: NextRequest) {
 
   // Jika status settlement, update current_amount dan kakaksaku pada tabel kakasaku
   if (status === "settlement") {
-    // Ambil current_amount dan kakaksaku lama
+    // Ambil current_amount, kakaksaku, dan message_template
     const { data: kakaSaku, error: getError } = await supabase
       .from(process.env.NEXT_PUBLIC_KAKA_SAKU as string)
-      .select("current_amount, kakaksaku")
+      .select("current_amount, kakaksaku, message_template, title")
       .eq("id", kaka_saku_id)
       .single();
 
@@ -63,6 +63,72 @@ export async function POST(req: NextRequest) {
         .from(process.env.NEXT_PUBLIC_KAKA_SAKU as string)
         .update({ current_amount: newAmount, kakaksaku: newKakaksaku })
         .eq("id", kaka_saku_id);
+    }
+
+    // Ambil nomor WhatsApp user dari tabel profiles
+    let phone = null;
+    try {
+      console.log("Email yang digunakan untuk query profile:", email);
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("phone")
+        .eq("email", email)
+        .single();
+      console.log("Hasil query profile:", profile, "Error:", profileError);
+      if (!profileError && profile && profile.phone) {
+        phone = profile.phone;
+      }
+    } catch (err) {
+      console.error("Gagal mengambil nomor WhatsApp user:", err);
+    }
+
+    // Log nomor WhatsApp yang ditemukan
+    console.log("Nomor WhatsApp user:", phone);
+
+    // Format nomor ke internasional (Indonesia)
+    if (phone && phone.startsWith("0")) {
+      phone = "62" + phone.slice(1);
+    }
+    console.log("Nomor WhatsApp (setelah format):", phone);
+
+    // Kirim WhatsApp notification hanya jika nomor ditemukan
+    if (phone) {
+      try {
+        let message = null;
+        if (kakaSaku && kakaSaku.message_template) {
+          // Format transaction time untuk display
+          const formattedTime = trxTime.toLocaleString('id-ID', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          });
+
+          // Format amount dengan pemisah ribuan
+          const formattedAmount = Number(amount).toLocaleString('id-ID');
+
+          message = kakaSaku.message_template
+            .replace(/\{name\}/g, name)
+            .replace(/\{title\}/g, kakaSaku.title || "KakaSaku")
+            .replace(/\{amount\}/g, formattedAmount)
+            .replace(/\{status\}/g, "berhasil")
+            .replace(/\{transaction_time\}/g, formattedTime);
+        }
+        if (message) {
+          await fetch(
+            process.env.WA_NOTIFICATION_URL as string,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ phone, message }),
+            }
+          );
+        }
+      } catch (err) {
+        console.error("Gagal mengirim WhatsApp notification:", err);
+      }
     }
   }
 
