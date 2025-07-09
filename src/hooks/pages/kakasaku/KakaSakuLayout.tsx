@@ -64,13 +64,13 @@ export default function KakaSakuLayout({ kakaSakuData }: { kakaSakuData: KakaSak
                 <div className="w-24 h-1 bg-orange-400 rounded mb-8"></div>
 
                 <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 order-2 md:order-1 mt-4 md:mt-0'>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 md:mt-0 order-last sm:order-first'>
                         {
                             paginatedData.map((item, idx) => {
                                 const progress = (item.current_amount / item.target_amount) * 100
                                 const isLoading = loadingButton === item.slug;
                                 return (
-                                    <Card key={idx} className="group overflow-hidden border-0 transition-all duration-300 bg-white rounded-xl p-0 pb-6">
+                                    <Card key={idx} className="group overflow-hidden border-0 transition-all duration-300 bg-white rounded-xl p-0 pb-6 h-fit">
                                         <CardHeader className="p-0 relative">
                                             <div className="aspect-[4/3] relative overflow-hidden">
                                                 <Image
@@ -146,8 +146,8 @@ export default function KakaSakuLayout({ kakaSakuData }: { kakaSakuData: KakaSak
                                 )
                             })
                         }
-                    </div>
 
+                    </div>
                     <BannerLayout />
                 </div>
                 {/* Pagination */}
