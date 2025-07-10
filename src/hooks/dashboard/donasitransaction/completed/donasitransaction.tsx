@@ -153,18 +153,18 @@ export default function Donasitransaction() {
     };
 
     const getStatusBadge = (status: string) => {
-        const statusMap: { [key: string]: { variant: "default" | "secondary" | "destructive" | "outline", label: string } } = {
-            'settlement': { variant: 'default', label: 'Berhasil' },
+        const statusMap: { [key: string]: { variant: "default" | "secondary" | "destructive" | "outline", label: string, className?: string } } = {
+            'settlement': { variant: 'outline', label: 'Berhasil', className: 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200' },
             'capture': { variant: 'default', label: 'Berhasil' },
-            'success': { variant: 'default', label: 'Berhasil' },
-            'pending': { variant: 'secondary', label: 'Pending' },
+            'success': { variant: 'outline', label: 'Berhasil', className: 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200' },
+            'pending': { variant: 'outline', label: 'Pending', className: 'bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200' },
             'deny': { variant: 'destructive', label: 'Ditolak' },
             'expire': { variant: 'destructive', label: 'Kadaluarsa' },
             'cancel': { variant: 'outline', label: 'Dibatalkan' }
         };
 
         const statusInfo = statusMap[status] || { variant: 'outline', label: status };
-        return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
+        return <Badge variant={statusInfo.variant} className={statusInfo.className}>{statusInfo.label}</Badge>;
     };
 
     const filteredTransactions = transactions.filter(trx => {

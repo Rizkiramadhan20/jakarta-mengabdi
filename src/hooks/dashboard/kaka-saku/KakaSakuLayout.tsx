@@ -28,7 +28,9 @@ import { Card } from '@/components/ui/card'
 
 import { Input } from '@/components/ui/input'
 
-export default function DonasiLayout() {
+import KakaSakuSkelaton from '@/hooks/dashboard/kaka-saku/KakaSakuSkelaton'
+
+export default function KakasakuLayout() {
     const {
         kakasaku, setKakasaku,
         loading, setLoading,
@@ -179,9 +181,7 @@ export default function DonasiLayout() {
             {/* Donasi Cards Grid */}
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {loading ? (
-                    <div className="col-span-full flex flex-col items-center justify-center py-8">
-                        Loading...
-                    </div>
+                    <KakaSakuSkelaton />
                 ) : filteredKakaSaku.length === 0 ? (
                     <div className="col-span-full flex flex-col items-center justify-center py-8 border rounded-2xl bg-white/95 shadow-md">
                         <img src="/globe.svg" alt="No Kakasaku" className="w-20 h-20 mb-4 opacity-80 mx-auto" />
