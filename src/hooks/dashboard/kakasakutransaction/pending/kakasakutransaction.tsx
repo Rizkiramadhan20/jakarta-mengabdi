@@ -187,6 +187,21 @@ export default function Kakasakutransaction() {
         currentPage * itemsPerPage
     );
 
+    // Reset to first page when search or filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search, kakaSakuFilter, dateFilter]);
+
+    // Ensure currentPage is valid when totalPages changes
+    useEffect(() => {
+        if (currentPage > totalPages && totalPages > 0) {
+            setCurrentPage(totalPages);
+        } else if (currentPage < 1 && totalPages > 0) {
+            setCurrentPage(1);
+        } else if (totalPages === 0) {
+            setCurrentPage(1);
+        }
+    }, [totalPages, currentPage]);
 
 
     return (
@@ -219,8 +234,6 @@ export default function Kakasakutransaction() {
                         className="pl-10"
                     />
                 </div>
-
-
 
                 <Select value={kakaSakuFilter} onValueChange={setKakaSakuFilter}>
                     <SelectTrigger>
@@ -257,17 +270,85 @@ export default function Kakasakutransaction() {
                 </Popover>
             </div>
 
+            {/* Search Results Counter */}
+            {(search || kakaSakuFilter !== 'all' || dateFilter) && (
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="text-sm text-yellow-800">
+                        Menampilkan {paginatedTransactions.length} dari {filteredTransactions.length} transaksi pending
+                        {search && ` (hasil pencarian: "${search}")`}
+                        {kakaSakuFilter !== 'all' && ` (kaka saku: ${getKakaSakuTitle(parseInt(kakaSakuFilter))})`}
+                        {dateFilter && ` (tanggal: ${dateFilter.toLocaleDateString('id-ID')})`}
+                    </div>
+                </div>
+            )}
+
             {/* Transactions Table */}
             <Card className="mt-6">
                 <CardHeader>
-                    <CardTitle>Daftar Transaksi ({filteredTransactions.length})</CardTitle>
+                    <CardTitle>
+                        Daftar Transaksi Pending
+                        {filteredTransactions.length !== transactions.filter(t => t.status === 'pending').length && (
+                            <span className="text-sm font-normal text-gray-500 ml-2">
+                                ({filteredTransactions.length} dari {transactions.filter(t => t.status === 'pending').length})
+                            </span>
+                        )}
+                        {filteredTransactions.length === transactions.filter(t => t.status === 'pending').length && (
+                            <span className="text-sm font-normal text-gray-500 ml-2">
+                                ({transactions.filter(t => t.status === 'pending').length})
+                            </span>
+                        )}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     {loading ? (
                         <KakasakutransactionSkelaton />
                     ) : filteredTransactions.length === 0 ? (
-                        <div className="flex justify-center items-center py-8">
-                            <p className="text-gray-400 text-lg">Tidak ada transaksi ditemukan.</p>
+                        <div className="flex flex-col justify-center items-center py-8">
+                            <p className="text-gray-400 text-lg mb-4">
+                                {search || kakaSakuFilter !== 'all' || dateFilter
+                                    ? 'Tidak ada transaksi pending yang sesuai dengan filter yang dipilih.'
+                                    : 'Tidak ada transaksi pending ditemukan.'
+                                }
+                            </p>
+                            {(search || kakaSakuFilter !== 'all' || dateFilter) && (
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        setSearch('');
+                                        setKakaSakuFilter('all');
+                                        setDateFilter(undefined);
+                                    }}
+                                >
+                                    Hapus Semua Filter
+                                </Button>
+                            )}
+                        </div>
+                    ) : paginatedTransactions.length === 0 ? (
+                        <div className="flex flex-col justify-center items-center py-8">
+                            <p className="text-gray-400 text-lg mb-4">
+                                Tidak ada transaksi pending di halaman {currentPage}.
+                                {totalPages > 1 && ` Silakan coba halaman lain atau ubah filter.`}
+                            </p>
+                            <div className="flex gap-2">
+                                {currentPage > 1 && (
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setCurrentPage(currentPage - 1)}
+                                    >
+                                        Halaman Sebelumnya
+                                    </Button>
+                                )}
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        setSearch('');
+                                        setKakaSakuFilter('all');
+                                        setDateFilter(undefined);
+                                    }}
+                                >
+                                    Hapus Semua Filter
+                                </Button>
+                            </div>
                         </div>
                     ) : (
                         <>

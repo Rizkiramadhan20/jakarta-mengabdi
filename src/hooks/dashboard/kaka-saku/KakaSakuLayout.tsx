@@ -4,7 +4,7 @@ import React, { useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
 
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, Search } from "lucide-react"
 
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
@@ -25,6 +25,8 @@ import DeleteModal from '@/hooks/dashboard/kaka-saku/modal/DeleteModal';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination'
 
 import { Card } from '@/components/ui/card'
+
+import { Input } from '@/components/ui/input'
 
 export default function DonasiLayout() {
     const {
@@ -74,12 +76,16 @@ export default function DonasiLayout() {
         handleTimelineImageChange,
         handleTimelineSubmit,
         deleteTimelineItem,
+        // Search and pagination
+        searchTerm,
+        setSearchTerm,
+        currentPage,
+        setCurrentPage,
+        itemsPerPage,
+        totalPages,
+        paginatedKakaSaku,
+        filteredKakaSaku,
     } = useManagamentKakaSaku();
-
-    const [currentPage, setCurrentPage] = React.useState(1);
-    const itemsPerPage = 10;
-    const totalPages = Math.ceil(kakasaku.length / itemsPerPage);
-    const paginatedKakaSaku = kakasaku.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     useEffect(() => {
         const fetchKakaSaku = async () => {
@@ -149,17 +155,79 @@ export default function DonasiLayout() {
                     </DialogContent>
                 </Dialog>
             </div>
+
+            {/* Search Bar */}
+            <div className="mt-6 p-4 border rounded-2xl border-border bg-card shadow-sm">
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                        type="text"
+                        placeholder="Cari Kaka Saku berdasarkan judul, deskripsi, status, jumlah, atau tanggal..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                </div>
+                {searchTerm && (
+                    <div className="mt-2 text-sm text-gray-600">
+                        Menampilkan {paginatedKakaSaku.length} dari {filteredKakaSaku.length} Kaka Saku
+                        {searchTerm && ` (hasil pencarian: "${searchTerm}")`}
+                    </div>
+                )}
+            </div>
+
             {/* Donasi Cards Grid */}
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {loading ? (
                     <div className="col-span-full flex flex-col items-center justify-center py-8">
                         Loading...
                     </div>
-                ) : kakasaku.length === 0 ? (
+                ) : filteredKakaSaku.length === 0 ? (
                     <div className="col-span-full flex flex-col items-center justify-center py-8 border rounded-2xl bg-white/95 shadow-md">
                         <img src="/globe.svg" alt="No Kakasaku" className="w-20 h-20 mb-4 opacity-80 mx-auto" />
-                        <h4 className="text-lg font-semibold mb-1">Belum ada Kaka Saku</h4>
-                        <p className="text-muted-foreground text-sm">Donasi belum tersedia. Mulai tambahkan Kaka Saku baru.</p>
+                        <h4 className="text-lg font-semibold mb-1">
+                            {searchTerm ? 'Tidak ada hasil pencarian' : 'Belum ada Kaka Saku'}
+                        </h4>
+                        <p className="text-muted-foreground text-sm">
+                            {searchTerm
+                                ? `Tidak ditemukan Kaka Saku yang sesuai dengan pencarian "${searchTerm}"`
+                                : 'Donasi belum tersedia. Mulai tambahkan Kaka Saku baru.'
+                            }
+                        </p>
+                        {searchTerm && (
+                            <Button
+                                variant="outline"
+                                className="mt-4"
+                                onClick={() => setSearchTerm("")}
+                            >
+                                Hapus Pencarian
+                            </Button>
+                        )}
+                    </div>
+                ) : paginatedKakaSaku.length === 0 ? (
+                    <div className="col-span-full flex flex-col items-center justify-center py-8 border rounded-2xl bg-white/95 shadow-md">
+                        <img src="/globe.svg" alt="No Results" className="w-20 h-20 mb-4 opacity-80 mx-auto" />
+                        <h4 className="text-lg font-semibold mb-1">Tidak ada data di halaman ini</h4>
+                        <p className="text-muted-foreground text-sm">
+                            Hasil pencarian tidak ditemukan di halaman {currentPage}.
+                            {totalPages > 1 && ` Silakan coba halaman lain atau hapus pencarian.`}
+                        </p>
+                        <div className="flex gap-2 mt-4">
+                            {currentPage > 1 && (
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setCurrentPage(currentPage - 1)}
+                                >
+                                    Halaman Sebelumnya
+                                </Button>
+                            )}
+                            <Button
+                                variant="outline"
+                                onClick={() => setSearchTerm("")}
+                            >
+                                Hapus Pencarian
+                            </Button>
+                        </div>
                     </div>
                 ) : (
                     paginatedKakaSaku.map((item, idx) => (
@@ -223,7 +291,7 @@ export default function DonasiLayout() {
                 )}
             </div>
             {/* Pagination */}
-            {kakasaku.length > itemsPerPage && (
+            {totalPages > 1 && (
                 <div className="py-4 flex justify-center">
                     <Pagination>
                         <PaginationContent>

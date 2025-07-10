@@ -45,6 +45,11 @@ export function useManagamentKakaSaku() {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [viewingProduct, setViewingProduct] = useState<KakaSaku | null>(null);
 
+  // Search and pagination states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
   // Timeline states
   const [timelineModalOpen, setTimelineModalOpen] = useState(false);
   const [timelineForm, setTimelineForm] = useState({
@@ -63,6 +68,44 @@ export function useManagamentKakaSaku() {
   );
   const [timelineUploading, setTimelineUploading] = useState(false);
   const timelineInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Filtered data based on search
+  const filteredKakaSaku = kakasaku.filter((item) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      item.title.toLowerCase().includes(searchLower) ||
+      item.description?.toLowerCase().includes(searchLower) ||
+      item.status.toLowerCase().includes(searchLower) ||
+      item.target_amount.toString().includes(searchLower) ||
+      item.current_amount.toString().includes(searchLower) ||
+      item.kakaksaku.toString().includes(searchLower) ||
+      item.share.toString().includes(searchLower) ||
+      (item.deadline && new Date(item.deadline).toLocaleDateString('id-ID').includes(searchLower))
+    );
+  });
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredKakaSaku.length / itemsPerPage);
+  const paginatedKakaSaku = filteredKakaSaku.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to first page when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  // Ensure currentPage is valid when totalPages changes
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    } else if (currentPage < 1 && totalPages > 0) {
+      setCurrentPage(1);
+    } else if (totalPages === 0) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
 
   useEffect(() => {
     const fetchKakaSaku = async () => {
@@ -522,5 +565,13 @@ export function useManagamentKakaSaku() {
     handleTimelineSubmit,
     uploadTimelineImage,
     deleteTimelineItem,
+    searchTerm,
+    setSearchTerm,
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    totalPages,
+    paginatedKakaSaku,
+    filteredKakaSaku,
   };
 }

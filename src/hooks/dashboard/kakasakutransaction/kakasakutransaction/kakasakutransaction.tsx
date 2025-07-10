@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 
-import { ChevronRight, Search, Eye, Calendar, Trash2 } from "lucide-react"
+import { ChevronRight, Search, Eye, Calendar, Trash2, Download } from "lucide-react"
 
 import { supabase } from '@/utils/supabase/supabase'
 
@@ -25,6 +25,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 
 import toast from 'react-hot-toast'
+
+import { downloadTransactionPDF, downloadAllTransactionsPDF } from './pdf/Pdf'
 
 import DeleteModal from '@/hooks/dashboard/kakasakutransaction/kakasakutransaction/modal/DeleteModal'
 
@@ -78,7 +80,7 @@ export default function Kakasakutransaction() {
     const fetchTransactions = async () => {
         setLoading(true);
         const { data, error } = await supabase
-            .from('kakasaku_transactions')
+            .from(process.env.NEXT_PUBLIC_KAKASAKU_TRANSACTION as string)
             .select('*')
             .order('transaction_time', { ascending: false });
 
@@ -142,6 +144,8 @@ export default function Kakasakutransaction() {
         }
     };
 
+
+
     const getKakaSakuTitle = (kakaSakuId: number) => {
         const kakaSaku = kakaSakuList.find(ks => ks.id === kakaSakuId);
         return kakaSaku?.title || `ID: ${kakaSakuId}`;
@@ -184,6 +188,21 @@ export default function Kakasakutransaction() {
         currentPage * itemsPerPage
     );
 
+    // Reset to first page when search or filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search, statusFilter, kakaSakuFilter, dateFilter]);
+
+    // Ensure currentPage is valid when totalPages changes
+    useEffect(() => {
+        if (currentPage > totalPages && totalPages > 0) {
+            setCurrentPage(totalPages);
+        } else if (currentPage < 1 && totalPages > 0) {
+            setCurrentPage(1);
+        } else if (totalPages === 0) {
+            setCurrentPage(1);
+        }
+    }, [totalPages, currentPage]);
 
 
     return (
@@ -202,6 +221,17 @@ export default function Kakasakutransaction() {
                             <span>Kaka Saku Transaction</span>
                         </li>
                     </ol>
+                </div>
+                <div className='flex gap-2'>
+                    <Button
+                        variant="outline"
+                        onClick={() => downloadAllTransactionsPDF(filteredTransactions, kakaSakuList, search, statusFilter, kakaSakuFilter, dateFilter)}
+                        disabled={filteredTransactions.length === 0}
+                        className="flex items-center gap-2"
+                    >
+                        <Download className="w-4 h-4" />
+                        Download All PDF
+                    </Button>
                 </div>
             </div>
 
@@ -263,17 +293,88 @@ export default function Kakasakutransaction() {
                 </Popover>
             </div>
 
+            {/* Search Results Counter */}
+            {(search || statusFilter !== 'all' || kakaSakuFilter !== 'all' || dateFilter) && (
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="text-sm text-blue-800">
+                        Menampilkan {paginatedTransactions.length} dari {filteredTransactions.length} transaksi
+                        {search && ` (hasil pencarian: "${search}")`}
+                        {statusFilter !== 'all' && ` (status: ${statusFilter})`}
+                        {kakaSakuFilter !== 'all' && ` (kaka saku: ${getKakaSakuTitle(parseInt(kakaSakuFilter))})`}
+                        {dateFilter && ` (tanggal: ${dateFilter.toLocaleDateString('id-ID')})`}
+                    </div>
+                </div>
+            )}
+
             {/* Transactions Table */}
             <Card className="mt-6">
                 <CardHeader>
-                    <CardTitle>Daftar Transaksi ({filteredTransactions.length})</CardTitle>
+                    <CardTitle>
+                        Daftar Transaksi
+                        {filteredTransactions.length !== transactions.length && (
+                            <span className="text-sm font-normal text-gray-500 ml-2">
+                                ({filteredTransactions.length} dari {transactions.length})
+                            </span>
+                        )}
+                        {filteredTransactions.length === transactions.length && (
+                            <span className="text-sm font-normal text-gray-500 ml-2">
+                                ({transactions.length})
+                            </span>
+                        )}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     {loading ? (
                         <KakasakutransactionSkelaton />
                     ) : filteredTransactions.length === 0 ? (
-                        <div className="flex justify-center items-center py-8">
-                            <p className="text-gray-400 text-lg">Tidak ada transaksi ditemukan.</p>
+                        <div className="flex flex-col justify-center items-center py-8">
+                            <p className="text-gray-400 text-lg mb-4">
+                                {search || statusFilter !== 'all' || kakaSakuFilter !== 'all' || dateFilter
+                                    ? 'Tidak ada transaksi yang sesuai dengan filter yang dipilih.'
+                                    : 'Tidak ada transaksi ditemukan.'
+                                }
+                            </p>
+                            {(search || statusFilter !== 'all' || kakaSakuFilter !== 'all' || dateFilter) && (
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        setSearch('');
+                                        setStatusFilter('all');
+                                        setKakaSakuFilter('all');
+                                        setDateFilter(undefined);
+                                    }}
+                                >
+                                    Hapus Semua Filter
+                                </Button>
+                            )}
+                        </div>
+                    ) : paginatedTransactions.length === 0 ? (
+                        <div className="flex flex-col justify-center items-center py-8">
+                            <p className="text-gray-400 text-lg mb-4">
+                                Tidak ada transaksi di halaman {currentPage}.
+                                {totalPages > 1 && ` Silakan coba halaman lain atau ubah filter.`}
+                            </p>
+                            <div className="flex gap-2">
+                                {currentPage > 1 && (
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setCurrentPage(currentPage - 1)}
+                                    >
+                                        Halaman Sebelumnya
+                                    </Button>
+                                )}
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        setSearch('');
+                                        setStatusFilter('all');
+                                        setKakaSakuFilter('all');
+                                        setDateFilter(undefined);
+                                    }}
+                                >
+                                    Hapus Semua Filter
+                                </Button>
+                            </div>
                         </div>
                     ) : (
                         <>
@@ -362,6 +463,15 @@ export default function Kakasakutransaction() {
                                                     <Eye className="w-4 h-4 mr-1" />
                                                     Detail
                                                 </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => downloadTransactionPDF(trx, kakaSakuList)}
+                                                    className="flex-1"
+                                                >
+                                                    <Download className="w-4 h-4 mr-1" />
+                                                    PDF
+                                                </Button>
                                                 {trx.status !== 'settlement' && (
                                                     <Button
                                                         variant="destructive"
@@ -448,6 +558,14 @@ export default function Kakasakutransaction() {
                                                         >
                                                             <Eye className="w-4 h-4 mr-1" />
                                                             Detail
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => downloadTransactionPDF(trx, kakaSakuList)}
+                                                        >
+                                                            <Download className="w-4 h-4 mr-1" />
+                                                            PDF
                                                         </Button>
                                                         {trx.status !== 'settlement' && (
                                                             <Button

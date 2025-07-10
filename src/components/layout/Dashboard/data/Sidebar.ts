@@ -7,6 +7,7 @@ import {
   HandCoins,
   CircleUser,
   Gift,
+  ChartNoAxesCombined
 } from "lucide-react";
 
 export const menuItems = [
@@ -93,6 +94,12 @@ export const menuItems = [
         label: "Completed",
       },
     ],
+  },
+
+  {
+    href: "/dashboard/rekaputasi",
+    label: "Rekaputasi",
+    icon: ChartNoAxesCombined,
   },
 
   {
