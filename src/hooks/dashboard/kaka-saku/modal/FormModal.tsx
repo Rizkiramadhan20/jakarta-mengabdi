@@ -68,7 +68,7 @@ const FormModal: React.FC<FormModalProps> = ({
         if (!form.message_template) {
             setForm((prev: any) => ({
                 ...prev,
-                message_template: 'Terima kasih {{name}} atas Kaka Saku sebesar {{amount}}. Pembayaran Anda {{status}}.'
+                message_template: 'Terima kasih, {name}.\nKamu telah berhasil melakukan transaksi donasi Kaka Saku sebesar {amount} untuk {title}.\n\n🕒 Waktu Transaksi: {transaction_time}\n📝 Status Pembayaran: {status}\n\nSimpan pesan ini sebagai bukti transaksi.\nAda pertanyaan? Hubungi kami kapan saja.\n\n✨ Makasih banyak, {name}!\n\n🎯 Program: {title}\n💸 Donasi Kaka Saku: {amount}\n🟢 Status: {status}\n🗓️ Waktu: {transaction_time}'
             }));
         }
     }, []);
