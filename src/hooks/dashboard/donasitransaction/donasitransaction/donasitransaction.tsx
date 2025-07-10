@@ -32,6 +32,8 @@ import ViewModal from '@/hooks/dashboard/donasitransaction/donasitransaction/mod
 
 import DonasitransactionSkeleton from "@/hooks/dashboard/donasitransaction/donasitransaction/donasitransactionSkelaton"
 
+import { downloadAllTransactionsPDF, downloadTransactionPDF } from './pdf/Pdf';
+
 interface DonasiTransaction {
     id: string;
     order_id: string;
@@ -280,6 +282,13 @@ export default function Donasitransaction() {
                         />
                     </PopoverContent>
                 </Popover>
+
+                <Button
+                    variant="outline"
+                    onClick={() => downloadAllTransactionsPDF(filteredTransactions, donasiList, search, statusFilter, donasiFilter, dateFilter)}
+                >
+                    Download PDF Semua
+                </Button>
             </div>
 
             {/* Search Results Counter */}
@@ -463,6 +472,13 @@ export default function Donasitransaction() {
                                                         Hapus
                                                     </Button>
                                                 )}
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => downloadTransactionPDF(trx, donasiList)}
+                                                >
+                                                    PDF
+                                                </Button>
                                             </div>
                                         </div>
                                     </Card>
@@ -549,6 +565,13 @@ export default function Donasitransaction() {
                                                                 Hapus
                                                             </Button>
                                                         )}
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            onClick={() => downloadTransactionPDF(trx, donasiList)}
+                                                        >
+                                                            PDF
+                                                        </Button>
                                                     </div>
                                                 </td>
                                             </tr>
