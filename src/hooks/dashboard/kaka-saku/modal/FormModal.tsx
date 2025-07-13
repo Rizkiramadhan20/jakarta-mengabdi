@@ -150,6 +150,11 @@ const FormModal: React.FC<FormModalProps> = ({
 
             <div className='flex flex-col gap-2'>
                 <Label htmlFor="message_template">Message Template</Label>
+                <div className="text-xs text-yellow-700 bg-yellow-100 rounded px-2 py-1 mb-1">
+                    ⚠ JANGAN HAPUS VARIABEL {'{...}'}.<br />
+                    - Teks biasa bisa diubah/deleted.<br />
+                    - {'{variabel}'} jangan dihapus/dimodifikasi.
+                </div>
                 <Textarea id="message_template" name="message_template" value={form.message_template || ''} onChange={handleChange} className="h-32 resize-none" />
             </div>
 
