@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Metadata } from 'next'
 
-import KakasakuLayout from '@/hooks/profile/kakasaku/kakasaku/KakasakuLayout'
+import DonasiLayout from '@/hooks/profile/donasi/donasi/DonasiLayout'
 
 export const metadata: Metadata = {
     title: 'Donasi | Jakarta mengabdi',
@@ -12,6 +12,6 @@ export const metadata: Metadata = {
 
 export default function page() {
     return (
-        <KakasakuLayout />
+        <DonasiLayout />
     )
 }
