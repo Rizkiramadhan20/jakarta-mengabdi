@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 
-import ProfileLayout from '@/hooks/profile/profile/ProfileLayout'
+import ProfileLayout from '@/hooks/profile/ProfileLayout'
 
 export const metadata: Metadata = {
     title: 'Profile | Jakarta mengabdi',
