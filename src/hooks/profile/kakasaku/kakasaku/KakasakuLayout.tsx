@@ -55,7 +55,7 @@ export default function Page() {
             if (!profile?.email) return;
             setLoading(true);
             const { data, error } = await supabase
-                .from('kakasaku_transactions')
+                .from(process.env.NEXT_PUBLIC_KAKASAKU_TRANSACTION as string)
                 .select('*')
                 .eq('email', profile.email)
                 .order('transaction_time', { ascending: false });
@@ -104,63 +104,6 @@ export default function Page() {
             <Badge variant={color} className="flex items-center gap-1 px-2 py-1">
                 {icon}{displayStatus}
             </Badge>
-        );
-    };
-
-    // Helper to render Midtrans details in a modern layout
-    const renderMidtransDetails = (data: any) => {
-        if (!data) return null;
-        // Flatten VA numbers if present
-        let vaNumbers = '';
-        if (Array.isArray(data.va_numbers) && data.va_numbers.length > 0) {
-            vaNumbers = data.va_numbers.map((va: any) => `${va.bank?.toUpperCase()}: ${va.va_number}`).join(', ');
-        }
-        let permataVa = data.permata_va_number ? `Permata: ${data.permata_va_number}` : '';
-        let billKey = data.bill_key ? `Bill Key: ${data.bill_key}` : '';
-        let billerCode = data.biller_code ? `Biller Code: ${data.biller_code}` : '';
-        let qrString = data.qr_string ? `QR String: ${data.qr_string}` : '';
-        let actions = Array.isArray(data.actions) ? data.actions : [];
-        let paymentCode = data.payment_code ? `Payment Code: ${data.payment_code}` : '';
-        let maskedCard = data.masked_card ? `Masked Card: ${data.masked_card}` : '';
-        let approvalCode = data.approval_code ? `Approval Code: ${data.approval_code}` : '';
-
-        return (
-            <Card className="w-full max-w-xl mx-auto">
-                <CardHeader className="pb-2">
-                    <CardTitle className="flex flex-col gap-1">
-                        <span className="text-base font-semibold">Order ID: <span className="font-mono font-normal">{data.order_id}</span></span>
-                        <span>{getStatusBadge(data.transaction_status)}</span>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-2 pb-0">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 mb-2 text-sm">
-                        <div><span className="font-semibold">Payment Type:</span> {data.payment_type}</div>
-                        <div><span className="font-semibold">Transaction Time:</span> {data.transaction_time ? new Date(data.transaction_time).toLocaleString() : '-'}</div>
-                        <div><span className="font-semibold">Gross Amount:</span> {data.gross_amount ? `Rp ${Number(data.gross_amount).toLocaleString()}` : '-'}</div>
-                        {vaNumbers && <div><span className="font-semibold">VA Number(s):</span> {vaNumbers}</div>}
-                        {permataVa && <div><span className="font-semibold">{permataVa}</span></div>}
-                        {billKey && <div><span className="font-semibold">{billKey}</span></div>}
-                        {billerCode && <div><span className="font-semibold">{billerCode}</span></div>}
-                        {qrString && <div><span className="font-semibold">{qrString}</span></div>}
-                        {paymentCode && <div><span className="font-semibold">{paymentCode}</span></div>}
-                        {maskedCard && <div><span className="font-semibold">{maskedCard}</span></div>}
-                        {approvalCode && <div><span className="font-semibold">{approvalCode}</span></div>}
-                    </div>
-                    {actions.length > 0 && (
-                        <div className="mt-4">
-                            <div className="font-semibold mb-1">Actions:</div>
-                            <ul className="list-disc list-inside text-blue-700">
-                                {actions.map((act: any, idx: number) => (
-                                    <li key={idx}><a href={act.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-900">{act.name || act.method || act.url}</a></li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
-                    {data.status_message && (
-                        <div className="mt-4 text-xs text-gray-500 italic">{data.status_message}</div>
-                    )}
-                </CardContent>
-            </Card>
         );
     };
 
@@ -214,7 +157,7 @@ export default function Page() {
                     <p className="text-gray-400 text-lg">Tidak ada transaksi ditemukan.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                     {filteredTransactions.map((trx) => {
                         return (
                             <Card key={trx.id} className="rounded-3xl shadow-lg hover:shadow-xl transition-shadow border border-gray-100 bg-white flex flex-col min-h-[440px] p-0 w-full max-w-4xl max-h-[90vh] overflow-y-auto mx-auto">
@@ -242,7 +185,8 @@ export default function Page() {
                                     <div className="flex items-center gap-2 w-full justify-end">
                                         <span className="text-xs text-gray-400">{trx.transaction_time ? new Date(trx.transaction_time).toLocaleString() : '-'}</span>
                                     </div>
-                                    <CardTitle className="text-lg font-bold text-primary flex items-center gap-2">
+
+                                    <CardTitle className="text-md font-bold text-primary flex items-center gap-2">
                                         Order ID: <span className="font-mono font-normal text-gray-700 text-base">{trx.order_id}</span>
                                     </CardTitle>
                                 </CardHeader>
@@ -263,7 +207,7 @@ export default function Page() {
                                     </div>
                                     {/* Transaction Info */}
                                     <div className="flex flex-col gap-1 mt-2">
-                                        <span className="text-2xl font-extrabold text-primary">Rp {trx.amount.toLocaleString()}</span>
+                                        <span className="text-md font-extrabold text-primary">Rp {trx.amount.toLocaleString()}</span>
                                         <span className="text-sm text-gray-600">Payment Type: <span className="font-semibold text-gray-800">{trx.payment_type || '-'}</span></span>
                                     </div>
                                 </CardContent>
