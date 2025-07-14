@@ -12,8 +12,6 @@ import { Badge } from '@/components/ui/badge';
 
 import { Button } from '@/components/ui/button';
 
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-
 import { Input } from '@/components/ui/input';
 
 import { Search } from 'lucide-react';
@@ -22,7 +20,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 import ImagePlaceholder from '@/base/helper/ImagePlaceholder';
 
-import ViewModal from '@/hooks/profile/kakasaku/kakasaku/modal/ViewModal';
+import ViewModal from './modal/ViewModal';
 
 import KakasakuSkelaton from "@/hooks/profile/kakasaku/kakasaku/KakasakuSkelaton"
 
@@ -47,7 +45,6 @@ export default function Page() {
     const [loading, setLoading] = useState(false);
     const [openModal, setOpenModal] = useState(false);
     const [modalContent, setModalContent] = useState<any>(null);
-    const [statusFilter, setStatusFilter] = useState<string>('all');
     const [search, setSearch] = useState('');
 
     useEffect(() => {
@@ -166,11 +163,7 @@ export default function Page() {
 
     // Filter transactions by status and search
     const filteredTransactions = transactions.filter(trx => {
-        const matchesStatus = statusFilter === 'all'
-            ? true
-            : statusFilter === 'success'
-                ? ['settlement', 'capture', 'success'].includes(trx.status)
-                : trx.status === 'pending';
+        const matchesStatus = trx.status === 'settlement';
         const matchesSearch =
             trx.name.toLowerCase().includes(search.toLowerCase()) ||
             trx.order_id.toLowerCase().includes(search.toLowerCase());
@@ -193,19 +186,6 @@ export default function Page() {
                         className="w-full h-14 pl-12 pr-4 bg-white border border-gray-200 rounded-2xl shadow focus:border-primary focus:ring-2 focus:ring-primary/20 transition placeholder:text-gray-400 text-base"
                     />
                 </div>
-                <Select
-                    value={statusFilter}
-                    onValueChange={value => setStatusFilter(value)}
-                >
-                    <SelectTrigger className="w-full md:w-56 h-14 bg-white border border-gray-200 rounded-2xl shadow focus:border-primary focus:ring-2 focus:ring-primary/20 transition text-base">
-                        <SelectValue placeholder="Filter status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">Semua Status</SelectItem>
-                        <SelectItem value="success">Berhasil</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                    </SelectContent>
-                </Select>
             </div>
             {loading ? (
                 <KakasakuSkelaton />

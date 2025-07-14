@@ -1,11 +1,7 @@
 import React from 'react';
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
-
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-
 import { Button } from '@/components/ui/button';
-
 import { Badge } from '@/components/ui/badge';
 
 interface ViewModalProps {

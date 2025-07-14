@@ -6,6 +6,8 @@ import { useAuth } from '@/utils/context/AuthContext';
 
 import { supabase } from '@/utils/supabase/supabase';
 
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
+
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 
 import { Badge } from '@/components/ui/badge';
@@ -22,9 +24,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 import ImagePlaceholder from '@/base/helper/ImagePlaceholder';
 
-import ViewModal from '@/hooks/profile/kakasaku/kakasaku/modal/ViewModal';
-
-import KakasakuSkelaton from "@/hooks/profile/kakasaku/kakasaku/KakasakuSkelaton"
+import ViewModal from './modal/ViewModal';
 
 interface KakasakuTransaction {
     id: number;
@@ -208,7 +208,9 @@ export default function Page() {
                 </Select>
             </div>
             {loading ? (
-                <KakasakuSkelaton />
+                <div className="flex justify-center items-center min-h-[200px]">
+                    <span className="text-lg text-gray-500 animate-pulse">Loading...</span>
+                </div>
             ) : filteredTransactions.length === 0 ? (
                 <div className="flex justify-center items-center min-h-[200px]">
                     <p className="text-gray-400 text-lg">Tidak ada transaksi ditemukan.</p>
