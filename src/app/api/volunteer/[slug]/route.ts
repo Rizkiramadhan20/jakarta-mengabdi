@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 
 import { supabase } from "@/utils/supabase/supabase";
 
-export const revalidate = 5; // validasi ulang setiap 5 detik
-
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ slug: string }> }
@@ -19,7 +17,7 @@ export async function GET(
 
   try {
     const { data, error } = await supabase
-      .from(process.env.NEXT_PUBLIC_KAKA_SAKU as string)
+      .from(process.env.NEXT_PUBLIC_VOLUNTEERS as string)
       .select("*")
       .eq("slug", slug)
       .single();
@@ -31,7 +29,7 @@ export async function GET(
     return NextResponse.json(data || null);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch kakasaku" },
+      { error: "Failed to fetch volunteer" },
       { status: 500 }
     );
   }

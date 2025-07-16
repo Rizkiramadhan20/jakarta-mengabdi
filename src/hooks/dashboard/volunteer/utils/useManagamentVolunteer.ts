@@ -11,21 +11,22 @@ import { Volunteer } from "@/interface/volunteer";
 import { slugify } from "@/base/helper/slugify";
 
 const defaultForm: Omit<Volunteer, "id" | "created_at" | "updated_at"> = {
-  img_url: "",
+  img_url: [],
   title: "",
   slug: "",
-  detail: "",
-  goals: [],
+  description: "",
+  detail: [],
+  devisi: [],
+  timeline: [],
+  content: "",
   category: "pilar cerdas",
   session_type: "onsite",
   form_link: "",
-  payment_type: "berbayar",
+  payment_options: [],
   time: "",
   location: "",
-  tasks: "",
-  criteria: "",
   file_document: "",
-  price: 0,
+  last_time: "",
 };
 
 export function useManagamentVolunteer() {
@@ -54,6 +55,8 @@ export function useManagamentVolunteer() {
     null
   );
   const [deleting, setDeleting] = useState(false);
+  const [draggedImageIdx, setDraggedImageIdx] = useState<number | null>(null);
+  const [isDraggingImage, setIsDraggingImage] = useState(false);
 
   useEffect(() => {
     const fetchVolunteers = async () => {
@@ -74,10 +77,7 @@ export function useManagamentVolunteer() {
     >
   ) => {
     const { name, value } = e.target;
-    if (name === "price") {
-      const num = value === "" ? 0 : Number(value.replace(/[^\d.]/g, ""));
-      setForm({ ...form, price: isNaN(num) ? 0 : num });
-    } else if (name === "title") {
+    if (name === "title") {
       setForm({ ...form, title: value, slug: slugify(value) });
     } else if (name === "session_type") {
       setForm({ ...form, session_type: value as "onsite" | "online" });
@@ -89,12 +89,14 @@ export function useManagamentVolunteer() {
   const openCreateModal = () => {
     setForm({ ...defaultForm });
     setImagePreviews([]);
+    setPendingImages([]);
     setModal({ open: true, editMode: false, editingId: null });
   };
 
   const openEditModal = (volunteer: Volunteer) => {
     setForm({ ...volunteer });
-    setImagePreviews(volunteer.img_url ? [volunteer.img_url] : []);
+    setImagePreviews(volunteer.img_url || []);
+    setPendingImages([]);
     setModal({ open: true, editMode: true, editingId: volunteer.id });
   };
 
@@ -102,14 +104,14 @@ export function useManagamentVolunteer() {
     setModal({ open: false, editMode: false, editingId: null });
     setForm({ ...defaultForm });
     setImagePreviews([]);
+    setPendingImages([]);
   };
 
   const handleFilesUpload = async (files: FileList) => {
-    setPendingImages(Array.from(files));
-    setImagePreviews(
-      Array.from(files).map((file) => URL.createObjectURL(file))
-    );
-    setForm({ ...form, img_url: "" });
+    const newFiles = Array.from(files);
+    setPendingImages(newFiles);
+    setImagePreviews(newFiles.map((file) => URL.createObjectURL(file)));
+    setForm({ ...form, img_url: [] });
   };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,19 +124,24 @@ export function useManagamentVolunteer() {
     e.preventDefault();
     setCreating(true);
     let error = null;
-    let uploadedUrl = "";
+    let uploadedUrls: string[] = [];
     if (pendingImages.length > 0) {
       setUploading(true);
       setUploadProgress({ done: 0, total: pendingImages.length });
-      // Only one image for img_url
-      uploadedUrl = await uploadImage(pendingImages[0]);
-      setUploadProgress((prev) => ({ ...prev, done: prev.done + 1 }));
+      // Upload all images
+      for (let i = 0; i < pendingImages.length; i++) {
+        const uploadedUrl = await uploadImage(pendingImages[i]);
+        uploadedUrls.push(uploadedUrl);
+        setUploadProgress((prev) => ({ ...prev, done: prev.done + 1 }));
+      }
       setUploading(false);
       setUploadProgress({ done: 0, total: 0 });
     }
-    let finalImgUrl = uploadedUrl;
+    let finalImgUrls = uploadedUrls;
     if (modal.editMode && form.img_url && form.img_url.length > 0) {
-      finalImgUrl = form.img_url;
+      finalImgUrls = [...form.img_url, ...uploadedUrls];
+    } else if (!modal.editMode) {
+      finalImgUrls = uploadedUrls;
     }
     let fileDocumentUrl = "";
     if (form.file_document && typeof form.file_document === "object") {
@@ -169,21 +176,22 @@ export function useManagamentVolunteer() {
       const res = await supabase
         .from(process.env.NEXT_PUBLIC_VOLUNTEERS as string)
         .update({
-          img_url: finalImgUrl,
+          img_url: finalImgUrls,
           title: form.title,
           slug: form.slug,
+          description: form.description,
           detail: form.detail,
-          goals: form.goals,
+          devisi: form.devisi,
+          timeline: form.timeline,
+          content: form.content,
           category: form.category,
           session_type: form.session_type,
           form_link: form.form_link,
-          payment_type: form.payment_type,
+          payment_options: form.payment_options,
           time: form.time,
           location: form.location,
-          tasks: form.tasks,
-          criteria: form.criteria,
           file_document: fileDocumentUrl,
-          price: form.price,
+          last_time: form.last_time,
         })
         .eq("id", modal.editingId);
       error = res.error;
@@ -196,21 +204,22 @@ export function useManagamentVolunteer() {
       const res = await supabase
         .from(process.env.NEXT_PUBLIC_VOLUNTEERS as string)
         .insert({
-          img_url: finalImgUrl,
+          img_url: finalImgUrls,
           title: form.title,
           slug: form.slug,
+          description: form.description,
           detail: form.detail,
-          goals: form.goals,
+          devisi: form.devisi,
+          timeline: form.timeline,
+          content: form.content,
           category: form.category,
           session_type: form.session_type,
           form_link: form.form_link,
-          payment_type: form.payment_type,
+          payment_options: form.payment_options,
           time: form.time,
           location: form.location,
-          tasks: form.tasks,
-          criteria: form.criteria,
           file_document: fileDocumentUrl,
-          price: form.price,
+          last_time: form.last_time,
         });
       error = res.error;
       if (!error) {
@@ -329,6 +338,56 @@ export function useManagamentVolunteer() {
     }
   };
 
+  const handleImageDragStart = (idx: number) => {
+    setDraggedImageIdx(idx);
+    setIsDraggingImage(true);
+  };
+
+  const handleImageDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  const handleImageDrop = (e: React.DragEvent<HTMLDivElement>, idx: number) => {
+    e.preventDefault();
+    if (draggedImageIdx === null) return;
+
+    const newImagePreviews = [...imagePreviews];
+    const newPendingImages = [...pendingImages];
+    const newImgUrls = [...form.img_url];
+
+    // Swap images
+    if (pendingImages.length > 0) {
+      [newPendingImages[draggedImageIdx], newPendingImages[idx]] = [
+        newPendingImages[idx],
+        newPendingImages[draggedImageIdx],
+      ];
+      [newImagePreviews[draggedImageIdx], newImagePreviews[idx]] = [
+        newImagePreviews[idx],
+        newImagePreviews[draggedImageIdx],
+      ];
+    } else {
+      [newImgUrls[draggedImageIdx], newImgUrls[idx]] = [
+        newImgUrls[idx],
+        newImgUrls[draggedImageIdx],
+      ];
+      [newImagePreviews[draggedImageIdx], newImagePreviews[idx]] = [
+        newImagePreviews[idx],
+        newImagePreviews[draggedImageIdx],
+      ];
+    }
+
+    setPendingImages(newPendingImages);
+    setImagePreviews(newImagePreviews);
+    setForm({ ...form, img_url: newImgUrls });
+    setDraggedImageIdx(null);
+    setIsDraggingImage(false);
+  };
+
+  const handleImageDragEnd = () => {
+    setDraggedImageIdx(null);
+    setIsDraggingImage(false);
+  };
+
   return {
     volunteers,
     setVolunteers,
@@ -375,5 +434,11 @@ export function useManagamentVolunteer() {
     handleDeleteFileDocument,
     deleting,
     setDeleting,
+    draggedImageIdx,
+    isDraggingImage,
+    handleImageDragStart,
+    handleImageDragOver,
+    handleImageDrop,
+    handleImageDragEnd,
   };
 }

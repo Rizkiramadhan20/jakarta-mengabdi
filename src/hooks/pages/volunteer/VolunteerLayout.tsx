@@ -109,7 +109,7 @@ export default function VolunteerLayout({ volunterData }: VolunterContentProps) 
             <section className='pt-28 pb-10'>
                 <div className='container px-4 md:px-8'>
                     {/*  */}
-                    {filteredData.length === 0 ? (
+                    {filteredData && filteredData.length === 0 ? (
                         <div className="col-span-full flex flex-col items-center justify-center py-20">
                             {/* SVG Ilustrasi Kosong */}
                             <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -129,7 +129,7 @@ export default function VolunteerLayout({ volunterData }: VolunterContentProps) 
                                     <Card key={idx} className='relative flex flex-col gap-4 p-0 group mb-10'>
                                         <CardContent className='flex flex-col gap-4 p-0'>
                                             <div className='relative w-full aspect-[6/4] bg-gray-100 flex items-center justify-center overflow-hidden'>
-                                                <Image src={item.img_url} className='object-cover transition-transform duration-300 group-hover:scale-105' alt={item.title} quality={100} loading="eager" fill />
+                                                <Image src={item.img_url[0] || '/placeholder.png'} className='object-cover transition-transform duration-300 group-hover:scale-105' alt={item.title} quality={100} loading="eager" fill />
                                             </div>
 
                                             <div className='absolute -top-16 -left-10'>
@@ -156,7 +156,7 @@ export default function VolunteerLayout({ volunterData }: VolunterContentProps) 
                                                     </div>
                                                 </div>
 
-                                                <Link href={item.slug} className='mt-auto'>
+                                                <Link href={`/volunteer/${item.slug}`} className='mt-auto'>
                                                     <Button className='w-full bg-orange-400 hover:bg-orange-500 text-white font-semibold h-12 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]'>
                                                         Daftar Sekarang
                                                     </Button>

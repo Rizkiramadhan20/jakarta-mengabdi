@@ -28,6 +28,8 @@ import VolunteerCardSkeleton from '@/hooks/dashboard/volunteer/VolunteerSkelaton
 
 import Image from 'next/image'
 
+import { formatDateTimeIndo } from '@/base/helper/FormatDate';
+
 export default function VolunteerLayout() {
     const {
         volunteers, setVolunteers,
@@ -41,6 +43,7 @@ export default function VolunteerLayout() {
         inputRef,
         uploadProgress,
         setPendingImages,
+        pendingImages,
         deleteModalOpen, setDeleteModalOpen,
         deletingId, setDeletingId,
         viewModalOpen,
@@ -58,6 +61,12 @@ export default function VolunteerLayout() {
         openViewModal,
         handleDeleteFileDocument,
         deleting,
+        draggedImageIdx,
+        isDraggingImage,
+        handleImageDragStart,
+        handleImageDragOver,
+        handleImageDrop,
+        handleImageDragEnd,
     } = useManagamentVolunteer();
 
     const [currentPage, setCurrentPage] = React.useState(1);
@@ -118,10 +127,17 @@ export default function VolunteerLayout() {
                             inputRef={inputRef}
                             uploadProgress={uploadProgress}
                             setPendingImages={setPendingImages}
+                            pendingImages={pendingImages}
+                            draggedImageIdx={draggedImageIdx}
+                            isDraggingImage={isDraggingImage}
                             handleChange={handleChange}
                             handleSubmit={handleSubmit}
                             handleDrag={handleDrag}
                             handleDrop={handleDrop}
+                            handleImageDragStart={handleImageDragStart}
+                            handleImageDragOver={handleImageDragOver}
+                            handleImageDrop={handleImageDrop}
+                            handleImageDragEnd={handleImageDragEnd}
                             closeModal={closeModal}
                             setImagePreviews={setImagePreviews}
                             handleDeleteFileDocument={handleDeleteFileDocument}
@@ -160,7 +176,7 @@ export default function VolunteerLayout() {
                                         </span>
                                     )}
                                     <Image
-                                        src={volunteer.img_url || '/placeholder.png'}
+                                        src={volunteer.img_url[0] || '/placeholder.png'}
                                         alt={volunteer.title}
                                         width={1080}
                                         height={1080}
@@ -176,8 +192,20 @@ export default function VolunteerLayout() {
                                 <div className="flex flex-wrap gap-3 text-sm text-gray-700 mb-1">
                                     <span>Lokasi: <span className="font-medium">{volunteer.location}</span></span>
                                 </div>
-                                <span className="text-xs text-gray-500">Waktu: {new Date(volunteer.time).toLocaleString("id-ID")}</span>
-                                <span className="text-xs text-gray-500">Harga: Rp{Number(volunteer.price).toLocaleString()}</span>
+                                <span className="text-xs text-gray-500">Jadwal event: {volunteer.time ? formatDateTimeIndo(volunteer.time) : '-'}</span>
+                                {volunteer.payment_options && volunteer.payment_options.length > 0 ? (
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                        {volunteer.payment_options.map((option, idx) => (
+                                            <span key={idx} className="text-xs px-2 py-1 rounded bg-gray-100 border border-gray-200 text-gray-700">
+                                                {option.type === "gratis"
+                                                    ? "Gratis"
+                                                    : `Berbayar: Rp${Number(option.price).toLocaleString()}`}
+                                            </span>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <span className="text-xs text-gray-500">Harga: -</span>
+                                )}
                             </CardContent>
                             <CardFooter className="flex flex-row gap-2 mt-2 px-5 pb-4">
                                 <Button size="sm" variant="secondary" className="flex-1 min-w-[80px] font-medium" onClick={() => openViewModal(volunteer)}>

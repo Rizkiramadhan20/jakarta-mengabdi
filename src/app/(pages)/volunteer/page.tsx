@@ -3,7 +3,7 @@ import React from 'react';
 
 import { fetchVolunteerData } from "@/lib/FetchVolunteer"
 
-import DonasiSkeleton from '@/hooks/pages/donasi/DonasiSkeleton';
+import ValunteerSkeleton from '@/hooks/pages/volunteer/ValunteerSkeleton';
 
 import { Metadata } from 'next';
 
@@ -44,9 +44,9 @@ export default async function Page() {
             <VolunteerLayout volunterData={volunterData} />
         )
     } catch (error) {
-        console.error('Error fetching Donasi data:', error);
+        console.error('Error fetching Volunteer data:', error);
         return (
-            <DonasiSkeleton />
+            <ValunteerSkeleton />
         );
     }
 }

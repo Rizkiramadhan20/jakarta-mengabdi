@@ -1,23 +1,29 @@
 export type Volunteer = {
   id: number;
-  img_url: string;
+  img_url: string[];
   title: string;
   slug: string;
-  detail: string;
-  goals: any;
+  description: string;
+  detail: any; // JSON field
+  devisi: any; // JSON field
+  timeline: any; // JSON field
+  content: string;
   category: "pilar cerdas" | "pilar sehat" | "pilar lestari" | "pilar peduli";
   session_type: "onsite" | "online";
   time: string;
   location: string;
-  tasks: string;
-  criteria: string;
+  form_link: string;
   file_document?: string | null;
   created_at: string;
   updated_at: string;
-  price: number;
-  form_link: string;
-  payment_type: "berbayar" | "gratis";
+  payment_options: PaymentOption[];
+  last_time: string;
 };
+
+export interface PaymentOption {
+  type: "berbayar" | "gratis";
+  price: number;
+}
 
 export interface DeleteModalProps {
   open: boolean;
@@ -40,10 +46,17 @@ export interface FormModalProps {
   inputRef: React.RefObject<HTMLInputElement | null>;
   uploadProgress: { done: number; total: number };
   setPendingImages: (imgs: File[]) => void;
+  pendingImages: File[];
+  draggedImageIdx: number | null;
+  isDraggingImage: boolean;
   handleChange: (e: React.ChangeEvent<any>) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   handleDrag: (e: React.DragEvent<HTMLDivElement>) => void;
   handleDrop: (e: React.DragEvent<HTMLDivElement>) => void;
+  handleImageDragStart: (idx: number) => void;
+  handleImageDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
+  handleImageDrop: (e: React.DragEvent<HTMLDivElement>, idx: number) => void;
+  handleImageDragEnd: () => void;
   closeModal: () => void;
   setImagePreviews: (imgs: string[]) => void;
   handleDeleteFileDocument: (fileUrl: string) => Promise<void>;
