@@ -33,7 +33,6 @@ interface VolunteerLayoutProps {
     volunteerData: Volunteer | null;
 }
 
-// Tambahkan helper untuk jam di file ini
 const formatTimeIndo = (dateStr: string | Date) => {
     try {
         return new Date(dateStr).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -54,7 +53,6 @@ export default function VolunteerLayout({ volunteerData }: VolunteerLayoutProps)
         );
     }
 
-    // Category color mapping
     const categoryColors: Record<string, { bg: string; text: string }> = {
         'Pilar Cerdas': { bg: 'bg-[#FFD54F]', text: 'text-white' },
         'Pilar Sehat': { bg: 'bg-[#4FC3F7]', text: 'text-white' },
@@ -242,9 +240,11 @@ prose max-w-none text-gray-800 text-sm md:text-base
                             <div className='flex gap-4 mb-3'>
                                 <Button className='cursor-default capitalize'>{volunteerData.payment_type}</Button>
 
-                                <h3 className="text-2xl font-extrabold text-green-700 mb-4">
-                                    Rp.{formatIDR(volunteerData.price)}
-                                </h3>
+                                {volunteerData.price > 0 && (
+                                    <h3 className="text-2xl font-extrabold text-green-700 mb-4">
+                                        Rp.{formatIDR(volunteerData.price)}
+                                    </h3>
+                                )}
                             </div>
                             {/* Box Info - Redesigned */}
                             <div className="relative border rounded-xl shadow p-4 mb-5 bg-white pb-12">

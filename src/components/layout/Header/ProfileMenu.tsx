@@ -47,10 +47,10 @@ export default function ProfileMenu({ isProfileOpen, toggleProfile }: ProfileMen
                             </AvatarFallback>
                         )}
                     </Avatar>
-                    <span className="hidden md:inline text-sm md:text-base font-semibold max-w-[120px] truncate text-[#f0ebd8]">
+                    <span className="inline text-sm md:text-base font-semibold max-w-[120px] truncate text-[#f0ebd8]">
                         {profile.full_name || 'User'}
                     </span>
-                    <ChevronDown className={`hidden md:inline transition-transform duration-200 text-[#f0ebd8] ${isProfileOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`inline transition-transform duration-200 text-[#f0ebd8] ${isProfileOpen ? 'rotate-180' : ''}`} />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-72 bg-[#403122]/80 backdrop-blur-xl text-[#f0ebd8] border-none shadow-2xl rounded-2xl p-2">

@@ -69,7 +69,7 @@ export default function Header() {
                                     <Link href={item.href}>
                                         <Button
                                             variant="ghost"
-                                            className={`text-[#f0ebd8] hover:text-gray-900 h-10 font-medium text-xl transition-all duration-300 hover:scale-105 ${item.href === '/' ? (pathname === '/' ? 'text-gray-900 bg-gray-100' : '') : (pathname?.startsWith(item.href) ? 'text-gray-900 bg-gray-100' : '')}`}
+                                            className={`text-[#f0ebd8] hover:text-gray-900 h-10 font-medium text-base transition-all duration-300 hover:scale-105 ${item.href === '/' ? (pathname === '/' ? 'text-gray-900 bg-gray-100' : '') : (pathname?.startsWith(item.href) ? 'text-gray-900 bg-gray-100' : '')}`}
                                         >
                                             {item.name}
                                         </Button>

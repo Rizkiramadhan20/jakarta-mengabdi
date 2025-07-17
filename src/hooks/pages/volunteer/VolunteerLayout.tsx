@@ -22,6 +22,10 @@ import { Card, CardContent } from '@/components/ui/card';
 
 import ValunteerHeading from './ValunteerHeading';
 
+import { Loader2 } from 'lucide-react';
+
+import { useRouter } from 'next/navigation';
+
 interface VolunterContentProps {
     volunterData: Volunteer[];
 }
@@ -59,14 +63,32 @@ export default function VolunteerLayout({ volunterData }: VolunterContentProps) 
     const [selectedLocation, setSelectedLocation] = React.useState<string | 'all'>('all');
     // Sort order state
     const [sortOrder, setSortOrder] = React.useState<'desc' | 'asc' | 'all'>('all'); // desc: terbaru, asc: terlama, all: semua
-    // Extract unique categories
-    const categories = React.useMemo(() => {
-        const unique = Array.from(new Set(volunterData.map(v => v.category)));
-        return unique;
-    }, [volunterData]);
-    // Extract unique locations
+    // Jakarta regions for filtering
+    const jakartaRegions = [
+        'Jakarta Utara',
+        'Jakarta Selatan',
+        'Jakarta Timur',
+        'Jakarta Barat',
+        'Jakarta Pusat',
+    ];
+
+    // Helper function to extract Jakarta region from location string
+    const extractJakartaRegion = (location: string) => {
+        const locationLower = location.toLowerCase();
+        for (const region of jakartaRegions) {
+            if (locationLower.includes(region.toLowerCase())) {
+                return region;
+            }
+        }
+        return null;
+    };
+
+    // Extract unique Jakarta regions from locations
     const locations = React.useMemo(() => {
-        const unique = Array.from(new Set(volunterData.map(v => v.location)));
+        const regions = volunterData
+            .map(v => extractJakartaRegion(v.location))
+            .filter(region => region !== null);
+        const unique = Array.from(new Set(regions));
         return unique;
     }, [volunterData]);
     // Filtered data
@@ -76,7 +98,10 @@ export default function VolunteerLayout({ volunterData }: VolunterContentProps) 
             data = data.filter(v => v.category && v.category.toLowerCase() === selectedCategory.toLowerCase());
         }
         if (selectedLocation !== 'all') {
-            data = data.filter(v => v.location === selectedLocation);
+            data = data.filter(v => {
+                const region = extractJakartaRegion(v.location);
+                return region === selectedLocation;
+            });
         }
         // Sort by time
         if (sortOrder === 'desc' || sortOrder === 'asc') {
@@ -89,10 +114,14 @@ export default function VolunteerLayout({ volunterData }: VolunterContentProps) 
         return data;
     }, [volunterData, selectedCategory, selectedLocation, sortOrder]);
 
-    // Helper function to get the last part of a location string
+    // Helper function to get the Jakarta region from a location string
     const getLastLocationPart = (location: string) => {
-        return location.split(',').pop()?.trim() || location;
+        return extractJakartaRegion(location) || location;
     };
+
+    // Loading state for button
+    const [loadingButton, setLoadingButton] = React.useState<string | null>(null);
+    const router = useRouter();
 
     return (
         <>
@@ -125,6 +154,7 @@ export default function VolunteerLayout({ volunterData }: VolunterContentProps) 
                         <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10'>
                             {filteredData.map((item, idx) => {
                                 const formattedDate = formatDateIndo(item.date);
+                                const isLoading = loadingButton === item.slug;
                                 return (
                                     <Card key={idx} className='relative flex flex-col gap-4 p-0 group mb-10'>
                                         <CardContent className='flex flex-col gap-4 p-0'>
@@ -156,11 +186,24 @@ export default function VolunteerLayout({ volunterData }: VolunterContentProps) 
                                                     </div>
                                                 </div>
 
-                                                <Link href={`/volunteer/${item.slug}`} className='mt-auto'>
-                                                    <Button className='w-full bg-orange-400 hover:bg-orange-500 text-white font-semibold h-12 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]'>
-                                                        Daftar Sekarang
-                                                    </Button>
-                                                </Link>
+                                                <Button
+                                                    className='w-full bg-orange-400 hover:bg-orange-500 text-white font-semibold h-12 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed'
+                                                    onClick={e => {
+                                                        e.preventDefault();
+                                                        setLoadingButton(item.slug);
+                                                        router.push(`/volunteer/${item.slug}`);
+                                                    }}
+                                                    disabled={!!loadingButton && !isLoading}
+                                                >
+                                                    {isLoading ? (
+                                                        <>
+                                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                            Berpindah halaman...
+                                                        </>
+                                                    ) : (
+                                                        'Daftar Sekarang'
+                                                    )}
+                                                </Button>
                                             </div>
                                         </CardContent>
                                     </Card>
