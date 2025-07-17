@@ -81,8 +81,8 @@ export default function VolunteerLayout({ volunterData }: VolunterContentProps) 
         // Sort by time
         if (sortOrder === 'desc' || sortOrder === 'asc') {
             data = [...data].sort((a, b) => {
-                const dateA = new Date(a.time).getTime();
-                const dateB = new Date(b.time).getTime();
+                const dateA = new Date(a.date).getTime();
+                const dateB = new Date(b.date).getTime();
                 return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
             });
         }
@@ -107,7 +107,7 @@ export default function VolunteerLayout({ volunterData }: VolunterContentProps) 
                 getLastLocationPart={getLastLocationPart}
             />
             <section className='pt-28 pb-10'>
-                <div className='container px-4 md:px-8'>
+                <div className='container px-4 md:px-14'>
                     {/*  */}
                     {filteredData && filteredData.length === 0 ? (
                         <div className="col-span-full flex flex-col items-center justify-center py-20">
@@ -124,7 +124,7 @@ export default function VolunteerLayout({ volunterData }: VolunterContentProps) 
                     ) : (
                         <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10'>
                             {filteredData.map((item, idx) => {
-                                const formattedDate = formatDateIndo(item.time);
+                                const formattedDate = formatDateIndo(item.date);
                                 return (
                                     <Card key={idx} className='relative flex flex-col gap-4 p-0 group mb-10'>
                                         <CardContent className='flex flex-col gap-4 p-0'>

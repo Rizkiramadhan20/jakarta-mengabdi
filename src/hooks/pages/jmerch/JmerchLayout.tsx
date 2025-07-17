@@ -15,7 +15,7 @@ import { slugify } from "@/base/helper/slugify"
 export default function JmerchLayout({ productcategoryData }: { productcategoryData: Category[] }) {
     return (
         <section className='py-16'>
-            <div className="container px-4 md:px-8">
+            <div className="container px-4 md:px-14">
                 <div className="mb-12">
                     <h2 className="text-3xl font-bold text-[#ED8002] lg:text-4xl">Lengkapi koleksimu</h2>
                 </div>

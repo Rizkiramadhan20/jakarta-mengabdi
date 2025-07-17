@@ -240,7 +240,7 @@ export default function DonasiDetailsContent({ donasiData }: DonasiDetailsConten
 
     return (
         <section className="py-28">
-            <div className="container px-4 md:px-8">
+            <div className="container px-4 md:px-18">
                 <div className="text-sm text-gray-500 mb-4">
                     Beranda &gt; Donasi &gt; {donasiData.title}
                 </div>

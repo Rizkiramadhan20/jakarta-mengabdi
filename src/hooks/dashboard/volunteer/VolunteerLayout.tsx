@@ -28,7 +28,7 @@ import VolunteerCardSkeleton from '@/hooks/dashboard/volunteer/VolunteerSkelaton
 
 import Image from 'next/image'
 
-import { formatDateTimeIndo } from '@/base/helper/FormatDate';
+import { formatDateIndo, formatTimeOnly } from '@/base/helper/FormatDate';
 
 export default function VolunteerLayout() {
     const {
@@ -192,19 +192,15 @@ export default function VolunteerLayout() {
                                 <div className="flex flex-wrap gap-3 text-sm text-gray-700 mb-1">
                                     <span>Lokasi: <span className="font-medium">{volunteer.location}</span></span>
                                 </div>
-                                <span className="text-xs text-gray-500">Jadwal event: {volunteer.time ? formatDateTimeIndo(volunteer.time) : '-'}</span>
-                                {volunteer.payment_options && volunteer.payment_options.length > 0 ? (
+                                <span className="text-xs text-gray-500">Jadwal event: {volunteer.date ? `${formatDateIndo(volunteer.date)} ${formatTimeOnly(volunteer.start_time)} - ${formatTimeOnly(volunteer.last_time)}` : '-'}</span>
+                                {volunteer.payment_type === 'gratis' ? (
                                     <div className="flex flex-wrap gap-2 mt-1">
-                                        {volunteer.payment_options.map((option, idx) => (
-                                            <span key={idx} className="text-xs px-2 py-1 rounded bg-gray-100 border border-gray-200 text-gray-700">
-                                                {option.type === "gratis"
-                                                    ? "Gratis"
-                                                    : `Berbayar: Rp${Number(option.price).toLocaleString()}`}
-                                            </span>
-                                        ))}
+                                        <span className="text-xs px-2 py-1 rounded bg-gray-100 border border-gray-200 text-gray-700">Gratis</span>
                                     </div>
                                 ) : (
-                                    <span className="text-xs text-gray-500">Harga: -</span>
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                        <span className="text-xs px-2 py-1 rounded bg-gray-100 border border-gray-200 text-gray-700">Berbayar: Rp{Number(volunteer.price).toLocaleString()}</span>
+                                    </div>
                                 )}
                             </CardContent>
                             <CardFooter className="flex flex-row gap-2 mt-2 px-5 pb-4">

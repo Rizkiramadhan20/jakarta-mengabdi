@@ -59,7 +59,7 @@ export default function KakaSakuLayout({ kakaSakuData }: { kakaSakuData: KakaSak
 
     return (
         <section className='pt-32 py-10'>
-            <div className="container px-4 md:px-10">
+            <div className="container px-4 md:px-14">
                 <h2 className="text-2xl md:text-3xl font-bold mb-2">KAKAK SAKU</h2>
                 <div className="w-24 h-1 bg-orange-400 rounded mb-8"></div>
 

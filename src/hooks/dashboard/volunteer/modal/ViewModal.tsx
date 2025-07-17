@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button';
 import type { Volunteer } from '@/interface/volunteer';
 
 import Image from 'next/image';
-import { formatDateTimeIndo } from '@/base/helper/FormatDate';
+
+import { formatDateIndo, formatTimeOnly } from '@/base/helper/FormatDate';
 
 interface ViewModalProps {
     open: boolean;
@@ -76,10 +77,15 @@ export default function ViewModal({ open, onOpenChange, viewingVolunteer, onClos
                                     <div>{viewingVolunteer.location}</div>
                                     <div className="font-semibold text-gray-700">Sesion Type:</div>
                                     <div>{viewingVolunteer.session_type}</div>
-                                    <div className="font-semibold text-gray-700">Jadwal event:</div>
-                                    <div>{viewingVolunteer.time ? formatDateTimeIndo(viewingVolunteer.time) : '-'}</div>
+                                    <div className="font-semibold text-gray-700">Acara:</div>
+                                    <div>{viewingVolunteer.date ? formatDateIndo(viewingVolunteer.date) : '-'}</div>
                                     <div className="font-semibold text-gray-700">Batas Pendaftaran:</div>
-                                    <div>{viewingVolunteer.last_time ? formatDateTimeIndo(viewingVolunteer.last_time) : '-'}</div>
+                                    <div>{viewingVolunteer.last_registration ? formatDateIndo(viewingVolunteer.last_registration) : '-'}</div>
+                                    <div className="font-semibold text-gray-700">Jam Mulai:</div>
+                                    <div><span>
+                                        {viewingVolunteer.start_time ? formatTimeOnly(viewingVolunteer.start_time) : '-'} - </span>
+                                        <span>{viewingVolunteer.last_time ? formatTimeOnly(viewingVolunteer.last_time) : '-'}</span>
+                                    </div>
                                     <div className="font-semibold text-gray-700">File Dokumen:</div>
                                     <div>{viewingVolunteer.file_document ? <a href={viewingVolunteer.file_document} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Lihat Dokumen</a> : '-'}</div>
                                     <div className="font-semibold text-gray-700">Form Link:</div>
@@ -88,13 +94,13 @@ export default function ViewModal({ open, onOpenChange, viewingVolunteer, onClos
                             </div>
 
                             {/* Deskripsi */}
-                            <div>
+                            <div className='flex flex-col gap-4'>
                                 <div className="font-semibold mb-1 text-gray-700">Deskripsi:</div>
                                 <div className="prose max-w-none bg-gray-50 rounded p-4 border text-gray-800">{viewingVolunteer.description}</div>
                             </div>
 
                             {/* Detail JSON */}
-                            <div>
+                            <div className='flex flex-col gap-4'>
                                 <div className="font-semibold mb-1 text-gray-700">Detail:</div>
                                 <div className="prose max-w-none bg-gray-50 rounded p-4 border text-gray-800">
                                     {Array.isArray(viewingVolunteer.detail) ? (
@@ -110,7 +116,7 @@ export default function ViewModal({ open, onOpenChange, viewingVolunteer, onClos
                             </div>
 
                             {/* Devisi JSON */}
-                            <div>
+                            <div className='flex flex-col gap-4'>
                                 <div className="font-semibold mb-1 text-gray-700">Devisi:</div>
                                 <div className="prose max-w-none bg-gray-50 rounded p-4 border text-gray-800">
                                     {Array.isArray(viewingVolunteer.devisi) ? (
@@ -126,7 +132,7 @@ export default function ViewModal({ open, onOpenChange, viewingVolunteer, onClos
                             </div>
 
                             {/* Timeline JSON */}
-                            <div>
+                            <div className='flex flex-col gap-4'>
                                 <div className="font-semibold mb-1 text-gray-700">Timeline:</div>
                                 <div className="prose max-w-none bg-gray-50 rounded p-4 border text-gray-800">
                                     {Array.isArray(viewingVolunteer.timeline) ? (
@@ -142,9 +148,22 @@ export default function ViewModal({ open, onOpenChange, viewingVolunteer, onClos
                             </div>
 
                             {/* Konten */}
-                            <div>
+                            <div className='flex flex-col gap-4'>
                                 <div className="font-semibold mb-1 text-gray-700">Konten:</div>
-                                <div className="prose max-w-none bg-gray-50 rounded p-4 border text-gray-800">{viewingVolunteer.content}</div>
+                                <div className="prose prose-lg max-w-none">
+                                    <div
+                                        dangerouslySetInnerHTML={{ __html: viewingVolunteer.content }}
+                                        className="
+prose max-w-none text-gray-800 text-sm md:text-base
+[&_strong]:text-gray-900 [&_strong]:font-semibold
+[&_ol]:list-decimal [&_ol]:pl-5 md:[&_ol]:pl-6 [&_ol]:space-y-1.5 md:[&_ol]:space-y-2
+[&_ul]:list-disc [&_ul]:pl-5 md:[&_ul]:pl-6 [&_ul]:space-y-1.5 md:[&_ul]:space-y-2
+[&_li]:text-gray-700 [&_li]:leading-relaxed
+[&_blockquote]:border-l-4 [&_blockquote]:border-orange-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-gray-600 [&_blockquote]:bg-orange-50 [&_blockquote]:py-2 [&_blockquote]:px-3 [&_blockquote]:rounded-md
+[&_.ql-ui]:hidden
+  "
+                                    />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>

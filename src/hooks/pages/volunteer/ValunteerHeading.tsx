@@ -29,7 +29,7 @@ export default function ValunteerHeading({
 }: ValunteerHeadingProps) {
     return (
         <section className="pt-32 pb-12 md:pt-40 md:pb-16">
-            <div className="container mx-auto px-2 md:px-8 relative z-10 flex flex-col items-center text-center">
+            <div className="container mx-auto px-4 md:px-14 relative z-10 flex flex-col items-center text-center">
                 {/* Decorative Images */}
                 <Image
                     src={img1}

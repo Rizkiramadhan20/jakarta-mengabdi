@@ -58,7 +58,7 @@ export default function DonasiLayout({ donasiData }: { donasiData: Donasi[] }) {
 
     return (
         <section className='py-10'>
-            <div className="container px-4 md:px-10">
+            <div className="container px-4 md:px-14">
                 <h2 className="text-2xl md:text-3xl font-bold mb-2">Jakarta Mengabdi Berdonasi</h2>
                 <div className="w-24 h-1 bg-orange-400 rounded mb-8"></div>
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>

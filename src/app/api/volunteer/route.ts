@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   try {
     const { data, error } = await supabase
       .from(process.env.NEXT_PUBLIC_VOLUNTEERS as string)
-      .select("id,title,category,session_type,location,time,img_url,slug")
+      .select("id,title,category,session_type,location,date,img_url,slug")
       .order("created_at", { ascending: false });
     if (error) {
       return NextResponse.json(

@@ -22,11 +22,14 @@ const defaultForm: Omit<Volunteer, "id" | "created_at" | "updated_at"> = {
   category: "pilar cerdas",
   session_type: "onsite",
   form_link: "",
-  payment_options: [],
-  time: "",
+  payment_type: "gratis",
+  price: 0,
+  date: "",
+  start_time: "",
+  last_time: "",
+  last_registration: "",
   location: "",
   file_document: "",
-  last_time: "",
 };
 
 export function useManagamentVolunteer() {
@@ -187,11 +190,14 @@ export function useManagamentVolunteer() {
           category: form.category,
           session_type: form.session_type,
           form_link: form.form_link,
-          payment_options: form.payment_options,
-          time: form.time,
+          payment_type: form.payment_type,
+          price: form.price,
+          date: form.date,
+          start_time: form.start_time,
+          last_time: form.last_time,
+          last_registration: form.last_registration,
           location: form.location,
           file_document: fileDocumentUrl,
-          last_time: form.last_time,
         })
         .eq("id", modal.editingId);
       error = res.error;
@@ -215,11 +221,14 @@ export function useManagamentVolunteer() {
           category: form.category,
           session_type: form.session_type,
           form_link: form.form_link,
-          payment_options: form.payment_options,
-          time: form.time,
+          payment_type: form.payment_type,
+          price: form.price,
+          date: form.date,
+          start_time: form.start_time,
+          last_time: form.last_time,
+          last_registration: form.last_registration,
           location: form.location,
           file_document: fileDocumentUrl,
-          last_time: form.last_time,
         });
       error = res.error;
       if (!error) {

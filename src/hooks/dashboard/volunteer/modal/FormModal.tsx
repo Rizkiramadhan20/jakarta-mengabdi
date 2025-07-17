@@ -41,6 +41,11 @@ const CATEGORIES = [
     'pilar peduli',
 ];
 
+const PAYMENT_TYPES = [
+    { label: 'Gratis', value: 'gratis' },
+    { label: 'Berbayar', value: 'berbayar' },
+];
+
 const FormModal: React.FC<FormModalProps> = ({
     isEditMode,
     form,
@@ -68,32 +73,13 @@ const FormModal: React.FC<FormModalProps> = ({
     setImagePreviews,
     handleDeleteFileDocument,
 }) => {
-    // Handler untuk payment_options (jsonb array)
-    const addPaymentOption = () => {
-        setForm({
-            ...form,
-            payment_options: [
-                ...(form.payment_options || []),
-                { type: 'gratis', price: 0 },
-            ],
-        });
+    const handlePaymentTypeChange = (val: string) => {
+        setForm({ ...form, payment_type: val, price: val === 'gratis' ? 0 : form.price || 0 });
     };
-    const updatePaymentOption = (idx: number, key: 'type' | 'price', value: any) => {
-        const newOptions = [...(form.payment_options || [])];
-        if (key === 'type') {
-            newOptions[idx].type = value;
-            if (value === 'gratis') newOptions[idx].price = 0;
-        } else {
-            newOptions[idx].price = value;
-        }
-        setForm({ ...form, payment_options: newOptions });
+    const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = getRawNumberFromIDR(e.target.value);
+        setForm({ ...form, price: raw });
     };
-    const removePaymentOption = (idx: number) => {
-        const newOptions = (form.payment_options || []).filter((_, i) => i !== idx);
-        setForm({ ...form, payment_options: newOptions });
-    };
-
-    // Helper functions for JSON array management
     const addDetailItem = () => {
         const newDetail = Array.isArray(form.detail) ? [...form.detail, ''] : [''];
         setForm({ ...form, detail: newDetail });
@@ -144,7 +130,7 @@ const FormModal: React.FC<FormModalProps> = ({
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4 space-y-4 w-full max-w-full">
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <div className='flex flex-col gap-2'>
                     <Label htmlFor="title">Title</Label>
                     <Input id="title" name="title" value={form.title} onChange={handleChange} required />
@@ -153,121 +139,154 @@ const FormModal: React.FC<FormModalProps> = ({
                     <Label htmlFor="slug">Slug</Label>
                     <Input id="slug" name="slug" value={form.slug} readOnly required placeholder="contoh: volunteer-anak-yatim" />
                 </div>
+
+                <div className='flex flex-col gap-2'>
+                    <Label htmlFor="category">Kategori</Label>
+                    <Select
+                        value={form.category}
+                        onValueChange={val => setForm({ ...form, category: val })}
+                    >
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Pilih kategori" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {CATEGORIES.map(cat => (
+                                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
 
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div className='flex flex-col gap-2'>
-                    <Label htmlFor="form_link">Form Link</Label>
-                    <Input id="form_link" name="form_link" value={form.form_link} onChange={handleChange} required placeholder="https://..." />
-                </div>
-
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <div className='flex flex-col gap-2'>
                     <Label htmlFor="location">Lokasi</Label>
                     <Input id="location" name="location" value={form.location} onChange={handleChange} required />
                 </div>
+                <div className='flex flex-col gap-2'>
+                    <Label htmlFor="session_type">Tipe Sesi</Label>
+                    <Select
+                        value={form.session_type}
+                        onValueChange={val => setForm({ ...form, session_type: val as 'onsite' | 'online' })}
+                    >
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Pilih tipe sesi" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="onsite">Onsite</SelectItem>
+                            <SelectItem value="online">Online</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className='flex flex-col gap-2'>
+                    <Label htmlFor="form_link">Form Link</Label>
+                    <Input id="form_link" name="form_link" value={form.form_link} onChange={handleChange} required placeholder="https://..." />
+                </div>
             </div>
 
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                {/* WAKTU MULAI */}
+            <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+                {/* Tanggal Event */}
                 <div className='flex flex-col'>
-                    <Label htmlFor="time">Waktu Mulai</Label>
+                    <Label htmlFor="date">Tanggal Event</Label>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                className={`w-full h-10 justify-start text-left font-normal rounded-md border px-3 py-2 text-sm ${!form.date ? 'text-muted-foreground' : ''}`}
+                            >
+                                {form.date ? format(new Date(form.date), 'dd/MM/yyyy') : 'Pilih tanggal event'}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                mode="single"
+                                selected={form.date ? new Date(form.date) : undefined}
+                                onSelect={date => {
+                                    if (!date) return;
+                                    setForm({ ...form, date: format(date, 'yyyy-MM-dd') });
+                                }}
+                                initialFocus
+                            />
+                        </PopoverContent>
+                    </Popover>
+                </div>
+                {/* Batas Pendaftaran */}
+                <div className='flex flex-col'>
+                    <Label htmlFor="last_registration">Batas Pendaftaran</Label>
                     <div className="flex gap-2 items-end">
                         <div className="flex flex-col flex-1">
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
                                         variant="outline"
-                                        className={`w-full h-10 justify-start text-left font-normal rounded-md border px-3 py-2 text-sm ${!form.time ? 'text-muted-foreground' : ''}`}
+                                        className={`w-full h-10 justify-start text-left font-normal rounded-md border px-3 py-2 text-sm ${!form.last_registration ? 'text-muted-foreground' : ''}`}
                                     >
-                                        {form.time ? format(new Date(form.time), 'dd/MM/yyyy') : 'Pilih tanggal mulai'}
+                                        {form.last_registration ? format(new Date(form.last_registration), 'dd/MM/yyyy') : 'Pilih tanggal selesai'}
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
                                         mode="single"
-                                        selected={form.time ? new Date(form.time) : undefined}
+                                        selected={form.last_registration ? new Date(form.last_registration) : undefined}
                                         onSelect={date => {
                                             if (!date) return;
-                                            const prev = form.time ? new Date(form.time) : new Date();
-                                            const jam = prev.getHours().toString().padStart(2, '0');
-                                            const menit = prev.getMinutes().toString().padStart(2, '0');
-                                            const iso = `${format(date, 'yyyy-MM-dd')}T${jam}:${menit}`;
-                                            setForm({ ...form, time: iso });
+                                            setForm({ ...form, last_registration: format(date, 'yyyy-MM-dd') });
                                         }}
                                         initialFocus
                                     />
                                 </PopoverContent>
                             </Popover>
-                        </div>
-
-                        <div className="flex flex-col items-start">
-                            <span className="text-xs text-muted-foreground ml-1">Jam</span>
-                            <Input
-                                type="time"
-                                value={form.time ? format(new Date(form.time), 'HH:mm') : ''}
-                                onChange={e => {
-                                    const date = form.time ? new Date(form.time) : new Date();
-                                    const [jam, menit] = e.target.value.split(':');
-                                    date.setHours(Number(jam));
-                                    date.setMinutes(Number(menit));
-                                    const iso = format(date, "yyyy-MM-dd'T'HH:mm");
-                                    setForm({ ...form, time: iso });
-                                }}
-                                className="w-24 h-10"
-                                required
-                            />
                         </div>
                     </div>
                 </div>
-                {/* WAKTU SELESAI */}
+                {/* Jam Mulai */}
                 <div className='flex flex-col'>
-                    <Label htmlFor="last_time">Waktu Selesai</Label>
-                    <div className="flex gap-2 items-end">
-                        <div className="flex flex-col flex-1">
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        className={`w-full h-10 justify-start text-left font-normal rounded-md border px-3 py-2 text-sm ${!form.last_time ? 'text-muted-foreground' : ''}`}
-                                    >
-                                        {form.last_time ? format(new Date(form.last_time), 'dd/MM/yyyy') : 'Pilih tanggal selesai'}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        selected={form.last_time ? new Date(form.last_time) : undefined}
-                                        onSelect={date => {
-                                            if (!date) return;
-                                            const prev = form.last_time ? new Date(form.last_time) : new Date();
-                                            const jam = prev.getHours().toString().padStart(2, '0');
-                                            const menit = prev.getMinutes().toString().padStart(2, '0');
-                                            const iso = `${format(date, 'yyyy-MM-dd')}T${jam}:${menit}`;
-                                            setForm({ ...form, last_time: iso });
-                                        }}
-                                        initialFocus
-                                    />
-                                </PopoverContent>
-                            </Popover>
-                        </div>
-                        <div className="flex flex-col items-start">
-                            <span className="text-xs text-muted-foreground ml-1">Jam</span>
+                    <Label htmlFor="start_time">Jam Mulai</Label>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                className={`w-full h-10 justify-start text-left font-normal rounded-md border px-3 py-2 text-sm ${!form.start_time ? 'text-muted-foreground' : ''}`}
+                            >
+                                {form.start_time ? form.start_time : 'Pilih jam mulai'}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-2" align="start">
                             <Input
                                 type="time"
-                                value={form.last_time ? format(new Date(form.last_time), 'HH:mm') : ''}
-                                onChange={e => {
-                                    const date = form.last_time ? new Date(form.last_time) : new Date();
-                                    const [jam, menit] = e.target.value.split(':');
-                                    date.setHours(Number(jam));
-                                    date.setMinutes(Number(menit));
-                                    const iso = format(date, "yyyy-MM-dd'T'HH:mm");
-                                    setForm({ ...form, last_time: iso });
-                                }}
-                                className="w-24 h-10"
+                                id="start_time"
+                                name="start_time"
+                                value={form.start_time}
+                                onChange={e => setForm({ ...form, start_time: e.target.value })}
                                 required
                             />
-                        </div>
-                    </div>
+                        </PopoverContent>
+                    </Popover>
+                </div>
+                {/* Jam Selesai */}
+                <div className='flex flex-col'>
+                    <Label htmlFor="last_time">Jam Selesai</Label>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                className={`w-full h-10 justify-start text-left font-normal rounded-md border px-3 py-2 text-sm ${!form.last_time ? 'text-muted-foreground' : ''}`}
+                            >
+                                {form.last_time ? form.last_time : 'Pilih jam selesai'}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-2" align="start">
+                            <Input
+                                type="time"
+                                id="last_time"
+                                name="last_time"
+                                value={form.last_time}
+                                onChange={e => setForm({ ...form, last_time: e.target.value })}
+                                required
+                            />
+                        </PopoverContent>
+                    </Popover>
                 </div>
             </div>
 
@@ -315,39 +334,35 @@ const FormModal: React.FC<FormModalProps> = ({
                     )}
                 </div>
 
-                {/* OPSI PEMBAYARAN JSONB */}
+                {/* OPSI PEMBAYARAN (SINGLE) */}
                 <div className="flex flex-col gap-2 w-full">
                     <Label>Opsi Pembayaran</Label>
-                    {(form.payment_options || []).map((opt, idx) => (
-                        <div key={idx} className="flex gap-2 items-center w-full">
-                            <Select
-                                value={opt.type}
-                                onValueChange={val => updatePaymentOption(idx, 'type', val as 'berbayar' | 'gratis')}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Tipe" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="berbayar">Berbayar</SelectItem>
-                                    <SelectItem value="gratis">Gratis</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Input
-                                type="text"
-                                className="w-full"
-                                placeholder="Harga"
-                                value={opt.type === 'gratis' ? '' : (opt.price === 0 ? '' : formatIDR(Number(opt.price)))}
-                                onChange={e => updatePaymentOption(idx, 'price', getRawNumberFromIDR(e.target.value))}
-                                disabled={opt.type === 'gratis'}
-                                required={opt.type === 'berbayar'}
-                                min="0"
-                                inputMode="numeric"
-                                pattern="[0-9.]*"
-                            />
-                            <Button type="button" size="icon" variant="destructive" onClick={() => removePaymentOption(idx)}><Trash2 size={16} /></Button>
-                        </div>
-                    ))}
-                    <Button type="button" variant="outline" size="sm" onClick={addPaymentOption} className="w-fit mt-1"><Plus size={16} className="mr-2" />Tambah Opsi Pembayaran</Button>
+                    <Select
+                        value={form.payment_type || 'gratis'}
+                        onValueChange={handlePaymentTypeChange}
+                    >
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Tipe" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {PAYMENT_TYPES.map(opt => (
+                                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    {form.payment_type === 'berbayar' && (
+                        <Input
+                            type="text"
+                            className="w-full mt-2"
+                            placeholder="Harga"
+                            value={form.price ? formatIDR(Number(form.price)) : ''}
+                            onChange={handlePriceChange}
+                            required
+                            min="0"
+                            inputMode="numeric"
+                            pattern="[0-9.]*"
+                        />
+                    )}
                 </div>
             </div>
 
@@ -574,8 +589,6 @@ const FormModal: React.FC<FormModalProps> = ({
                         className="min-h-[250px]"
                     />
                 </div>
-
-
             </div>
 
             <DialogFooter>

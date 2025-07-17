@@ -10,14 +10,17 @@ export type Volunteer = {
   content: string;
   category: "pilar cerdas" | "pilar sehat" | "pilar lestari" | "pilar peduli";
   session_type: "onsite" | "online";
-  time: string;
+  date: string;
+  start_time: string;
+  last_time: string;
+  last_registration: string;
   location: string;
   form_link: string;
   file_document?: string | null;
   created_at: string;
   updated_at: string;
-  payment_options: PaymentOption[];
-  last_time: string;
+  payment_type: "gratis" | "berbayar";
+  price: number;
 };
 
 export interface PaymentOption {
