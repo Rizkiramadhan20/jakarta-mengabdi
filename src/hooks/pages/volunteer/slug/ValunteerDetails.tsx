@@ -254,7 +254,7 @@ prose max-w-none text-gray-800 text-sm md:text-base
                                     <div className='flex flex-col gap-1'>
                                         <div className="text-base text-gray-500 font-medium mb-0.5">Jadwal event</div>
                                         <div className="text-base font-semibold text-gray-600">
-                                            {volunteerData.last_registration ? formatDateIndo(volunteerData.last_registration) : '-'}
+                                            {volunteerData.date ? formatDateIndo(volunteerData.date) : '-'}
                                         </div>
                                         <div className="text-base text-gray-600">
                                             Pukul: {volunteerData.start_time ? formatTimeOnly(volunteerData.start_time) : '-'} - {volunteerData.last_time ? formatTimeOnly(volunteerData.last_time) : '-'}
