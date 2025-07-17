@@ -4,7 +4,11 @@ import Image from 'next/image'
 
 import blob from "@/base/assets/blobs.png"
 
-export default function SocialMedia() {
+import { OnlineStore } from '@/interface/jmerch'
+
+import Link from 'next/link'
+
+export default function SocialMedia({ onlineStoreData }: { onlineStoreData: OnlineStore[] }) {
     return (
         <section className='py-8 md:py-12 lg:py-16 bg-[#ED8002] overflow-hidden'>
             <div className="px-4 md:px-24">
@@ -24,14 +28,16 @@ export default function SocialMedia() {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                            <button className="bg-[#553510] text-white px-4 md:px-6 py-3 md:py-4 rounded-full font-medium flex items-center justify-center text-sm md:text-base">
-                                Buat Desainmu Sekarang
-                                <div className="w-2 h-2 rounded-full ml-2 bg-gray-300"></div>
-                            </button>
-                            <button className="bg-[#553510] text-white px-4 md:px-6 py-3 md:py-4 rounded-full font-medium flex items-center justify-center text-sm md:text-base">
-                                Tanya Dulu, Gratis!
-                                <div className="w-2 h-2 rounded-full ml-2 bg-gray-300"></div>
-                            </button>
+                            {onlineStoreData.map((item, idx) => {
+                                return (
+                                    <Link href={item.url} key={idx} className='bg-[#553510] text-white px-4 md:px-6 py-3 md:py-4 rounded-full font-medium flex items-center justify-center text-sm md:text-base'>
+                                        <span>
+                                            {item.name}
+                                        </span>
+                                        <div className="w-2 h-2 rounded-full ml-2 bg-gray-300"></div>
+                                    </Link>
+                                )
+                            })}
                         </div>
                     </div>
 

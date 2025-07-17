@@ -1,9 +1,7 @@
 
 import React, { Fragment } from 'react';
 
-import { fetchJMerchData } from "@/lib/FetchJMERCH"
-
-import { fetchKakakSakuData } from "@/lib/FetchKakakSaku"
+import { fetchJMerchData, fetchOnlineStoreData } from "@/lib/FetchJMERCH"
 
 import DonasiSkeleton from '@/hooks/pages/donasi/DonasiSkeleton';
 
@@ -45,12 +43,12 @@ export const metadata: Metadata = {
 export default async function Page() {
     try {
         const jmerchData = await fetchJMerchData();
-        const kakaSakuData = await fetchKakakSakuData();
+        const onlineStoreData = await fetchOnlineStoreData();
 
         return <Fragment>
             <HeroJmerch />
             <JmerchLayout jmerchData={jmerchData} />
-            <SocialMedia />
+            <SocialMedia onlineStoreData={onlineStoreData} />
         </Fragment>;
     } catch (error) {
         console.error('Error fetching Donasi data:', error);

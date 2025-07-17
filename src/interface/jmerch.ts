@@ -7,6 +7,7 @@ export interface JMerch {
 
 export interface OnlineStore {
   id: number;
+  name: string;
   url: string;
   created_at: string;
 }

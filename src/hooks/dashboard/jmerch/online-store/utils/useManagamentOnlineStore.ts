@@ -17,7 +17,7 @@ export function useManagamentOnlineStore() {
     const fetchOnlineStore = async () => {
       setLoading(true);
       const { data, error } = await supabase
-        .from("online_store")
+        .from(process.env.NEXT_PUBLIC_ONLINE_STORE as string)
         .select("id, name, url, created_at")
         .order("created_at", { ascending: false });
       if (error) {
@@ -60,7 +60,7 @@ export function useManagamentOnlineStore() {
     let error = null;
     if (isEditMode && editingId) {
       const res = await supabase
-        .from("online_store")
+        .from(process.env.NEXT_PUBLIC_ONLINE_STORE as string)
         .update({ name: form.name, url: form.url })
         .eq("id", editingId);
       error = res.error;
@@ -71,7 +71,7 @@ export function useManagamentOnlineStore() {
       }
     } else {
       const res = await supabase
-        .from("online_store")
+        .from(process.env.NEXT_PUBLIC_ONLINE_STORE as string)
         .insert({ name: form.name, url: form.url });
       error = res.error;
       if (!error) {
@@ -84,7 +84,7 @@ export function useManagamentOnlineStore() {
     if (!error) {
       closeModal();
       const { data, error } = await supabase
-        .from("online_store")
+        .from(process.env.NEXT_PUBLIC_ONLINE_STORE as string)
         .select("id, name, url, created_at")
         .order("created_at", { ascending: false });
       if (error) {
@@ -94,7 +94,10 @@ export function useManagamentOnlineStore() {
     }
   };
   const handleDelete = async (id: number) => {
-    const { error } = await supabase.from("online_store").delete().eq("id", id);
+    const { error } = await supabase
+      .from(process.env.NEXT_PUBLIC_ONLINE_STORE as string)
+      .delete()
+      .eq("id", id);
     if (!error) {
       setOnlineStore(onlineStore.filter((c) => c.id !== id));
       toast.success("Online Store berhasil dihapus!");
