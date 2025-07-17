@@ -25,9 +25,9 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Konfirmasi Hapus Produk</DialogTitle>
+                    <DialogTitle>Konfirmasi Hapus JMerch</DialogTitle>
                 </DialogHeader>
-                <div>Apakah Anda yakin ingin menghapus produk ini?</div>
+                <div>Apakah Anda yakin ingin menghapus JMerch ini?</div>
                 <DialogFooter>
                     <Button
                         variant="destructive"

@@ -1,17 +1,15 @@
-import { Category } from "@/interface/products";
+import { JMerch } from "@/interface/jmerch";
 
-export const fetchProductscategoryData = async (): Promise<Category[]> => {
+export const fetchJMerchData = async (): Promise<JMerch[]> => {
   try {
-    // Lewati pengambilan selama waktu pembuatan jika BASE_URL tidak tersedia
+    // Skip fetch during build time if BASE_URL is not available
     if (!process.env.NEXT_PUBLIC_BASE_URL) {
-      console.warn(
-        "NEXT_PUBLIC_BASE_URL tidak tersedia selama waktu pembangunan"
-      );
+      console.warn("NEXT_PUBLIC_BASE_URL not available during build time");
       return [];
     }
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/products-category`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/jmerch`,
       {
         headers: {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_SECRET}`,
@@ -25,9 +23,10 @@ export const fetchProductscategoryData = async (): Promise<Category[]> => {
     }
 
     const data = await response.json();
-    return data || []; // Mengembalikan data secara langsung, dengan fallback ke array kosong
+    return data || [];
   } catch (error) {
-    console.error("Error fetching products category data:", error);
+    console.error("Error fetching jmerch data:", error);
+    // Return empty array instead of throwing to prevent build failures
     return [];
   }
 };

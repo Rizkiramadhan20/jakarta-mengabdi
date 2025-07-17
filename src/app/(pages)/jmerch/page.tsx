@@ -1,7 +1,7 @@
 
 import React, { Fragment } from 'react';
 
-import { fetchProductscategoryData } from "@/lib/FetchJMERCH"
+import { fetchJMerchData } from "@/lib/FetchJMERCH"
 
 import { fetchKakakSakuData } from "@/lib/FetchKakakSaku"
 
@@ -44,12 +44,12 @@ export const metadata: Metadata = {
 
 export default async function Page() {
     try {
-        const productcategoryData = await fetchProductscategoryData();
+        const jmerchData = await fetchJMerchData();
         const kakaSakuData = await fetchKakakSakuData();
 
         return <Fragment>
             <HeroJmerch />
-            <JmerchLayout productcategoryData={productcategoryData} />
+            <JmerchLayout jmerchData={jmerchData} />
             <SocialMedia />
         </Fragment>;
     } catch (error) {

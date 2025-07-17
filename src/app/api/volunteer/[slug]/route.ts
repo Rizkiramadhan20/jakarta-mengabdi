@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 import { supabase } from "@/utils/supabase/supabase";
 
+export const revalidate = 5; // validasi ulang setiap 5 detik
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ slug: string }> }

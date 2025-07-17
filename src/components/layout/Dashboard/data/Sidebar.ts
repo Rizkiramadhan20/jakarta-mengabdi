@@ -7,7 +7,7 @@ import {
   HandCoins,
   CircleUser,
   Gift,
-  ChartNoAxesCombined
+  ChartNoAxesCombined,
 } from "lucide-react";
 
 export const menuItems = [
@@ -18,18 +18,18 @@ export const menuItems = [
   },
 
   {
-    href: "/dashboard/products",
-    label: "Products",
+    href: "/dashboard/jmerch",
+    label: "JMerch",
     icon: Building2,
     subItems: [
       {
-        href: "/dashboard/products/products",
-        label: "Products",
+        href: "/dashboard/jmerch/jmerch",
+        label: "JMerch",
       },
 
       {
-        href: "/dashboard/products/category",
-        label: "Category",
+        href: "/dashboard/jmerch/online-store",
+        label: "Online Store",
       },
     ],
   },

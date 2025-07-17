@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 
   try {
     const { data, error } = await supabase
-      .from(process.env.NEXT_PUBLIC_PRODUCTS_CATEGORY as string)
+      .from(process.env.NEXT_PUBLIC_JMERCH as string)
       .select("*")
       .order("created_at", { ascending: false });
     if (error) {
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     return NextResponse.json(data || []);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch products" },
+      { error: "Failed to fetch jmerch" },
       { status: 500 }
     );
   }

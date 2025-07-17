@@ -8,21 +8,21 @@ import { ChevronRight } from "lucide-react"
 
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
-import FormModal from '@/hooks/dashboard/products/category/modal/FormModal';
+import FormModal from '@/hooks/dashboard/jmerch/jmerch/modal/FormModal';
 
-import DeleteModal from '@/hooks/dashboard/products/category/modal/DeleteModal';
+import DeleteModal from '@/hooks/dashboard/jmerch/jmerch/modal/DeleteModal';
 
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination'
 
-import { useManagamentProductsCategory } from '@/hooks/dashboard/products/category/utils/useManagamentCategory';
+import { useManagamentJMerch } from '@/hooks/dashboard/jmerch/jmerch/utils/useManagamentJmerch';
 
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 
-import CategorySkelaton from '@/hooks/dashboard/products/category/CategorySkelaton';
+import CategorySkelaton from '@/hooks/dashboard/jmerch/jmerch/JmerchSkelaton';
 
-export default function CategoryLayout() {
+export default function JmerchLayout() {
     const {
-        categories,
+        jmerch,
         loading,
         modalOpen, setModalOpen,
         isEditMode,
@@ -42,7 +42,18 @@ export default function CategoryLayout() {
         uploadProgress,
         inputRef,
         handleImageChange,
-    } = useManagamentProductsCategory();
+        pendingImages,
+        setPendingImages,
+        dragActive,
+        handleDrag,
+        handleDrop,
+        draggedImageIdx,
+        isDraggingImage,
+        handleImageDragStart,
+        handleImageDragOver,
+        handleImageDrop,
+        handleImageDragEnd,
+    } = useManagamentJMerch();
 
     const [currentPage, setCurrentPage] = React.useState(1);
 
@@ -50,18 +61,18 @@ export default function CategoryLayout() {
 
     const [search, setSearch] = React.useState("");
 
-    const filteredCategories = categories.filter((cat) =>
+    const filteredJMerch = jmerch.filter((cat) =>
         cat.name.toLowerCase().includes(search.toLowerCase())
     );
-    const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
-    const paginatedCategories = filteredCategories.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const totalPages = Math.ceil(filteredJMerch.length / itemsPerPage);
+    const paginatedJMerch = filteredJMerch.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     return (
         <section className='overflow-hidden'>
             <div className='flex flex-col md:flex-row justify-between items-start md:items-center p-4 md:p-6 border rounded-2xl border-border bg-card shadow-sm gap-4'>
                 <div className='flex flex-col gap-3'>
                     <h3 className='text-2xl md:text-3xl font-bold'>
-                        Manajemen Kategori
+                        Manajemen JMerch
                     </h3>
                     <ol className='flex gap-2 items-center text-sm text-muted-foreground'>
                         <li className='flex items-center hover:text-primary transition-colors'>
@@ -69,7 +80,7 @@ export default function CategoryLayout() {
                             <ChevronRight className="w-4 h-4 mx-1 text-muted-foreground" />
                         </li>
                         <li className='flex items-center text-primary font-medium'>
-                            <span>Categories</span>
+                            <span>JMerch</span>
                         </li>
                     </ol>
                 </div>
@@ -81,12 +92,12 @@ export default function CategoryLayout() {
                             className="w-full md:w-auto px-6 py-2.5 font-medium shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105"
                             onClick={openCreateModal}
                         >
-                            Tambah Kategori
+                            Tambah JMerch
                         </Button>
                     </DialogTrigger>
                     <DialogContent className='max-w-lg max-h-[90vh] overflow-y-auto'>
                         <DialogHeader>
-                            <DialogTitle>{isEditMode ? 'Edit Kategori' : 'Tambah Kategori'}</DialogTitle>
+                            <DialogTitle>{isEditMode ? 'Edit JMerch' : 'Tambah JMerch'}</DialogTitle>
                         </DialogHeader>
                         <FormModal
                             isEditMode={isEditMode}
@@ -102,6 +113,17 @@ export default function CategoryLayout() {
                             uploadProgress={uploadProgress}
                             inputRef={inputRef}
                             handleImageChange={handleImageChange}
+                            pendingImages={pendingImages}
+                            setPendingImages={setPendingImages}
+                            dragActive={dragActive}
+                            handleDrag={handleDrag}
+                            handleDrop={handleDrop}
+                            draggedImageIdx={draggedImageIdx}
+                            isDraggingImage={isDraggingImage}
+                            handleImageDragStart={handleImageDragStart}
+                            handleImageDragOver={handleImageDragOver}
+                            handleImageDrop={handleImageDrop}
+                            handleImageDragEnd={handleImageDragEnd}
                         />
                     </DialogContent>
                 </Dialog>
@@ -111,7 +133,7 @@ export default function CategoryLayout() {
                 <div className="mb-4 flex justify-start">
                     <input
                         type="text"
-                        placeholder="Cari kategori..."
+                        placeholder="Cari JMerch..."
                         value={search}
                         onChange={e => {
                             setSearch(e.target.value);
@@ -122,7 +144,7 @@ export default function CategoryLayout() {
                 </div>
                 {loading ? (
                     <CategorySkelaton />
-                ) : filteredCategories.length === 0 && categories.length > 0 ? (
+                ) : filteredJMerch.length === 0 && jmerch.length > 0 ? (
                     <div className="col-span-full flex flex-col items-center justify-center py-8 border rounded-2xl bg-white/95 shadow-md">
                         <svg width="80" height="80" viewBox="0 0 24 24" fill="none" className="w-20 h-20 mb-4 opacity-80 mx-auto" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="12" cy="12" r="10" stroke="#888" strokeWidth="2" fill="#f3f4f6" />
@@ -130,10 +152,10 @@ export default function CategoryLayout() {
                             <circle cx="9" cy="10" r="1" fill="#888" />
                             <circle cx="15" cy="10" r="1" fill="#888" />
                         </svg>
-                        <h4 className="text-lg font-semibold mb-1">Kategori tidak ditemukan</h4>
+                        <h4 className="text-lg font-semibold mb-1">JMerch tidak ditemukan</h4>
                         <p className="text-muted-foreground text-sm">Coba kata kunci lain.</p>
                     </div>
-                ) : categories.length === 0 ? (
+                ) : jmerch.length === 0 ? (
                     <div className="col-span-full flex flex-col items-center justify-center py-8 border rounded-2xl bg-white/95 shadow-md">
                         <svg width="80" height="80" viewBox="0 0 24 24" fill="none" className="w-20 h-20 mb-4 opacity-80 mx-auto" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="12" cy="12" r="10" stroke="#888" strokeWidth="2" fill="#f3f4f6" />
@@ -141,8 +163,8 @@ export default function CategoryLayout() {
                             <circle cx="9" cy="10" r="1" fill="#888" />
                             <circle cx="15" cy="10" r="1" fill="#888" />
                         </svg>
-                        <h4 className="text-lg font-semibold mb-1">Belum ada kategori</h4>
-                        <p className="text-muted-foreground text-sm">Kategori belum tersedia. Mulai tambahkan kategori baru.</p>
+                        <h4 className="text-lg font-semibold mb-1">Belum ada JMerch</h4>
+                        <p className="text-muted-foreground text-sm">JMerch belum tersedia. Mulai tambahkan JMerch baru.</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto rounded-xl border border-border bg-card stacked-table-container">
@@ -151,36 +173,36 @@ export default function CategoryLayout() {
                                 <TableRow className="bg-gray-100">
                                     <TableHead className="w-12 font-bold text-gray-700 px-4 py-3">No</TableHead>
                                     <TableHead className="font-bold text-gray-700 px-4 py-3">Gambar</TableHead>
-                                    <TableHead className="font-bold text-gray-700 px-4 py-3">Nama Kategori</TableHead>
+                                    <TableHead className="font-bold text-gray-700 px-4 py-3">Nama JMerch</TableHead>
                                     <TableHead className="font-bold text-gray-700 px-4 py-3">Tanggal Dibuat</TableHead>
                                     <TableHead className="w-40 font-bold text-gray-700 px-4 py-3">Aksi</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody className='overflow-auto'>
-                                {paginatedCategories.map((category, idx) => (
+                                {paginatedJMerch.map((jmerch, idx) => (
                                     <TableRow
-                                        key={category.id}
+                                        key={jmerch.id}
                                         className="hover:bg-gray-50 transition-colors"
                                     >
                                         <TableCell data-label="No" className="px-4 py-2">{(currentPage - 1) * itemsPerPage + idx + 1}</TableCell>
                                         <TableCell data-label="Gambar" className="px-4 py-2">
-                                            {category.thumbnail ? (
-                                                <img src={category.thumbnail} alt={category.name} className="w-16 h-16 object-cover rounded-md" />
+                                            {Array.isArray(jmerch.thumbnail) && jmerch.thumbnail.length > 0 ? (
+                                                <img src={jmerch.thumbnail[0] || ""} alt={jmerch.name} className="w-16 h-16 object-cover rounded-md" />
                                             ) : (
                                                 <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center">
                                                     <span className="text-xs text-gray-500">No Image</span>
                                                 </div>
                                             )}
                                         </TableCell>
-                                        <TableCell data-label="Nama Kategori" className="px-4 py-2">{category.name}</TableCell>
-                                        <TableCell data-label="Tanggal Dibuat" className="px-4 py-2">{new Date(category.created_at).toLocaleDateString('id-ID')}</TableCell>
+                                        <TableCell data-label="Nama JMerch" className="px-4 py-2">{jmerch.name}</TableCell>
+                                        <TableCell data-label="Tanggal Dibuat" className="px-4 py-2">{new Date(jmerch.created_at).toLocaleDateString('id-ID')}</TableCell>
                                         <TableCell data-label="Aksi" className="px-4 py-2">
                                             <div className="flex flex-row gap-2">
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
                                                     className="hover:bg-blue-50 hover:text-blue-600 transition"
-                                                    onClick={() => openEditModal(category)}
+                                                    onClick={() => openEditModal(jmerch)}
                                                 >
                                                     Edit
                                                 </Button>
@@ -189,7 +211,7 @@ export default function CategoryLayout() {
                                                     size="sm"
                                                     className="hover:bg-red-50 hover:text-red-600 transition"
                                                     onClick={() => {
-                                                        setDeletingId(category.id);
+                                                        setDeletingId(jmerch.id);
                                                         setDeleteModalOpen(true);
                                                     }}
                                                 >
@@ -205,7 +227,7 @@ export default function CategoryLayout() {
                 )}
             </div>
 
-            {categories.length > itemsPerPage && (
+            {jmerch.length > itemsPerPage && (
                 <Pagination className="mt-8">
                     <PaginationContent>
                         <PaginationItem>

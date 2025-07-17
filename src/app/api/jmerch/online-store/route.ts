@@ -13,23 +13,17 @@ export async function GET(request: Request) {
 
   try {
     const { data, error } = await supabase
-      .from(process.env.NEXT_PUBLIC_PRODUCTS as string)
+      .from(process.env.NEXT_PUBLIC_ONLINE_STORE as string)
       .select("*")
       .order("created_at", { ascending: false });
     if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500, headers: { "Cache-Control": "no-store" } }
-      );
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
-    return NextResponse.json(data || [], {
-      status: 200,
-      headers: { "Cache-Control": "no-store" },
-    });
+    return NextResponse.json(data || []);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch products" },
-      { status: 500, headers: { "Cache-Control": "no-store" } }
+      { error: "Failed to fetch online store" },
+      { status: 500 }
     );
   }
 }

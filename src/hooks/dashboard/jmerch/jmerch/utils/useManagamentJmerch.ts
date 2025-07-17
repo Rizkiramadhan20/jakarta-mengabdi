@@ -4,64 +4,69 @@ import toast from "react-hot-toast";
 
 import { supabase } from "@/utils/supabase/supabase";
 
-import { Category } from "@/interface/products";
+import { JMerch } from "@/interface/jmerch";
+
 import imagekitInstance from "@/utils/imagekit/imagekit";
 
-export function useManagamentProductsCategory() {
-  const [categories, setCategories] = useState<Category[]>([]);
+export function useManagamentJMerch() {
+  const [jmerch, setJMerch] = useState<JMerch[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState({
     name: "",
-    thumbnail: "",
+    thumbnail: [] as string[],
   });
   const [creating, setCreating] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [imagePreviews, setImagePreviews] = useState<string[]>(
-    form.thumbnail ? [form.thumbnail] : []
+    form.thumbnail ? form.thumbnail : []
   );
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0 });
+  const [pendingImages, setPendingImages] = useState<File[]>([]);
+  const [dragActive, setDragActive] = useState(false);
+  const [draggedImageIdx, setDraggedImageIdx] = useState<number | null>(null);
+  const [isDraggingImage, setIsDraggingImage] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchJMerch = async () => {
       setLoading(true);
       const { data, error } = await supabase
-        .from(process.env.NEXT_PUBLIC_PRODUCTS_CATEGORY as string)
+        .from(process.env.NEXT_PUBLIC_JMERCH as string)
         .select("id, name, thumbnail, created_at")
         .order("created_at", { ascending: false });
       if (error) {
         console.error("Supabase error:", error);
       }
-      console.log("Fetched categories:", data);
-      if (!error && data) setCategories(data as Category[]);
+      console.log("Fetched jmerch:", data);
+      if (!error && data) setJMerch(data as JMerch[]);
       setLoading(false);
     };
-    fetchCategories();
+    fetchJMerch();
   }, [creating]);
 
   const openCreateModal = () => {
     setForm({
       name: "",
-      thumbnail: "",
+      thumbnail: [],
     });
     setImagePreviews([]);
     setIsEditMode(false);
     setEditingId(null);
     setModalOpen(true);
   };
-  const openEditModal = (category: Category) => {
+  const openEditModal = (jmerch: JMerch) => {
     setForm({
-      name: category.name,
-      thumbnail: category.thumbnail || "",
+      name: jmerch.name,
+      thumbnail: jmerch.thumbnail || [],
     });
-    setImagePreviews(category.thumbnail ? [category.thumbnail] : []);
+    setImagePreviews(jmerch.thumbnail ? jmerch.thumbnail : []);
     setIsEditMode(true);
-    setEditingId(category.id);
+    setEditingId(jmerch.id);
     setModalOpen(true);
   };
   const closeModal = () => {
@@ -87,7 +92,7 @@ export function useManagamentProductsCategory() {
     let error = null;
     if (isEditMode && editingId) {
       const res = await supabase
-        .from(process.env.NEXT_PUBLIC_PRODUCTS_CATEGORY as string)
+        .from(process.env.NEXT_PUBLIC_JMERCH as string)
         .update({
           name: form.name,
           thumbnail: form.thumbnail,
@@ -95,48 +100,48 @@ export function useManagamentProductsCategory() {
         .eq("id", editingId);
       error = res.error;
       if (!error) {
-        toast.success("Kategori berhasil diupdate!");
+        toast.success("JMerch berhasil diupdate!");
       } else {
-        toast.error("Gagal mengupdate kategori!");
+        toast.error("Gagal mengupdate JMerch!");
       }
     } else {
       const res = await supabase
-        .from(process.env.NEXT_PUBLIC_PRODUCTS_CATEGORY as string)
+        .from(process.env.NEXT_PUBLIC_JMERCH as string)
         .insert({
           name: form.name,
           thumbnail: form.thumbnail,
         });
       error = res.error;
       if (!error) {
-        toast.success("Kategori berhasil dibuat!");
+        toast.success("JMerch berhasil dibuat!");
       } else {
-        toast.error("Gagal membuat kategori!");
+        toast.error("Gagal membuat JMerch!");
       }
     }
     setCreating(false);
     if (!error) {
       closeModal();
       const { data, error } = await supabase
-        .from(process.env.NEXT_PUBLIC_PRODUCTS_CATEGORY as string)
+        .from(process.env.NEXT_PUBLIC_JMERCH as string)
         .select("id, name, thumbnail, created_at")
         .order("created_at", { ascending: false });
       if (error) {
         console.error("Supabase error:", error);
       }
-      console.log("Fetched categories after submit:", data);
-      if (data) setCategories(data as Category[]);
+      console.log("Fetched jmerch after submit:", data);
+      if (data) setJMerch(data as JMerch[]);
     }
   };
   const handleDelete = async (id: number) => {
     const { error } = await supabase
-      .from(process.env.NEXT_PUBLIC_PRODUCTS_CATEGORY as string)
+      .from(process.env.NEXT_PUBLIC_JMERCH as string)
       .delete()
       .eq("id", id);
     if (!error) {
-      setCategories(categories.filter((c) => c.id !== id));
-      toast.success("Kategori berhasil dihapus!");
+      setJMerch(jmerch.filter((c) => c.id !== id));
+      toast.success("JMerch berhasil dihapus!");
     } else {
-      toast.error("Gagal menghapus kategori!");
+      toast.error("Gagal menghapus JMerch!");
     }
   };
   const uploadImage = async (file: File): Promise<string> => {
@@ -150,8 +155,8 @@ export function useManagamentProductsCategory() {
       const base64 = await base64Promise;
       const result = await imagekitInstance.upload({
         file: base64,
-        fileName: `category-${Date.now()}`,
-        folder: "/categories",
+        fileName: `jmerch-${Date.now()}`,
+        folder: "/jmerch",
       });
       if (!result || !result.url) {
         throw new Error("Failed to upload image");
@@ -163,24 +168,68 @@ export function useManagamentProductsCategory() {
     }
   };
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
     setUploading(true);
-    setUploadProgress({ done: 0, total: 1 });
+    setUploadProgress({ done: 0, total: files.length });
     try {
-      const url = await uploadImage(file);
-      setImagePreviews([url]);
-      setForm({ ...form, thumbnail: url });
-      setUploadProgress({ done: 1, total: 1 });
+      const urls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const url = await uploadImage(files[i]);
+        urls.push(url);
+        setUploadProgress({ done: i + 1, total: files.length });
+      }
+      setImagePreviews(urls);
+      setForm({ ...form, thumbnail: urls });
     } catch (error) {
       setUploadProgress({ done: 0, total: 0 });
     }
     setUploading(false);
   };
 
+  // Drag & drop handlers
+  const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(true);
+  };
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      setPendingImages(Array.from(e.dataTransfer.files));
+    }
+  };
+  // Drag-sort handlers
+  const handleImageDragStart = (idx: number) => {
+    setDraggedImageIdx(idx);
+    setIsDraggingImage(true);
+  };
+  const handleImageDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  const handleImageDrop = (e: React.DragEvent<HTMLDivElement>, idx: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedImageIdx === null) return;
+    const newPreviews = [...imagePreviews];
+    const [removed] = newPreviews.splice(draggedImageIdx, 1);
+    newPreviews.splice(idx, 0, removed);
+    setImagePreviews(newPreviews);
+    setForm({ ...form, thumbnail: newPreviews });
+    setDraggedImageIdx(null);
+    setIsDraggingImage(false);
+  };
+  const handleImageDragEnd = () => {
+    setDraggedImageIdx(null);
+    setIsDraggingImage(false);
+  };
+
   return {
-    categories,
-    setCategories,
+    jmerch,
+    setJMerch,
     loading,
     setLoading,
     modalOpen,
@@ -212,5 +261,16 @@ export function useManagamentProductsCategory() {
     inputRef,
     handleImageChange,
     uploadImage,
+    pendingImages,
+    setPendingImages,
+    dragActive,
+    handleDrag,
+    handleDrop,
+    draggedImageIdx,
+    isDraggingImage,
+    handleImageDragStart,
+    handleImageDragOver,
+    handleImageDrop,
+    handleImageDragEnd,
   };
 }
