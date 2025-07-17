@@ -119,6 +119,30 @@ export default function VolunteerLayout({ volunterData }: VolunterContentProps) 
         return extractJakartaRegion(location) || location;
     };
 
+    // Helper untuk ambil kalimat pertama dan wilayah Jakarta
+    const formatLocation = (location: string) => {
+        // Ambil bagian sebelum koma kedua
+        const parts = location.split(',');
+        let firstPart = parts[0].trim();
+        // Cari wilayah Jakarta
+        const jakartaRegions = [
+            'Jakarta Utara',
+            'Jakarta Selatan',
+            'Jakarta Timur',
+            'Jakarta Barat',
+            'Jakarta Pusat',
+        ];
+        let foundRegion = '';
+        for (const region of jakartaRegions) {
+            if (location.toLowerCase().includes(region.toLowerCase())) {
+                foundRegion = region;
+                break;
+            }
+        }
+        // Gabungkan hasil
+        return foundRegion ? `${firstPart}, ${foundRegion}` : firstPart;
+    };
+
     // Loading state for button
     const [loadingButton, setLoadingButton] = React.useState<string | null>(null);
     const router = useRouter();
@@ -169,8 +193,8 @@ export default function VolunteerLayout({ volunterData }: VolunterContentProps) 
                                             {/* Badges */}
                                             <div className='flex flex-col py-4 px-4 space-y-6'>
                                                 <div className='flex gap-2'>
-                                                    <span className={`px-4 py-1 rounded-full text-sm font-semibold ${categoryBadgeColor(item.category)}`}>{item.category}</span>
-                                                    <span className={`px-4 py-1 rounded-full text-sm font-semibold ${sessionTypeBadgeColor(item.session_type)}`}>{item.session_type}</span>
+                                                    <span className={`px-4 py-1 rounded-full text-sm font-semibold capitalize ${categoryBadgeColor(item.category)}`}>{item.category}</span>
+                                                    <span className={`px-4 py-1 rounded-full text-sm font-semibold capitalize ${sessionTypeBadgeColor(item.session_type)}`}>{item.session_type}</span>
                                                 </div>
 
                                                 <div className='flex flex-col gap-3'>
@@ -178,7 +202,7 @@ export default function VolunteerLayout({ volunterData }: VolunterContentProps) 
 
                                                     <div className='flex items-center gap-2'>
                                                         <Image src={location} width={22} height={22} alt='location' />
-                                                        <span className='text-base'>{item.location}</span>
+                                                        <span className='text-base'>{formatLocation(item.location)}</span>
                                                     </div>
                                                     <div className='flex items-center gap-2'>
                                                         <Image src={calender} width={22} height={22} alt='calendar' />

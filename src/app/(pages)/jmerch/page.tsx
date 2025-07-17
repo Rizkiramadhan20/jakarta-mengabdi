@@ -13,6 +13,8 @@ import JmerchLayout from '@/hooks/pages/jmerch/JmerchLayout'
 
 import HeroJmerch from "@/hooks/pages/jmerch/HeroJmerch"
 
+import SocialMedia from '@/hooks/pages/jmerch/SocialMedia';
+
 export const metadata: Metadata = {
     title: 'JMERCH - Jakarta Mengabdi',
     description: 'Explore our collection of visual works and creative projects at Sunik Yohan',
@@ -48,6 +50,7 @@ export default async function Page() {
         return <Fragment>
             <HeroJmerch />
             <JmerchLayout productcategoryData={productcategoryData} />
+            <SocialMedia />
         </Fragment>;
     } catch (error) {
         console.error('Error fetching Donasi data:', error);
