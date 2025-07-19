@@ -76,33 +76,6 @@ const sidebarNavItems: NavItem[] = [
     },
 
     {
-        title: "Volunteer",
-        href: "/profile/volunteer",
-        icon: CreditCard,
-        subItems: [
-            { title: "Tranksaksi", href: "/profile/volunteer/volunteer" },
-            { title: "Tertunda", href: "/profile/volunteer/pending" },
-            { title: "Selesai", href: "/profile/volunteer/completed" },
-        ],
-    },
-
-    {
-        title: "Alamat",
-        href: "/profile/address",
-        icon: MapPin,
-    },
-
-    {
-        title: "Security",
-        href: "/profile/security",
-        icon: Shield,
-        subItems: [
-            { title: "Password", href: "/profile/security/password" },
-            { title: "Delete Accounts", href: "/profile/security/delete" },
-        ],
-    },
-
-    {
         title: "Profile",
         href: "/profile/profile",
         icon: UserPen,

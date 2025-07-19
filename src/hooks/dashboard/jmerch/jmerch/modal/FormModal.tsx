@@ -94,7 +94,7 @@ const FormModal: React.FC<FormModalProps> = ({
                         />
                         <UploadCloud className="w-8 h-8 text-muted-foreground mb-1" />
                         <span className="text-muted-foreground font-medium">
-                            {dragActive ? 'Drop images here...' : 'Click or drag images here'}
+                            Click or drag images here
                         </span>
                         <span className="text-xs text-muted-foreground mt-1">Max file size: 2MB. JPG, PNG, or GIF.</span>
                     </div>
