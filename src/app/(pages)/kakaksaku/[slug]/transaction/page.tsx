@@ -10,7 +10,7 @@ import Image from 'next/image';
 
 import successImg from '@/base/assets/banner.png';
 
-import pendingImg from '@/base/assets/login.jpg';
+import pendingImg from '@/base/assets/banner.png';
 
 import { useAuth } from '@/utils/context/AuthContext';
 

@@ -250,7 +250,7 @@ export default function DonasiDetailsContent({ donasiData }: DonasiDetailsConten
                         <Image
                             src={donasiData.image_url as string}
                             alt={donasiData.title}
-                            className="w-full h-auto object-cover rounded-lg mb-6"
+                            className="w-full h-[40%] object-cover rounded-lg mb-6"
                             width={1000}
                             height={1000}
                         />

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 
-import coffeImage from "@/base/assets/login.jpg"
+import coffeImage from "@/base/assets/login.png"
 
 import Image from 'next/image'
 
@@ -60,7 +60,7 @@ export default function SigninLayout() {
             {/* Left: Login Form */}
             <div className="order-2 md:order-1 flex flex-col justify-center md:w-1/2 w-full px-8 md:px-24 py-12">
                 <div className="mb-10">
-                    <h1 className="text-4xl font-semibold mb-2">Selamat pagi!</h1>
+                    <h1 className="text-4xl font-semibold mb-2">Selamat Datang!</h1>
                     <p className="mb-8">Terima kasih sudah kembali!</p>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
@@ -72,7 +72,7 @@ export default function SigninLayout() {
                                 type="email"
                                 placeholder="you@example.com"
                                 required
-                                className="mt-2 bg-white border-gray-600  placeholder:text-gray-400 focus:border-[#45cad1] focus:ring-[#45cad1]"
+                                className="mt-2 bg-white border-gray-600  placeholder:text-gray-400 focus:border-[#ED8002] focus:ring-[#ED8002]"
                                 value={formData.email}
                                 onChange={handleChange}
                             />
@@ -86,7 +86,7 @@ export default function SigninLayout() {
                                     id="password"
                                     type={showPassword ? "text" : "password"}
                                     required
-                                    className="mt-2 bg-white border-gray-600  placeholder:text-gray-400 focus:border-[#45cad1] focus:ring-[#45cad1] pr-10"
+                                    className="mt-2 bg-white border-gray-600  placeholder:text-gray-400 focus:border-[#ED8002] focus:ring-[#ED8002] pr-10"
                                     value={formData.password}
                                     onChange={handleChange}
                                 />
@@ -105,7 +105,7 @@ export default function SigninLayout() {
                                     id="remember"
                                     checked={formData.remember}
                                     onCheckedChange={handleCheckboxChange}
-                                    className="text-[#45cad1] focus:ring-[#45cad1] data-[state=checked]:bg-[#45cad1] data-[state=checked]:border-[#45cad1] bg-white"
+                                    className="text-[#ED8002] focus:ring-[#ED8002] data-[state=checked]:bg-[#ED8002] data-[state=checked]:border-[#ED8002] bg-white"
                                 />
                                 <Label htmlFor="remember">Ingat aku</Label>
                             </div>
@@ -114,12 +114,12 @@ export default function SigninLayout() {
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-[#45cad1] hover:bg-[#45cad1]  font-semibold text-lg py-2 rounded shadow cursor-pointer"
+                            className="w-full bg-[#ED8002] hover:bg-[#ED8002]  font-semibold text-lg py-2 rounded shadow cursor-pointer"
                         >
                             {isLoading ? 'Loading...' : 'Login'}
                         </Button>
                         <p className="text-sm text-center">
-                            Tidak memiliki akun? <a href="/signup" className="text-[#45cad1] hover:underline">Daftar di sini</a>
+                            Tidak memiliki akun? <a href="/signup" className="text-[#ED8002] hover:underline">Daftar di sini</a>
                         </p>
                     </form>
                 </div>

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 
-import coffeImage from "@/base/assets/login.jpg"
+import coffeImage from "@/base/assets/login.png"
 
 import Image from 'next/image'
 
@@ -176,13 +176,13 @@ export default function SignupLayout() {
                         </div>
                         <Button
                             type="submit"
-                            className="w-full bg-[#45cad1] hover:bg-[#45cad1] nt-semibold text-lg py-2 rounded shadow cursor-pointer"
+                            className="w-full bg-[#ED8002] hover:bg-[#ED8002] nt-semibold text-lg py-2 rounded shadow cursor-pointer"
                             disabled={loading}
                         >
                             {loading ? 'Membuat Akun...' : 'Buat Akun'}
                         </Button>
                         <p className=" text-sm text-center">
-                            Sudah punya akun? <a href="/signin" className="text-[#45cad1] hover:underline">Masuk di sini</a>
+                            Sudah punya akun? <a href="/signin" className="text-[#ED8002] hover:underline">Masuk di sini</a>
                         </p>
                     </form>
                 </div>
