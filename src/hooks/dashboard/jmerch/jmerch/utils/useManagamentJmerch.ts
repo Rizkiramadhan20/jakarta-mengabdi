@@ -179,12 +179,19 @@ export function useManagamentJMerch() {
         urls.push(url);
         setUploadProgress({ done: i + 1, total: files.length });
       }
-      setImagePreviews(urls);
-      setForm({ ...form, thumbnail: urls });
+      // Tambahkan gambar baru ke array yang sudah ada, bukan mengganti
+      const newImagePreviews = [...imagePreviews, ...urls];
+      const newThumbnail = [...form.thumbnail, ...urls];
+      setImagePreviews(newImagePreviews);
+      setForm({ ...form, thumbnail: newThumbnail });
     } catch (error) {
       setUploadProgress({ done: 0, total: 0 });
     }
     setUploading(false);
+    // Reset input file agar bisa memilih file yang sama lagi
+    if (e.target) {
+      e.target.value = "";
+    }
   };
 
   // Drag & drop handlers
@@ -193,12 +200,32 @@ export function useManagamentJMerch() {
     e.stopPropagation();
     setDragActive(true);
   };
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setPendingImages(Array.from(e.dataTransfer.files));
+      setUploading(true);
+      setUploadProgress({ done: 0, total: e.dataTransfer.files.length });
+      try {
+        const urls: string[] = [];
+        for (let i = 0; i < e.dataTransfer.files.length; i++) {
+          const url = await uploadImage(e.dataTransfer.files[i]);
+          urls.push(url);
+          setUploadProgress({
+            done: i + 1,
+            total: e.dataTransfer.files.length,
+          });
+        }
+        // Tambahkan gambar baru ke array yang sudah ada, bukan mengganti
+        const newImagePreviews = [...imagePreviews, ...urls];
+        const newThumbnail = [...form.thumbnail, ...urls];
+        setImagePreviews(newImagePreviews);
+        setForm({ ...form, thumbnail: newThumbnail });
+      } catch (error) {
+        setUploadProgress({ done: 0, total: 0 });
+      }
+      setUploading(false);
     }
   };
   // Drag-sort handlers

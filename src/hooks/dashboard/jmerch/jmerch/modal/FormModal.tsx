@@ -68,6 +68,17 @@ const FormModal: React.FC<FormModalProps> = ({
             </div>
             <div className='flex flex-col gap-2'>
                 <Label htmlFor="thumbnail">Thumbnail</Label>
+                <input
+                    id="thumbnail"
+                    name="thumbnail"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                    disabled={uploading}
+                    ref={inputRef}
+                    style={{ display: 'none' }}
+                />
                 {imagePreviews.length === 0 && (
                     <div
                         onClick={() => inputRef.current?.click()}
@@ -81,17 +92,6 @@ const FormModal: React.FC<FormModalProps> = ({
                         `}
                         style={{ minHeight: 120 }}
                     >
-                        <input
-                            id="thumbnail"
-                            name="thumbnail"
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            onChange={handleImageChange}
-                            disabled={uploading}
-                            ref={inputRef}
-                            style={{ display: 'none' }}
-                        />
                         <UploadCloud className="w-8 h-8 text-muted-foreground mb-1" />
                         <span className="text-muted-foreground font-medium">
                             Click or drag images here
@@ -111,48 +111,61 @@ const FormModal: React.FC<FormModalProps> = ({
                     </div>
                 )}
                 {imagePreviews.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-3">
-                        {imagePreviews.map((img, idx) => (
-                            <div
-                                key={idx}
-                                className={`relative group cursor-move ${isDraggingImage && draggedImageIdx === idx ? 'opacity-50' : ''}`}
-                                draggable
-                                onDragStart={() => handleImageDragStart(idx)}
-                                onDragOver={handleImageDragOver}
-                                onDrop={e => handleImageDrop(e, idx)}
-                                onDragEnd={handleImageDragEnd}
-                            >
-                                <Image
-                                    width={1080}
-                                    height={1080}
-                                    src={img}
-                                    alt={`Preview ${idx + 1}`}
-                                    className="w-full h-24 object-cover rounded-md border border-border shadow-sm"
-                                />
-                                <button
-                                    type="button"
-                                    className="absolute top-1 right-1 bg-white/80 hover:bg-red-100 text-red-500 rounded-full p-1 shadow transition-opacity opacity-0 group-hover:opacity-100"
-                                    style={{ transition: 'opacity 0.2s' }}
-                                    onClick={e => {
-                                        e.stopPropagation();
-                                        if (pendingImages.length > 0) {
-                                            setPendingImages(pendingImages.filter((_, i) => i !== idx))
-                                            setImagePreviews(imagePreviews.filter((_, i) => i !== idx))
-                                        } else {
-                                            setImagePreviews(imagePreviews.filter((imgUrl: string) => imgUrl !== img))
-                                            setForm({ ...form, thumbnail: form.thumbnail.filter((imgUrl: string) => imgUrl !== img) })
-                                        }
-                                    }}
-                                    title="Remove image"
+                    <>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-3">
+                            {imagePreviews.map((img, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`relative group cursor-move ${isDraggingImage && draggedImageIdx === idx ? 'opacity-50' : ''}`}
+                                    draggable
+                                    onDragStart={() => handleImageDragStart(idx)}
+                                    onDragOver={handleImageDragOver}
+                                    onDrop={e => handleImageDrop(e, idx)}
+                                    onDragEnd={handleImageDragEnd}
                                 >
-                                    <Trash2 size={16} />
-                                </button>
-                                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-medium transition-opacity pointer-events-none">
-                                    Geser untuk urutkan
+                                    <Image
+                                        width={1080}
+                                        height={1080}
+                                        src={img}
+                                        alt={`Preview ${idx + 1}`}
+                                        className="w-full h-24 object-cover rounded-md border border-border shadow-sm"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute top-1 right-1 bg-white/80 hover:bg-red-100 text-red-500 rounded-full p-1 shadow transition-opacity opacity-0 group-hover:opacity-100"
+                                        style={{ transition: 'opacity 0.2s' }}
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            if (pendingImages.length > 0) {
+                                                setPendingImages(pendingImages.filter((_, i) => i !== idx))
+                                                setImagePreviews(imagePreviews.filter((_, i) => i !== idx))
+                                            } else {
+                                                setImagePreviews(imagePreviews.filter((imgUrl: string) => imgUrl !== img))
+                                                setForm({ ...form, thumbnail: form.thumbnail.filter((imgUrl: string) => imgUrl !== img) })
+                                            }
+                                        }}
+                                        title="Remove image"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-medium transition-opacity pointer-events-none">
+                                        Geser untuk urutkan
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                        <div className="mt-3">
+                            <button
+                                type="button"
+                                onClick={() => inputRef.current?.click()}
+                                disabled={uploading}
+                                className="flex items-center gap-2 px-4 py-2 border border-dashed border-primary/50 rounded-lg text-primary hover:bg-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <UploadCloud className="w-4 h-4" />
+                                Tambah Gambar
+                            </button>
+                        </div>
+                    </>
                 )}
             </div>
             <DialogFooter>

@@ -34,17 +34,6 @@ export async function POST(req: NextRequest) {
     // Gunakan waktu sekarang jika transaction_time tidak ada
     const trxTime = transaction_time ? new Date(transaction_time) : new Date();
 
-    console.log("Attempting to insert transaction with data:", {
-      order_id,
-      kaka_saku_id,
-      name,
-      email,
-      amount,
-      status,
-      payment_type,
-      transaction_time: trxTime,
-    });
-
     const { error } = await supabase
       .from(process.env.NEXT_PUBLIC_KAKASAKU_TRANSACTION as string)
       .insert([
@@ -64,7 +53,6 @@ export async function POST(req: NextRequest) {
       ]);
 
     if (error) {
-      console.error("Supabase insert error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -89,13 +77,11 @@ export async function POST(req: NextRequest) {
       // Ambil nomor WhatsApp user dari tabel profiles
       let phone = null;
       try {
-        console.log("Email yang digunakan untuk query profile:", email);
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("phone")
           .eq("email", email)
           .single();
-        console.log("Hasil query profile:", profile, "Error:", profileError);
         if (!profileError && profile && profile.phone) {
           phone = profile.phone;
         }
@@ -103,14 +89,10 @@ export async function POST(req: NextRequest) {
         console.error("Gagal mengambil nomor WhatsApp user:", err);
       }
 
-      // Log nomor WhatsApp yang ditemukan
-      console.log("Nomor WhatsApp user:", phone);
-
       // Format nomor ke internasional (Indonesia)
       if (phone && phone.startsWith("0")) {
         phone = "62" + phone.slice(1);
       }
-      console.log("Nomor WhatsApp (setelah format):", phone);
 
       // Kirim WhatsApp notification hanya jika nomor ditemukan
       if (phone) {
@@ -189,8 +171,6 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    console.log("Attempting to delete transaction with ID:", id);
-
     // Delete the transaction using service role key
     const { error: deleteError } = await supabase
       .from(process.env.NEXT_PUBLIC_KAKASAKU_TRANSACTION as string)
@@ -202,7 +182,6 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: deleteError.message }, { status: 500 });
     }
 
-    console.log("Transaction deleted successfully");
     return NextResponse.json({
       success: true,
       message: "Transaction deleted successfully",

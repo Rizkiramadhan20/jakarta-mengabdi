@@ -25,7 +25,7 @@ const JmerchGalleryDialog: React.FC<JmerchGalleryDialogProps> = ({ open, onOpenC
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-4xl p-4 sm:p-6">
                 <DialogTitle className="mb-4">{title}</DialogTitle>
-                <div className="flex flex-col md:flex-row gap-4 min-h-[300px]">
+                <div className="flex flex-col md:flex-row gap-4 min-h-[300px] overflow-hidden">
                     {/* Gambar utama */}
                     <div className="flex-1 flex items-center justify-center min-w-0">
                         {images[activeIdx] && (
@@ -34,12 +34,12 @@ const JmerchGalleryDialog: React.FC<JmerchGalleryDialogProps> = ({ open, onOpenC
                                     src={images[activeIdx]}
                                     alt={`Gambar utama`}
                                     fill
-                                    className="object-contain"
-                                    style={{ maxHeight: '60vh' }}
+                                    className="object-contain max-h-[60vh]"
                                 />
                             </div>
                         )}
                     </div>
+
                     {/* Thumbnail di bawah (mobile) / kanan (desktop) dengan ScrollArea */}
                     <ScrollArea className="w-full md:w-auto max-w-full md:max-h-[60vh] md:min-w-[100px]">
                         <div className="flex flex-row flex-nowrap md:flex-col md:flex-wrap gap-2 pt-2">
