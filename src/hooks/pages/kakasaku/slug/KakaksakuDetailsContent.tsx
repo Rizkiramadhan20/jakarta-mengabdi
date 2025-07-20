@@ -82,7 +82,7 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
         const fetchRecentDonors = async () => {
             if (!kakaSakuData?.id) return;
             const { data, error } = await supabase
-                .from('kakasaku_transactions')
+                .from(process.env.NEXT_PUBLIC_KAKASAKU_TRANSACTION as string)
                 .select('name, amount, photo_url')
                 .eq('kaka_saku_id', Number(kakaSakuData.id))
                 .order('transaction_time', { ascending: false })
@@ -235,7 +235,7 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                             <Image
                                 src={Array.isArray(kakaSakuData.image_url) ? kakaSakuData.image_url[0] : kakaSakuData.image_url}
                                 alt={kakaSakuData.title}
-                                className="w-full h-auto object-cover rounded-lg mb-6"
+                                className="w-full h-[25%] object-cover rounded-lg mb-6"
                                 width={1000}
                                 height={1000}
                             />
@@ -244,7 +244,7 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
 
                         {/* Timeline Filter */}
                         <div className="mt-6">
-                            <div className="flex justify-between items-center gap-2 p-6 border-2 border-orange-400 rounded-lg bg-white z-50 relative overflow-x-auto flex-nowrap scrollbar-thin scrollbar-thumb-orange-200 scrollbar-track-transparent">
+                            <div className="flex justify-between items-center gap-2 p-6 border-2 border-orange-400 rounded-lg bg-white relative overflow-x-auto flex-nowrap scrollbar-thin scrollbar-thumb-orange-200 scrollbar-track-transparent">
                                 {timelineTypes && timelineTypes.length > 0 ? (
                                     timelineTypes.map((type) => (
                                         <div
