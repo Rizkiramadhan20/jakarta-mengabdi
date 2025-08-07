@@ -120,11 +120,21 @@ export async function POST(req: NextRequest) {
               .replace(/\{transaction_time\}/g, formattedTime);
           }
           if (message) {
-            await fetch(process.env.WA_NOTIFICATION_URL as string, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ phone, message }),
-            });
+            await fetch(
+              "https://bdg.wablas.com/api/send-message?phone=" +
+                phone +
+                "&message=" +
+                message,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization:
+                    "cqXHXn6Rq7cAmSnfZBJWyNv8AgcC1svplSPlZGIlu7ZapGFIjNrI6oO",
+                },
+                body: JSON.stringify({ phone, message }),
+              }
+            );
           }
         } catch (err) {
           console.error("Gagal mengirim WhatsApp notification:", err);
