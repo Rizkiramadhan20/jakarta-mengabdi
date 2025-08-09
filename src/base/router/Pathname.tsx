@@ -19,6 +19,8 @@ const Pathname = ({ children }: { children: React.ReactNode }) => {
         pathname?.includes("/signup") ||
         pathname?.includes("/signin") ||
         pathname?.includes("/forgot-password") ||
+        pathname?.includes("/reset-password") ||
+        pathname?.includes("/verification") ||
         pathname?.includes("/profile") ||
         pathname?.includes("/dashboard") || false;
 

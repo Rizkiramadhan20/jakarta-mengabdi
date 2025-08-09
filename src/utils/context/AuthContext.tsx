@@ -77,12 +77,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 return
             }
 
-            toast.success('Account created successfully! Redirecting to login...', {
+            toast.success('Account created successfully! Please verify your email.', {
                 duration: 2000,
             })
 
             setTimeout(() => {
-                router.push('/signin')
+                router.push('/verification')
             }, 2000)
         } catch {
             toast.error('An unexpected error occurred. Please try again.')
@@ -110,19 +110,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Ambil id user dari Supabase Auth
             const userId = data.user?.id;
 
-            // Query ke tabel profiles untuk ambil role
+            // Query ke tabel profiles untuk ambil role dan status verifikasi
             const { data: userData, error: userError } = await supabase
                 .from(process.env.NEXT_PUBLIC_PROFILES as string)
-                .select('role')
+                .select('role, is_verified')
                 .eq('id', userId)
                 .single();
 
             if (userError) {
-                toast.error('Gagal mengambil data role user');
+                toast.error('Gagal mengambil data user');
                 return;
             }
 
             const userRole = userData?.role || 'user';
+            const isVerified = userData?.is_verified || false;
+
+            // Cek status verifikasi
+            if (!isVerified) {
+                toast.error('Harap verifikasi email terlebih dahulu');
+                await supabase.auth.signOut(); // Logout user yang belum verifikasi
+                return;
+            }
 
             toast.success('Login successful! Redirecting...', {
                 duration: 2000,
@@ -176,10 +184,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             toast.success('Password reset link has been sent to your email!', {
                 duration: 3000,
             })
-
-            setTimeout(() => {
-                router.push('/signin')
-            }, 3000)
         } catch {
             toast.error('An unexpected error occurred. Please try again.')
         }
