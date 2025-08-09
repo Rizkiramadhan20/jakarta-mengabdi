@@ -40,6 +40,10 @@ import { format } from 'date-fns';
 
 import { id } from 'date-fns/locale';
 
+import Link from 'next/link';
+
+import { Eye, Link as LinkIcon } from "lucide-react"
+
 interface KakasakuDetailsContentProps {
     kakaSakuData: KakaSaku | null;
 }
@@ -249,7 +253,7 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                                     timelineTypes.map((type) => (
                                         <div
                                             key={type}
-                                            onClick={() => setSelectedType(selectedType === type ? '' : type)}
+                                            onClick={() => setSelectedType(type)}
                                             className={`${selectedType === type ? "font-bold" : ""} text-md cursor-pointer whitespace-nowrap px-3 py-1`}
                                         >
                                             {type}
@@ -266,7 +270,7 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                             {filteredTimeline && filteredTimeline.length > 0 ? (
                                 filteredTimeline.map((item, idx) => {
                                     return (
-                                        <div key={idx} className="flex items-center gap-2">
+                                        <div key={idx} className="flex items-center gap-2 relative">
                                             {item.image_url && (
                                                 <Image
                                                     src={item.image_url}
@@ -275,6 +279,34 @@ export default function KakasakuDetailsContent({ kakaSakuData }: KakasakuDetails
                                                     height={1000}
                                                     className="object-cover rounded"
                                                 />
+                                            )}
+
+                                            {selectedType === "💸 Transparansi" && (
+                                                <div className="absolute w-[74%] bottom-8 md:bottom-20 xl:bottom-24 left-10 md:left-24">
+                                                    <div className="grid grid-cols-1 gap-2 md:gap-4 xl:gap-6 h-full overflow-y-auto">
+                                                        {kakaSakuData.transparansi && kakaSakuData.transparansi.length > 0 ? (
+                                                            kakaSakuData.transparansi.map((transparansi) => (
+                                                                <Link href={transparansi.url} target='_blank' key={transparansi.id} className="bg-[#30c4ff] border-4 rounded-tl-3xl rounded-bl-2xl border-gray-800 rounded-lg p-2 md:p-6 shadow-sm hover:shadow-md transition-shadow">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <div className="flex gap-2 items-center">
+                                                                            <LinkIcon className='w-4 h-4 md:w-6 md:h-6' />
+                                                                            <h3 className="font-bold text-gray-800 text-xs md:text-lg">{transparansi.label}</h3>
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <Eye className='w-4 h-4 md:w-6 md:h-6' />
+                                                                        </div>
+                                                                    </div>
+                                                                </Link>
+                                                            ))
+                                                        ) : (
+                                                            <div className="col-span-full text-center text-gray-500 py-8">
+                                                                <span className="text-4xl mb-2 block">📊</span>
+                                                                <p>Belum ada laporan transparansi tersedia</p>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             )}
                                         </div>
                                     )

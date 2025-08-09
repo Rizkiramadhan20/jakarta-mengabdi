@@ -13,8 +13,14 @@ export interface KakaSaku {
   created_at: string;
   message_template?: string;
   timeline: Timeline[];
+  transparansi: Transaparasi[];
 }
 
+export interface Transaparasi {
+  id: string;
+  label: string;
+  url: string;
+}
 export interface Timeline {
   id: string;
   type: string;

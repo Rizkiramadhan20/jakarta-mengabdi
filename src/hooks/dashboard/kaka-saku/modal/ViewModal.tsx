@@ -8,7 +8,7 @@ import type { KakaSaku } from '@/interface/kakaSaku';
 
 import Image from 'next/image';
 
-import { Clock } from 'lucide-react';
+import { Clock, FileText, ExternalLink } from 'lucide-react';
 
 import { ViewModalProps } from "@/interface/kakaSaku"
 
@@ -109,6 +109,53 @@ export default function ViewModal({ open, onOpenChange, viewingProduct, onClose 
                                     <div className="border-2 border-dashed rounded-lg p-6 text-center text-gray-500">
                                         <Clock className="w-8 h-8 mx-auto mb-2 opacity-50" />
                                         <p className="text-sm">No timeline items</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Transparency Section */}
+                            <div className="mt-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <FileText className="w-5 h-5 text-gray-600" />
+                                    <span className="font-semibold text-gray-800">Transparansi</span>
+                                </div>
+                                {viewingProduct.transparansi && viewingProduct.transparansi.length > 0 ? (
+                                    <div className="space-y-3 max-h-60 overflow-y-auto">
+                                        {viewingProduct.transparansi.map((transparency) => (
+                                            <div key={transparency.id} className="border rounded-lg p-3 bg-gray-50">
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-medium text-gray-800">
+                                                                {transparency.label}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex-shrink-0">
+                                                        {transparency.url ? (
+                                                            <a
+                                                                href={transparency.url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="inline-flex items-center gap-1 px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors"
+                                                            >
+                                                                <ExternalLink className="w-3 h-3" />
+                                                                Lihat
+                                                            </a>
+                                                        ) : (
+                                                            <span className="px-3 py-1 text-xs bg-gray-100 text-gray-500 rounded-full">
+                                                                No URL
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="border-2 border-dashed rounded-lg p-6 text-center text-gray-500">
+                                        <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                                        <p className="text-sm">No transparency items</p>
                                     </div>
                                 )}
                             </div>

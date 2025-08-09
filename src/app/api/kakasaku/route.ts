@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     const { data, error } = await supabase
       .from(process.env.NEXT_PUBLIC_KAKA_SAKU as string)
       .select(
-        "id,title,slug,image_url,target_amount,current_amount,status,deadline"
+        "id,title,slug,image_url,target_amount,current_amount,status,deadline,timeline,transparansi"
       )
       .order("created_at", { ascending: false });
     if (error) {

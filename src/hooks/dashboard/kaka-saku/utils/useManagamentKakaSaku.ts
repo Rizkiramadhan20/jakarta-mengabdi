@@ -6,7 +6,7 @@ import { supabase } from "@/utils/supabase/supabase";
 
 import imagekitInstance from "@/utils/imagekit/imagekit";
 
-import type { KakaSaku, Timeline } from "@/interface/kakaSaku";
+import type { KakaSaku, Timeline, Transaparasi } from "@/interface/kakaSaku";
 
 import { slugify } from "@/base/helper/slugify";
 
@@ -29,6 +29,7 @@ export function useManagamentKakaSaku() {
     image_url: "",
     message_template: "",
     timeline: [] as Timeline[],
+    transparansi: [] as Transaparasi[],
   });
   const [creating, setCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -80,7 +81,10 @@ export function useManagamentKakaSaku() {
       item.current_amount.toString().includes(searchLower) ||
       item.kakaksaku.toString().includes(searchLower) ||
       item.share.toString().includes(searchLower) ||
-      (item.deadline && new Date(item.deadline).toLocaleDateString('id-ID').includes(searchLower))
+      (item.deadline &&
+        new Date(item.deadline)
+          .toLocaleDateString("id-ID")
+          .includes(searchLower))
     );
   });
 
@@ -165,6 +169,7 @@ export function useManagamentKakaSaku() {
       image_url: "",
       message_template: "",
       timeline: [],
+      transparansi: [],
     });
     setImagePreview(null);
     setIsEditMode(false);
@@ -185,6 +190,7 @@ export function useManagamentKakaSaku() {
       image_url: kakaSaku.image_url || "",
       message_template: kakaSaku.message_template || "",
       timeline: kakaSaku.timeline || [],
+      transparansi: kakaSaku.transparansi || [],
     });
     setImagePreview(kakaSaku.image_url || null);
     setIsEditMode(true);
@@ -262,6 +268,7 @@ export function useManagamentKakaSaku() {
           deadline: form.deadline,
           message_template: form.message_template,
           timeline: form.timeline,
+          transparansi: form.transparansi,
         })
         .eq("id", editingId);
       error = res.error;
@@ -286,6 +293,7 @@ export function useManagamentKakaSaku() {
           deadline: form.deadline,
           message_template: form.message_template,
           timeline: form.timeline,
+          transparansi: form.transparansi,
         });
       error = res.error;
       if (!error) {

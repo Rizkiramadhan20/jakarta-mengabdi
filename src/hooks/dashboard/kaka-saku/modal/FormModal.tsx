@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 import { formatIDR, getRawNumberFromIDR } from '@/base/helper/FormatPrice';
 
-import { UploadCloud, Trash2, Plus, Edit, Clock } from 'lucide-react';
+import { UploadCloud, Trash2, Plus, Edit, Clock, FileText } from 'lucide-react';
 
 import Image from 'next/image';
 
@@ -34,7 +34,7 @@ import {
     Calendar as CalendarComponent,
 } from '@/components/ui/calendar';
 
-import type { Timeline, FormModalProps } from '@/interface/kakaSaku';
+import type { Timeline, Transaparasi, FormModalProps } from '@/interface/kakaSaku';
 
 const FormModal: React.FC<FormModalProps> = ({
     isEditMode,
@@ -226,6 +226,100 @@ const FormModal: React.FC<FormModalProps> = ({
                         <Clock className="w-8 h-8 mx-auto mb-2 opacity-50" />
                         <p className="text-sm">No timeline items yet</p>
                         <p className="text-xs">Click "Add Timeline" to create your first timeline item</p>
+                    </div>
+                )}
+            </div>
+
+            {/* Transparency Section */}
+            <div className='flex flex-col gap-2'>
+                <div className="flex items-center justify-between">
+                    <Label>Transparansi</Label>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                            const newTransparency = {
+                                id: Date.now().toString(),
+                                label: '',
+                                url: ''
+                            };
+                            setForm({
+                                ...form,
+                                transparansi: [...(form.transparansi || []), newTransparency]
+                            });
+                        }}
+                        className="flex items-center gap-2"
+                    >
+                        <Plus size={16} />
+                        Add Transparansi
+                    </Button>
+                </div>
+
+                {form.transparansi && form.transparansi.length > 0 ? (
+                    <div className="space-y-3 max-h-60 overflow-y-auto">
+                        {form.transparansi.map((transparency: Transaparasi, index: number) => (
+                            <div key={transparency.id} className="border rounded-lg p-3 bg-muted/30">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="flex-1 space-y-2">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                            <div>
+                                                <Label className="text-xs">Label</Label>
+                                                <Input
+                                                    value={transparency.label}
+                                                    onChange={(e) => {
+                                                        const updatedTransparency = form.transparansi.map((item: Transaparasi) =>
+                                                            item.id === transparency.id
+                                                                ? { ...item, label: e.target.value }
+                                                                : item
+                                                        );
+                                                        setForm({ ...form, transparansi: updatedTransparency });
+                                                    }}
+                                                    placeholder="e.g., Laporan Keuangan"
+                                                    className="h-8"
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label className="text-xs">URL</Label>
+                                                <Input
+                                                    value={transparency.url}
+                                                    onChange={(e) => {
+                                                        const updatedTransparency = form.transparansi.map((item: Transaparasi) =>
+                                                            item.id === transparency.id
+                                                                ? { ...item, url: e.target.value }
+                                                                : item
+                                                        );
+                                                        setForm({ ...form, transparansi: updatedTransparency });
+                                                    }}
+                                                    placeholder="https://..."
+                                                    className="h-8"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => {
+                                                const updatedTransparency = form.transparansi.filter((item: Transaparasi) => item.id !== transparency.id);
+                                                setForm({ ...form, transparansi: updatedTransparency });
+                                            }}
+                                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                                        >
+                                            <Trash2 size={14} />
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="border-2 border-dashed rounded-lg p-6 text-center text-muted-foreground">
+                        <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">No transparency items yet</p>
+                        <p className="text-xs">Click "Add Transparansi" to create your first transparency item</p>
                     </div>
                 )}
             </div>
