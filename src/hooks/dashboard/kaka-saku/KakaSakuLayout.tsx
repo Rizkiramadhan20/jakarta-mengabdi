@@ -32,7 +32,7 @@ import KakaSakuSkelaton from '@/hooks/dashboard/kaka-saku/KakaSakuSkelaton'
 
 export default function KakasakuLayout() {
     const {
-        kakasaku, setKakasaku,
+        setKakasaku,
         loading, setLoading,
         modalOpen, setModalOpen,
         isEditMode,
@@ -83,7 +83,6 @@ export default function KakasakuLayout() {
         setSearchTerm,
         currentPage,
         setCurrentPage,
-        itemsPerPage,
         totalPages,
         paginatedKakaSaku,
         filteredKakaSaku,
@@ -230,7 +229,7 @@ export default function KakasakuLayout() {
                         </div>
                     </div>
                 ) : (
-                    paginatedKakaSaku.map((item, idx) => (
+                    paginatedKakaSaku.map((item) => (
                         <Card
                             key={item.id}
                             className="relative p-0 bg-white/95 rounded-2xl border border-gray-100 transition-all duration-300 group flex flex-col overflow-hidden"

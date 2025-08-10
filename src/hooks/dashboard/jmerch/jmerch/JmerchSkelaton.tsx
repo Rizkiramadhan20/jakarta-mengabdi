@@ -3,7 +3,7 @@ import React from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 
-export default function CategorySkelaton() {
+export default function JmerchSkelaton() {
     return (
         <div className="overflow-x-auto rounded-xl border border-border bg-card stacked-table-container">
             <Table className="min-w-[600px] md:table-auto stacked-table">
