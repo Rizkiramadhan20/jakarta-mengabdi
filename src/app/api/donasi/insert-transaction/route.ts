@@ -87,17 +87,17 @@ export async function POST(req: NextRequest) {
     if (phone && donasi && donasi.message_template) {
       try {
         // Format transaction time untuk display
-        const formattedTime = trxTime.toLocaleString('id-ID', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
+        const formattedTime = trxTime.toLocaleString("id-ID", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
         });
 
         // Format amount dengan pemisah ribuan
-        const formattedAmount = Number(amount).toLocaleString('id-ID');
+        const formattedAmount = Number(amount).toLocaleString("id-ID");
 
         let message = donasi.message_template
           .replace(/\{name\}/g, name)
@@ -106,10 +106,13 @@ export async function POST(req: NextRequest) {
           .replace(/\{status\}/g, "berhasil")
           .replace(/\{transaction_time\}/g, formattedTime);
         await fetch(
-          process.env.WA_NOTIFICATION_URL as string,
+          `${process.env.WA_NOTIFICATION_URL}?phone=${phone}&message=${message}`,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `${process.env.WA_TOKEN}.${process.env.WA_SECRET}`,
+            },
             body: JSON.stringify({ phone, message }),
           }
         );

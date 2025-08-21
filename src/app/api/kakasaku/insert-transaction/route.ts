@@ -121,16 +121,12 @@ export async function POST(req: NextRequest) {
           }
           if (message) {
             await fetch(
-              "https://bdg.wablas.com/api/send-message?phone=" +
-                phone +
-                "&message=" +
-                message,
+              `${process.env.WA_NOTIFICATION_URL}?phone=${phone}&message=${message}`,
               {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
-                  Authorization:
-                    "MIcuCLWmJYSgD9tIqcrL1W9CICbDkQf68MPgKzmwH7fnEEJiGsuEa49",
+                  Authorization: `${process.env.WA_TOKEN}.${process.env.WA_SECRET}`,
                 },
                 body: JSON.stringify({ phone, message }),
               }
