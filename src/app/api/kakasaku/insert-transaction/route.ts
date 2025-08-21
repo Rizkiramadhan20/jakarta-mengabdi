@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
                 headers: {
                   "Content-Type": "application/json",
                   Authorization:
-                    "cqXHXn6Rq7cAmSnfZBJWyNv8AgcC1svplSPlZGIlu7ZapGFIjNrI6oO",
+                    "MIcuCLWmJYSgD9tIqcrL1W9CICbDkQf68MPgKzmwH7fnEEJiGsuEa49",
                 },
                 body: JSON.stringify({ phone, message }),
               }
