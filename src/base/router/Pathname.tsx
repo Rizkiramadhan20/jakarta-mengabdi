@@ -49,12 +49,9 @@ const Pathname = ({ children }: { children: React.ReactNode }) => {
                 }}
             />
             <Script
-                src="https://app.sandbox.midtrans.com/snap/snap.js"
-                data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
+                src="https://app.midtrans.com/snap/snap.js"
+                data-client-key={process.env.MIDTRANS_CLIENT_KEY}
                 strategy="lazyOnload"
-                onLoad={() => {
-                    console.log("Snap script loaded");
-                }}
             />
             {!isAdminRoute && <Header />}
             {children}
