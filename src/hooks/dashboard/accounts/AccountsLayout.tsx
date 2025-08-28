@@ -2,7 +2,7 @@
 
 import React from 'react'
 
-import { ChevronRight, Search, Users, Mail, Phone, Calendar, Edit, Trash2 } from "lucide-react"
+import { ChevronRight, Search, Users, Mail, Phone, Calendar, Edit, Trash2, MoreHorizontal, Key, ToggleLeft, ToggleRight } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -17,6 +17,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+
+import { Label } from '@/components/ui/label'
 
 import { format } from 'date-fns'
 
@@ -39,7 +43,21 @@ export default function AccountsLayout() {
         filteredUsers,
         handleDeleteClick,
         handleDeleteConfirm,
-        handleDeleteCancel
+        handleDeleteCancel,
+        // Edit functionality
+        editDialogOpen,
+        setEditDialogOpen,
+        userToEdit,
+        editType,
+        newPassword,
+        setNewPassword,
+        confirmPassword,
+        setConfirmPassword,
+        updating,
+        handleEditClick,
+        handleEditConfirm,
+        handleEditCancel,
+        handleEditDialogChange
     } = useManagementAccounts()
 
     const formatDate = (dateString: string) => {
@@ -90,9 +108,9 @@ export default function AccountsLayout() {
                         <Mail className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{users.filter(u => u.email).length}</div>
+                        <div className="text-2xl font-bold">{users.filter(u => u.is_active).length}</div>
                         <p className="text-xs text-muted-foreground">
-                            Pengguna dengan email
+                            Pengguna aktif
                         </p>
                     </CardContent>
                 </Card>
@@ -174,17 +192,38 @@ export default function AccountsLayout() {
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center justify-between mt-3">
-                                                    <Badge variant="secondary" className="text-xs capitalize">
-                                                        {user.role}
-                                                    </Badge>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleDeleteClick(user)}
-                                                        className="text-destructive hover:text-destructive p-1 h-8 w-8"
-                                                    >
-                                                        <Trash2 className="h-3 w-3" />
-                                                    </Button>
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge variant="secondary" className="text-xs capitalize">
+                                                            {user.role}
+                                                        </Badge>
+                                                        <Badge variant={user.is_active ? "default" : "destructive"} className="text-xs">
+                                                            {user.is_active ? "Aktif" : "Nonaktif"}
+                                                        </Badge>
+                                                    </div>
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                                                <MoreHorizontal className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem onClick={() => handleEditClick(user, 'status')}>
+                                                                <ToggleLeft className="mr-2 h-4 w-4" />
+                                                                {user.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => handleEditClick(user, 'password')}>
+                                                                <Key className="mr-2 h-4 w-4" />
+                                                                Ubah Password
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                onClick={() => handleDeleteClick(user)}
+                                                                className="text-destructive"
+                                                            >
+                                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                                Hapus
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
                                                 </div>
                                             </div>
                                         </div>
@@ -201,6 +240,7 @@ export default function AccountsLayout() {
                                             <TableHead>Email</TableHead>
                                             <TableHead>Telepon</TableHead>
                                             <TableHead>Bergabung</TableHead>
+                                            <TableHead>Role</TableHead>
                                             <TableHead>Status</TableHead>
                                             <TableHead className="text-right">Aksi</TableHead>
                                         </TableRow>
@@ -243,28 +283,44 @@ export default function AccountsLayout() {
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Badge variant="secondary" className="capitalize">
-                                                        {user.role}
-                                                    </Badge>
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge variant="secondary" className="capitalize">
+                                                            {user.role}
+                                                        </Badge>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge variant={user.is_active ? "default" : "destructive"}>
+                                                            {user.is_active ? "Aktif" : "Nonaktif"}
+                                                        </Badge>
+                                                    </div>
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            disabled
-                                                        >
-                                                            <Edit className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => handleDeleteClick(user)}
-                                                            className="text-destructive hover:text-destructive"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                                                <MoreHorizontal className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem onClick={() => handleEditClick(user, 'status')}>
+                                                                <ToggleLeft className="mr-2 h-4 w-4" />
+                                                                {user.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => handleEditClick(user, 'password')}>
+                                                                <Key className="mr-2 h-4 w-4" />
+                                                                Ubah Password
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                onClick={() => handleDeleteClick(user)}
+                                                                className="text-destructive"
+                                                            >
+                                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                                Hapus
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -304,6 +360,82 @@ export default function AccountsLayout() {
                             disabled={deleting}
                         >
                             {deleting ? 'Menghapus...' : 'Hapus Pengguna'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Edit Dialog */}
+            <Dialog open={editDialogOpen} onOpenChange={handleEditDialogChange}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            {editType === 'status'
+                                ? `${userToEdit?.is_active ? 'Nonaktifkan' : 'Aktifkan'} Pengguna`
+                                : 'Ubah Password Pengguna'
+                            }
+                        </DialogTitle>
+                        <DialogDescription>
+                            {editType === 'status' ? (
+                                <>
+                                    Apakah Anda yakin ingin{' '}
+                                    <span className="font-semibold">
+                                        {userToEdit?.is_active ? 'menonaktifkan' : 'mengaktifkan'}
+                                    </span>{' '}
+                                    pengguna <span className="font-semibold">{userToEdit?.full_name || userToEdit?.email}</span>?
+                                </>
+                            ) : (
+                                <>
+                                    Masukkan password baru untuk pengguna{' '}
+                                    <span className="font-semibold">{userToEdit?.full_name || userToEdit?.email}</span>.
+                                </>
+                            )}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {editType === 'password' && (
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="newPassword">Password Baru</Label>
+                                <Input
+                                    key={`newPassword-${userToEdit?.id}`}
+                                    id="newPassword"
+                                    type="password"
+                                    placeholder="Masukkan password baru"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="confirmPassword">Konfirmasi Password</Label>
+                                <Input
+                                    key={`confirmPassword-${userToEdit?.id}`}
+                                    id="confirmPassword"
+                                    type="password"
+                                    placeholder="Konfirmasi password baru"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={handleEditCancel}
+                            disabled={updating}
+                        >
+                            Batal
+                        </Button>
+                        <Button
+                            onClick={handleEditConfirm}
+                            disabled={updating || (editType === 'password' && (!newPassword || !confirmPassword))}
+                        >
+                            {updating ? 'Mengubah...' : editType === 'status'
+                                ? (userToEdit?.is_active ? 'Nonaktifkan' : 'Aktifkan')
+                                : 'Ubah Password'
+                            }
                         </Button>
                     </DialogFooter>
                 </DialogContent>
