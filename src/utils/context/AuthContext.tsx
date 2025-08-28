@@ -100,7 +100,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 if (error.message.includes('Invalid login credentials')) {
                     toast.error('Invalid email or password')
                 } else if (error.message.includes('Email not confirmed')) {
-                    toast.error('Please verify your email first')
+                    toast.error('Harap verifikasi email terlebih dahulu')
+                    // Redirect ke halaman verifikasi untuk email yang belum dikonfirmasi
+                    router.push('/verification')
                 } else {
                     toast.error(error.message)
                 }
@@ -128,7 +130,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Cek status verifikasi
             if (!isVerified) {
                 toast.error('Harap verifikasi email terlebih dahulu');
-                await supabase.auth.signOut(); // Logout user yang belum verifikasi
+                // Redirect ke halaman verifikasi tanpa logout
+                router.push('/verification');
                 return;
             }
 
