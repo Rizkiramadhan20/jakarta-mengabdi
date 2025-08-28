@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest) {
     let phone = null;
     try {
       const { data: profile, error: profileError } = await supabase
-        .from("profiles")
+        .from(process.env.NEXT_PUBLIC_PROFILES as string)
         .select("phone")
         .eq("email", email)
         .single();

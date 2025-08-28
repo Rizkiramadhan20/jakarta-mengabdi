@@ -1,12 +1,8 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
-import { ChevronRight, Search, Users, Mail, Phone, Calendar, Eye, Edit, Trash2 } from "lucide-react"
-
-import { supabase } from '@/utils/supabase/supabase'
-
-import { Profile } from '@/interface/profile'
+import { ChevronRight, Search, Users, Mail, Phone, Calendar, Edit, Trash2 } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -20,7 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 import { format } from 'date-fns'
 
@@ -28,49 +24,23 @@ import { id } from 'date-fns/locale'
 
 import AccountsSkeleton from "@/hooks/dashboard/accounts/AccountsSkelaton"
 
+import { useManagementAccounts } from '@/hooks/dashboard/accounts/lib/useManagementAccounts'
+
 export default function AccountsLayout() {
-    const [users, setUsers] = useState<Profile[]>([])
-    const [loading, setLoading] = useState(true)
-    const [searchTerm, setSearchTerm] = useState('')
-    const [selectedUser, setSelectedUser] = useState<Profile | null>(null)
-    const [viewModalOpen, setViewModalOpen] = useState(false)
-
-    useEffect(() => {
-        fetchUsers()
-    }, [])
-
-    const fetchUsers = async () => {
-        try {
-            setLoading(true)
-            const { data, error } = await supabase
-                .from(process.env.NEXT_PUBLIC_PROFILES as string)
-                .select('*')
-                .eq('role', 'user')
-                .order('created_at', { ascending: false })
-
-            if (error) {
-                console.error('Error fetching users:', error)
-                return
-            }
-
-            setUsers(data || [])
-        } catch (error) {
-            console.error('Error:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const filteredUsers = users.filter(user =>
-        user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.phone?.includes(searchTerm)
-    )
-
-    const handleViewUser = (user: Profile) => {
-        setSelectedUser(user)
-        setViewModalOpen(true)
-    }
+    const {
+        users,
+        loading,
+        searchTerm,
+        setSearchTerm,
+        deleteDialogOpen,
+        setDeleteDialogOpen,
+        userToDelete,
+        deleting,
+        filteredUsers,
+        handleDeleteClick,
+        handleDeleteConfirm,
+        handleDeleteCancel
+    } = useManagementAccounts()
 
     const formatDate = (dateString: string) => {
         try {
@@ -210,10 +180,10 @@ export default function AccountsLayout() {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        onClick={() => handleViewUser(user)}
-                                                        className="h-6 w-6 p-0"
+                                                        onClick={() => handleDeleteClick(user)}
+                                                        className="text-destructive hover:text-destructive p-1 h-8 w-8"
                                                     >
-                                                        <Eye className="h-3 w-3" />
+                                                        <Trash2 className="h-3 w-3" />
                                                     </Button>
                                                 </div>
                                             </div>
@@ -251,7 +221,6 @@ export default function AccountsLayout() {
                                                         </Avatar>
                                                         <div>
                                                             <div className="font-medium">{user.full_name || 'Nama tidak tersedia'}</div>
-                                                            <div className="text-sm text-muted-foreground">ID: {user.id}</div>
                                                         </div>
                                                     </div>
                                                 </TableCell>
@@ -283,13 +252,6 @@ export default function AccountsLayout() {
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            onClick={() => handleViewUser(user)}
-                                                        >
-                                                            <Eye className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
                                                             disabled
                                                         >
                                                             <Edit className="h-4 w-4" />
@@ -297,7 +259,8 @@ export default function AccountsLayout() {
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            disabled
+                                                            onClick={() => handleDeleteClick(user)}
+                                                            className="text-destructive hover:text-destructive"
                                                         >
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
@@ -313,61 +276,36 @@ export default function AccountsLayout() {
                 </CardContent>
             </Card>
 
-            {/* View User Modal */}
-            <Dialog open={viewModalOpen} onOpenChange={setViewModalOpen}>
-                <DialogContent className="max-w-md">
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Detail Pengguna</DialogTitle>
+                        <DialogTitle>Konfirmasi Hapus Pengguna</DialogTitle>
+                        <DialogDescription>
+                            Apakah Anda yakin ingin menghapus pengguna{' '}
+                            <span className="font-semibold">{userToDelete?.full_name || userToDelete?.email}</span>?
+                            <br />
+                            <span className="text-destructive">
+                                Tindakan ini tidak dapat dibatalkan.
+                            </span>
+                        </DialogDescription>
                     </DialogHeader>
-                    {selectedUser && (
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-4">
-                                <Avatar className="h-16 w-16">
-                                    {selectedUser.photo_url ? (
-                                        <AvatarImage src={selectedUser.photo_url} alt={selectedUser.full_name} />
-                                    ) : (
-                                        <AvatarFallback className="bg-primary/10 text-primary text-lg">
-                                            {selectedUser.full_name?.charAt(0) || 'U'}
-                                        </AvatarFallback>
-                                    )}
-                                </Avatar>
-                                <div>
-                                    <h3 className="text-lg font-semibold">{selectedUser.full_name || 'Nama tidak tersedia'}</h3>
-                                    <p className="text-sm text-muted-foreground">{selectedUser.email || 'Email tidak tersedia'}</p>
-                                    <Badge variant="secondary" className="mt-1 capitalize">
-                                        {selectedUser.role}
-                                    </Badge>
-                                </div>
-                            </div>
-
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2">
-                                    <Phone className="h-4 w-4 text-muted-foreground" />
-                                    <span className="text-sm">
-                                        {selectedUser.phone || 'Telepon tidak tersedia'}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                                    <span className="text-sm">
-                                        Bergabung: {formatDate(selectedUser.created_at)}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                                    <span className="text-sm">
-                                        Diperbarui: {formatDate(selectedUser.updated_at)}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className="pt-4 border-t">
-                                <p className="text-xs text-muted-foreground">
-                                    ID Pengguna: {selectedUser.id}
-                                </p>
-                            </div>
-                        </div>
-                    )}
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={handleDeleteCancel}
+                            disabled={deleting}
+                        >
+                            Batal
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={handleDeleteConfirm}
+                            disabled={deleting}
+                        >
+                            {deleting ? 'Menghapus...' : 'Hapus Pengguna'}
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </section>
