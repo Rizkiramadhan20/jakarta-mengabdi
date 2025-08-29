@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React from 'react'
 
 import coffeImage from "@/base/assets/login.png"
 
@@ -14,50 +14,19 @@ import { Button } from "@/components/ui/button"
 
 import { Eye, EyeOff, Phone, Mail, User, Lock } from 'lucide-react'
 
-import { useAuth } from '@/utils/context/AuthContext'
-
-import toast from 'react-hot-toast'
+import { useStateSignup } from '@/hooks/(auth)/signup/lib/useStateSignup'
 
 export default function SignupLayout() {
-    const [showPassword, setShowPassword] = useState(false)
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    const [formData, setFormData] = useState({
-        fullName: '',
-        email: '',
-        phone: '',
-        password: '',
-        confirmPassword: ''
-    })
-    const [loading, setLoading] = useState(false)
-    const { signUp } = useAuth()
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { id, value } = e.target
-        setFormData(prev => ({
-            ...prev,
-            [id]: value
-        }))
-    }
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setLoading(true)
-
-        if (formData.password !== formData.confirmPassword) {
-            toast.error('Passwords do not match')
-            setLoading(false)
-            return
-        }
-
-        if (formData.password.length < 6) {
-            toast.error('Password must be at least 6 characters long')
-            setLoading(false)
-            return
-        }
-
-        await signUp(formData.email, formData.password, formData.fullName, formData.phone)
-        setLoading(false)
-    }
+    const {
+        showPassword,
+        setShowPassword,
+        showConfirmPassword,
+        setShowConfirmPassword,
+        formData,
+        handleChange,
+        loading,
+        handleSubmit,
+    } = useStateSignup()
 
     return (
         <section className="min-h-screen flex flex-col md:flex-row">

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React from 'react'
 
 import coffeImage from "@/base/assets/login.png"
 
@@ -16,43 +16,18 @@ import { Checkbox } from '@/components/ui/checkbox'
 
 import { Eye, EyeOff } from 'lucide-react'
 
-import { useAuth } from '@/utils/context/AuthContext'
+import useStateSignin from '@/hooks/(auth)/signin/lib/useStateSignin'
 
 export default function SigninLayout() {
-    const [showPassword, setShowPassword] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-        remember: false
-    })
-    const { signIn } = useAuth()
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { id, value, type, checked } = e.target
-        setFormData(prev => ({
-            ...prev,
-            [id]: type === 'checkbox' ? checked : value
-        }))
-    }
-
-    const handleCheckboxChange = (checked: boolean) => {
-        setFormData(prev => ({
-            ...prev,
-            remember: checked
-        }))
-    }
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setIsLoading(true)
-        try {
-            await signIn(formData.email, formData.password)
-        } catch (error) {
-        } finally {
-            setIsLoading(false)
-        }
-    }
+    const {
+        showPassword,
+        isLoading,
+        formData,
+        handleChange,
+        handleCheckboxChange,
+        toggleShowPassword,
+        handleSubmit,
+    } = useStateSignin()
 
     return (
         <section className="min-h-screen flex flex-col md:flex-row bg-">
@@ -91,7 +66,7 @@ export default function SigninLayout() {
                                 />
                                 <button
                                     type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
+                                    onClick={toggleShowPassword}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                                 >
                                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}

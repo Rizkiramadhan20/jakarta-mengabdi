@@ -18,3 +18,13 @@ export interface AuthContextType {
   resetPassword: (email: string) => Promise<void>;
   changePassword: (newPassword: string) => Promise<boolean>;
 }
+
+//
+
+export type SignupFormData = {
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+};
