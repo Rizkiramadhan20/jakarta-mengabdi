@@ -75,9 +75,7 @@ export async function POST(req: NextRequest) {
       if (!profileError && profile && profile.phone) {
         phone = profile.phone;
       }
-    } catch (err) {
-      console.error("Gagal mengambil nomor WhatsApp user:", err);
-    }
+    } catch (err) {}
 
     // Format nomor ke internasional (Indonesia)
     if (phone && phone.startsWith("0")) {
@@ -117,9 +115,7 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({ phone, message }),
           }
         );
-      } catch (err) {
-        console.error("Gagal mengirim WhatsApp notification:", err);
-      }
+      } catch (err) {}
     }
   }
 

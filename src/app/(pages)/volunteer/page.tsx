@@ -44,7 +44,6 @@ export default async function Page() {
             <VolunteerLayout volunterData={volunterData} />
         )
     } catch (error) {
-        console.error('Error fetching Volunteer data:', error);
         return (
             <ValunteerSkeleton />
         );

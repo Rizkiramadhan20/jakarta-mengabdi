@@ -40,9 +40,7 @@ export function useManagamentJMerch() {
         .select("id, name, thumbnail, created_at")
         .order("created_at", { ascending: false });
       if (error) {
-        console.error("Supabase error:", error);
       }
-      console.log("Fetched jmerch:", data);
       if (!error && data) setJMerch(data as JMerch[]);
       setLoading(false);
     };
@@ -126,9 +124,7 @@ export function useManagamentJMerch() {
         .select("id, name, thumbnail, created_at")
         .order("created_at", { ascending: false });
       if (error) {
-        console.error("Supabase error:", error);
       }
-      console.log("Fetched jmerch after submit:", data);
       if (data) setJMerch(data as JMerch[]);
     }
   };
@@ -163,7 +159,6 @@ export function useManagamentJMerch() {
       }
       return result.url;
     } catch (error) {
-      console.error("Error uploading image:", error);
       throw new Error("Failed to upload image");
     }
   };

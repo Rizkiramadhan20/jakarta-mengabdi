@@ -30,7 +30,6 @@ export default function ForgotPasswordLayout() {
             await resetPassword(email)
             setIsEmailSent(true)
         } catch (error) {
-            console.error('Reset password failed:', error)
         } finally {
             setIsLoading(false)
         }

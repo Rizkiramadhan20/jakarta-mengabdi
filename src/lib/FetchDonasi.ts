@@ -4,7 +4,6 @@ export const fetchDonasiData = async (): Promise<Donasi[]> => {
   try {
     // Skip fetch during build time if BASE_URL is not available
     if (!process.env.NEXT_PUBLIC_BASE_URL) {
-      console.warn("NEXT_PUBLIC_BASE_URL not available during build time");
       return [];
     }
 
@@ -25,7 +24,6 @@ export const fetchDonasiData = async (): Promise<Donasi[]> => {
     const data = await response.json();
     return data || [];
   } catch (error) {
-    console.error("Error fetching donasi data:", error);
     // Return empty array instead of throwing to prevent build failures
     return [];
   }
@@ -37,7 +35,6 @@ export const fetchDonasiBySlug = async (
   try {
     // Skip fetch during build time if BASE_URL is not available
     if (!process.env.NEXT_PUBLIC_BASE_URL) {
-      console.warn("NEXT_PUBLIC_BASE_URL not available during build time");
       return null;
     }
 
@@ -59,7 +56,6 @@ export const fetchDonasiBySlug = async (
 
     return data || null;
   } catch (error) {
-    console.error("Error fetching donasi by slug:", error);
     // Return null instead of throwing to prevent build failures
     return null;
   }

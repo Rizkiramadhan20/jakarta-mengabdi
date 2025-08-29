@@ -4,7 +4,6 @@ export const fetchJMerchData = async (): Promise<JMerch[]> => {
   try {
     // Skip fetch during build time if BASE_URL is not available
     if (!process.env.NEXT_PUBLIC_BASE_URL) {
-      console.warn("NEXT_PUBLIC_BASE_URL not available during build time");
       return [];
     }
 
@@ -25,7 +24,6 @@ export const fetchJMerchData = async (): Promise<JMerch[]> => {
     const data = await response.json();
     return data || [];
   } catch (error) {
-    console.error("Error fetching jmerch data:", error);
     return [];
   }
 };
@@ -33,7 +31,6 @@ export const fetchJMerchData = async (): Promise<JMerch[]> => {
 export const fetchOnlineStoreData = async (): Promise<OnlineStore[]> => {
   try {
     if (!process.env.NEXT_PUBLIC_BASE_URL) {
-      console.warn("NEXT_PUBLIC_BASE_URL not available during build time");
       return [];
     }
 
@@ -54,7 +51,6 @@ export const fetchOnlineStoreData = async (): Promise<OnlineStore[]> => {
     const data = await response.json();
     return data || [];
   } catch (error) {
-    console.error("Error fetching online store data:", error);
     return [];
   }
 };

@@ -61,7 +61,6 @@ export default function ResetPasswordLayout() {
                     }
                 }
             } catch (error) {
-                console.error('Error checking token:', error)
                 toast.error('Terjadi kesalahan, silakan coba lagi')
                 setTimeout(() => router.push('/forgot-password'), 3000)
             } finally {
@@ -92,7 +91,6 @@ export default function ResetPasswordLayout() {
                 setIsSuccess(true)
             }
         } catch (error) {
-            console.error('Reset password failed:', error)
         } finally {
             setIsLoading(false)
         }

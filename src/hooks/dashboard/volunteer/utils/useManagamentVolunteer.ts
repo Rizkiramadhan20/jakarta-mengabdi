@@ -167,7 +167,6 @@ export function useManagamentVolunteer() {
         }
         fileDocumentUrl = result.url;
       } catch (error) {
-        console.error("ImageKit upload error:", error);
         toast.error("Gagal upload dokumen!");
         setCreating(false);
         return;
@@ -287,7 +286,6 @@ export function useManagamentVolunteer() {
       }
       return result.url;
     } catch (error) {
-      console.error("Error uploading image:", error);
       throw new Error("Failed to upload image");
     }
   };

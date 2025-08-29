@@ -2,7 +2,7 @@
 
 import React from 'react'
 
-import { ChevronRight, Search, Users, Mail, Phone, Calendar, Edit, Trash2, MoreHorizontal, Key, ToggleLeft, ToggleRight } from "lucide-react"
+import { ChevronRight, Search, Users, Mail, Phone, Calendar, Trash2, MoreHorizontal, Key, ToggleLeft, Plus } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -12,23 +12,27 @@ import { Button } from '@/components/ui/button'
 
 import { Badge } from '@/components/ui/badge'
 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-
-import { Label } from '@/components/ui/label'
 
 import { format } from 'date-fns'
 
 import { id } from 'date-fns/locale'
 
-import AccountsSkeleton from "@/hooks/dashboard/accounts/AccountsSkelaton"
+import AccountsSkeleton from "@/hooks/dashboard/accounts/admins/AccountsSkelaton"
 
-import { useManagementAccounts } from '@/hooks/dashboard/accounts/lib/useManagementAccounts'
+import { useManagementAccounts } from '@/hooks/dashboard/accounts/admins/lib/useManagementAccounts'
+
+import ModalForm from '@/hooks/dashboard/accounts/admins/modal/ModalForm'
+
+import DeleteModal from '@/hooks/dashboard/accounts/admins/modal/DeleteModal'
+
+import EditModal from '@/hooks/dashboard/accounts/admins/modal/EditModal'
 
 export default function AccountsLayout() {
     const {
@@ -36,6 +40,8 @@ export default function AccountsLayout() {
         loading,
         searchTerm,
         setSearchTerm,
+        statusFilter,
+        setStatusFilter,
         deleteDialogOpen,
         setDeleteDialogOpen,
         userToDelete,
@@ -57,7 +63,20 @@ export default function AccountsLayout() {
         handleEditClick,
         handleEditConfirm,
         handleEditCancel,
-        handleEditDialogChange
+        handleEditDialogChange,
+        // Create admin functionality
+        createDialogOpen,
+        setCreateDialogOpen,
+        creating,
+        createFormData,
+        handleCreateClick,
+        handleCreateConfirm,
+        handleCreateCancel,
+        handleCreateFormChange,
+        showPassword,
+        setShowPassword,
+        showConfirmPassword,
+        setShowConfirmPassword
     } = useManagementAccounts()
 
     const formatDate = (dateString: string) => {
@@ -92,7 +111,7 @@ export default function AccountsLayout() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                        <CardTitle className="text-sm font-medium">Total Admins</CardTitle>
                         <Users className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
@@ -104,19 +123,19 @@ export default function AccountsLayout() {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+                        <CardTitle className="text-sm font-medium">Active Admins</CardTitle>
                         <Mail className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{users.filter(u => u.is_active).length}</div>
                         <p className="text-xs text-muted-foreground">
-                            Pengguna aktif
+                            Admin aktif
                         </p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">This Month</CardTitle>
+                        <CardTitle className="text-sm font-medium">This Month Admins</CardTitle>
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
@@ -138,15 +157,33 @@ export default function AccountsLayout() {
             {/* Search and Content */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Daftar Akun Pengguna</CardTitle>
-                    <div className="relative mt-2">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                        <Input
-                            placeholder="Cari berdasarkan nama, email, atau nomor telepon..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10"
-                        />
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <CardTitle>Daftar Akun Admin</CardTitle>
+                        <Button onClick={handleCreateClick} className="w-full sm:w-auto">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Tambah Admin
+                        </Button>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
+                        <div className="sm:col-span-2 relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                            <Input
+                                placeholder="Cari berdasarkan nama, email, atau nomor telepon admin..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-10"
+                            />
+                        </div>
+                        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Filter status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Semua</SelectItem>
+                                <SelectItem value="active">Aktif</SelectItem>
+                                <SelectItem value="inactive">Nonaktif</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                 </CardHeader>
                 <CardContent>
@@ -333,113 +370,44 @@ export default function AccountsLayout() {
             </Card>
 
             {/* Delete Confirmation Dialog */}
-            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Konfirmasi Hapus Pengguna</DialogTitle>
-                        <DialogDescription>
-                            Apakah Anda yakin ingin menghapus pengguna{' '}
-                            <span className="font-semibold">{userToDelete?.full_name || userToDelete?.email}</span>?
-                            <br />
-                            <span className="text-destructive">
-                                Tindakan ini tidak dapat dibatalkan.
-                            </span>
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={handleDeleteCancel}
-                            disabled={deleting}
-                        >
-                            Batal
-                        </Button>
-                        <Button
-                            variant="destructive"
-                            onClick={handleDeleteConfirm}
-                            disabled={deleting}
-                        >
-                            {deleting ? 'Menghapus...' : 'Hapus Pengguna'}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <DeleteModal
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                targetUser={userToDelete}
+                deleting={deleting}
+                onCancel={handleDeleteCancel}
+                onConfirm={handleDeleteConfirm}
+            />
 
             {/* Edit Dialog */}
-            <Dialog open={editDialogOpen} onOpenChange={handleEditDialogChange}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>
-                            {editType === 'status'
-                                ? `${userToEdit?.is_active ? 'Nonaktifkan' : 'Aktifkan'} Pengguna`
-                                : 'Ubah Password Pengguna'
-                            }
-                        </DialogTitle>
-                        <DialogDescription>
-                            {editType === 'status' ? (
-                                <>
-                                    Apakah Anda yakin ingin{' '}
-                                    <span className="font-semibold">
-                                        {userToEdit?.is_active ? 'menonaktifkan' : 'mengaktifkan'}
-                                    </span>{' '}
-                                    pengguna <span className="font-semibold">{userToEdit?.full_name || userToEdit?.email}</span>?
-                                </>
-                            ) : (
-                                <>
-                                    Masukkan password baru untuk pengguna{' '}
-                                    <span className="font-semibold">{userToEdit?.full_name || userToEdit?.email}</span>.
-                                </>
-                            )}
-                        </DialogDescription>
-                    </DialogHeader>
+            <EditModal
+                open={editDialogOpen}
+                onOpenChange={handleEditDialogChange}
+                user={userToEdit}
+                editType={editType}
+                newPassword={newPassword}
+                confirmPassword={confirmPassword}
+                setNewPassword={setNewPassword}
+                setConfirmPassword={setConfirmPassword}
+                updating={updating}
+                onCancel={handleEditCancel}
+                onConfirm={handleEditConfirm}
+            />
 
-                    {editType === 'password' && (
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="newPassword">Password Baru</Label>
-                                <Input
-                                    key={`newPassword-${userToEdit?.id}`}
-                                    id="newPassword"
-                                    type="password"
-                                    placeholder="Masukkan password baru"
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="confirmPassword">Konfirmasi Password</Label>
-                                <Input
-                                    key={`confirmPassword-${userToEdit?.id}`}
-                                    id="confirmPassword"
-                                    type="password"
-                                    placeholder="Konfirmasi password baru"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    )}
-
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={handleEditCancel}
-                            disabled={updating}
-                        >
-                            Batal
-                        </Button>
-                        <Button
-                            onClick={handleEditConfirm}
-                            disabled={updating || (editType === 'password' && (!newPassword || !confirmPassword))}
-                        >
-                            {updating ? 'Mengubah...' : editType === 'status'
-                                ? (userToEdit?.is_active ? 'Nonaktifkan' : 'Aktifkan')
-                                : 'Ubah Password'
-                            }
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            {/* Create Admin Dialog */}
+            <ModalForm
+                open={createDialogOpen}
+                onOpenChange={setCreateDialogOpen}
+                form={createFormData}
+                onFormChange={handleCreateFormChange}
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
+                showConfirmPassword={showConfirmPassword}
+                setShowConfirmPassword={setShowConfirmPassword}
+                onCancel={handleCreateCancel}
+                onConfirm={handleCreateConfirm}
+                creating={creating}
+            />
         </section>
     )
 }

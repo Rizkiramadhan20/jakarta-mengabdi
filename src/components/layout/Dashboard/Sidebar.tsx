@@ -40,7 +40,6 @@ export default function SuperAdminHeader({ onSidebarToggle }: HeaderProps) {
         const fetchTemperature = async () => {
             try {
                 if (!process.env.NEXT_PUBLIC_WEATHER_API) {
-                    console.warn('Weather API key is not configured');
                     setLoading(false);
                     return;
                 }
@@ -56,7 +55,6 @@ export default function SuperAdminHeader({ onSidebarToggle }: HeaderProps) {
                 const data = await response.json();
                 setTemperature(data.current.temp_c);
             } catch (error) {
-                console.error('Error fetching temperature:', error);
                 setTemperature(null);
             } finally {
                 setLoading(false);

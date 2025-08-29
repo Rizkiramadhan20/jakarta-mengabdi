@@ -51,7 +51,6 @@ export default async function Page() {
             <SocialMedia onlineStoreData={onlineStoreData} />
         </Fragment>;
     } catch (error) {
-        console.error('Error fetching Donasi data:', error);
         return (
             <DonasiSkeleton />
         );

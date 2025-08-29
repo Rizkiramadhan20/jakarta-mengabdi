@@ -49,7 +49,6 @@ export default function SigninLayout() {
         try {
             await signIn(formData.email, formData.password)
         } catch (error) {
-            console.error('Login failed:', error)
         } finally {
             setIsLoading(false)
         }

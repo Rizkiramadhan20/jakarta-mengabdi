@@ -4,7 +4,6 @@ export const fetchVolunteerData = async (): Promise<Volunteer[]> => {
   try {
     // Skip fetch during build time if BASE_URL is not available
     if (!process.env.NEXT_PUBLIC_BASE_URL) {
-      console.warn("NEXT_PUBLIC_BASE_URL not available during build time");
       return [];
     }
 
@@ -26,7 +25,6 @@ export const fetchVolunteerData = async (): Promise<Volunteer[]> => {
     const data = await response.json();
     return data || [];
   } catch (error) {
-    console.error("Error fetching volunteer data:", error);
     return [];
   }
 };
@@ -52,7 +50,6 @@ export const fetchVolunteerBySlug = async (
 
     return data || null;
   } catch (error) {
-    console.error("Error fetching volunteer by slug:", error);
     // Return null instead of throwing to prevent build failures
     return null;
   }

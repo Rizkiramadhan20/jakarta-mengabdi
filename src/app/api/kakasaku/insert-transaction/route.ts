@@ -85,9 +85,7 @@ export async function POST(req: NextRequest) {
         if (!profileError && profile && profile.phone) {
           phone = profile.phone;
         }
-      } catch (err) {
-        console.error("Gagal mengambil nomor WhatsApp user:", err);
-      }
+      } catch (err) {}
 
       // Format nomor ke internasional (Indonesia)
       if (phone && phone.startsWith("0")) {
@@ -132,15 +130,12 @@ export async function POST(req: NextRequest) {
               }
             );
           }
-        } catch (err) {
-          console.error("Gagal mengirim WhatsApp notification:", err);
-        }
+        } catch (err) {}
       }
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Unexpected error in POST:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -184,7 +179,6 @@ export async function DELETE(req: NextRequest) {
       .eq("id", id);
 
     if (deleteError) {
-      console.error("Error deleting transaction:", deleteError);
       return NextResponse.json({ error: deleteError.message }, { status: 500 });
     }
 
@@ -193,7 +187,6 @@ export async function DELETE(req: NextRequest) {
       message: "Transaction deleted successfully",
     });
   } catch (error) {
-    console.error("Unexpected error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

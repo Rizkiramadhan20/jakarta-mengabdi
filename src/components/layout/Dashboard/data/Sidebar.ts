@@ -104,8 +104,19 @@ export const menuItems = [
 
   {
     href: "/dashboard/accounts",
-    label: "Accounts",
+    label: "Manajemen Pengguna",
     icon: CircleUser,
+    subItems: [
+      {
+        href: "/dashboard/accounts/user",
+        label: "Pengguna",
+      },
+
+      {
+        href: "/dashboard/accounts/admin",
+        label: "Admin",
+      },
+    ],
   },
 
   {

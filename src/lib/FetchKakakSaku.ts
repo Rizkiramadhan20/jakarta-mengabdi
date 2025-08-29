@@ -17,9 +17,8 @@ export const fetchKakakSakuData = async (): Promise<KakaSaku[]> => {
     }
 
     const data = await response.json();
-    return data || []; // Mengembalikan data secara langsung, dengan fallback ke array kosong
+    return data || [];
   } catch (error) {
-    console.error("Error fetching kaka saku data:", error);
     return [];
   }
 };
@@ -45,7 +44,6 @@ export const fetchKakaSakuBySlug = async (
 
     return data || null;
   } catch (error) {
-    console.error("Error fetching kaka saku by slug:", error);
     // Return null instead of throwing to prevent build failures
     return null;
   }

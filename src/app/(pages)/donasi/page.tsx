@@ -27,7 +27,6 @@ export default async function Page() {
             <DonasiLayout donasiData={donasiData} />
         </Fragment>;
     } catch (error) {
-        console.error('Error fetching Donasi data:', error);
         return (
             <DonasiSkeleton />
         );

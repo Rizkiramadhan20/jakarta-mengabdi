@@ -250,7 +250,6 @@ export function useManagamentDonasi() {
       }
       return result.url;
     } catch (error) {
-      console.error("Error uploading image:", error);
       throw new Error("Failed to upload image");
     }
   };

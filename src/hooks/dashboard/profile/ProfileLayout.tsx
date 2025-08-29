@@ -162,7 +162,6 @@ export default function ProfileLayout() {
             // Refresh the page to show new photo
             window.location.reload()
         } catch (error) {
-            console.error('Upload error:', error)
             toast.error('Terjadi kesalahan saat mengupload photo')
         } finally {
             setIsUploadingPhoto(false)

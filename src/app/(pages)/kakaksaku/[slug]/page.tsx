@@ -31,7 +31,6 @@ export default async function Page({ params }: Props) {
             />
         );
     } catch (error) {
-        console.error('Error fetching kaka saku data:', error);
         return (
             <KakasakuSlugSkeleton />
         );

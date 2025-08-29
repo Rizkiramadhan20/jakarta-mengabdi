@@ -21,7 +21,6 @@ export function useManagamentOnlineStore() {
         .select("id, name, url, created_at")
         .order("created_at", { ascending: false });
       if (error) {
-        console.error("Supabase error:", error);
       }
       if (!error && data) setOnlineStore(data);
       setLoading(false);
@@ -88,7 +87,6 @@ export function useManagamentOnlineStore() {
         .select("id, name, url, created_at")
         .order("created_at", { ascending: false });
       if (error) {
-        console.error("Supabase error:", error);
       }
       if (data) setOnlineStore(data);
     }
