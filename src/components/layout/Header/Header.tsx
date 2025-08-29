@@ -6,7 +6,7 @@ import Image from "next/image";
 
 import Link from "next/link";
 
-import { Menu, LogIn, Info, Utensils, Users } from "lucide-react";
+import { Menu, Info, Utensils, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -22,7 +22,6 @@ import { usePathname } from "next/navigation";
 
 import { useAuth } from "@/utils/context/AuthContext";
 
-// Use NavLink as menuHamburger equivalent
 const menuHamburger = [
     { name: "Donasi ", href: "/donasi", icon: Info },
     { name: "Volunteer ", href: "/volunteer", icon: Utensils },
@@ -95,16 +94,7 @@ export default function Header() {
                                 Login
                             </Button>
                         )}
-                        {!user && (
-                            <Button
-                                size="icon"
-                                variant={"default"}
-                                className={`sm:hidden bg-[#F0EBD7] text-[#403122] flex items-center hover:bg-gray-100/80 transition-all duration-300 w-24`}
-                                onClick={() => window.location.href = '/signin'}
-                            >
-                                Signin<LogIn className="h-5 w-5 ml-1" />
-                            </Button>
-                        )}
+
                         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                             <SheetTrigger asChild>
                                 <Button variant="ghost" size="icon" className="lg:hidden hover:bg-gray-100/80 transition-all duration-300">

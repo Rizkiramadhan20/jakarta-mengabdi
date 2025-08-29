@@ -31,7 +31,7 @@ interface SubMenuItem {
 
 export default function SuperAdminHeader({ onSidebarToggle }: HeaderProps) {
     const pathname = usePathname();
-    const { user } = useAuth();
+    const { profile } = useAuth();
     const [activeDropdown, setActiveDropdown] = React.useState<number | null>(null);
     const [temperature, setTemperature] = React.useState<number | null>(null);
     const [loading, setLoading] = React.useState(true);
@@ -39,14 +39,14 @@ export default function SuperAdminHeader({ onSidebarToggle }: HeaderProps) {
     React.useEffect(() => {
         const fetchTemperature = async () => {
             try {
-                if (!process.env.NEXT_PUBLIC_WEATHER_API_KEY) {
+                if (!process.env.NEXT_PUBLIC_WEATHER_API) {
                     console.warn('Weather API key is not configured');
                     setLoading(false);
                     return;
                 }
 
                 const response = await fetch(
-                    `https://api.weatherapi.com/v1/current.json?key=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&q=Jakarta`
+                    `https://api.weatherapi.com/v1/current.json?key=${process.env.NEXT_PUBLIC_WEATHER_API}&q=Jakarta`
                 );
 
                 if (!response.ok) {
@@ -99,23 +99,15 @@ export default function SuperAdminHeader({ onSidebarToggle }: HeaderProps) {
             {/* Logo Section */}
             <div className="p-6 border-b border-sidebar-border">
                 <Link href="/" className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center overflow-hidden">
-                        {user?.user_metadata?.photoURL ? (
-                            <Image
-                                src={user.user_metadata.photoURL}
-                                alt="User Profile"
-                                width={32}
-                                height={32}
-                                className="object-cover"
-                            />
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+                        {profile?.photo_url ? (
+                            <Image src={profile.photo_url} alt="Profile" width={32} height={32} className="rounded-full" />
                         ) : (
-                            <span className="text-lg font-bold text-sidebar-primary-foreground">
-                                {user?.user_metadata?.full_name?.[0] || 'S'}
-                            </span>
+                            <span>{profile?.full_name?.[0] || 'S'}</span>
                         )}
                     </div>
                     <span className="text-xl font-semibold bg-gradient-to-r from-sidebar-primary to-sidebar-primary/60 bg-clip-text text-transparent">
-                        {user?.user_metadata?.full_name || 'User'}
+                        {profile?.full_name || 'User'}
                     </span>
                 </Link>
             </div>
@@ -262,14 +254,9 @@ export default function SuperAdminHeader({ onSidebarToggle }: HeaderProps) {
                                         </div>
                                     )}
                                 </div>
-                                <span className="text-2xl font-semibold bg-gradient-to-r from-sidebar-accent to-sidebar-accent/60 bg-clip-text text-transparent">
+                                <span className="text-2xl font-semibold">
                                     {loading ? 'Loading...' : temperature ? `${Math.round(temperature)}°C` : 'N/A'}
                                 </span>
-                            </div>
-                        </div>
-                        <div className="w-12 h-12 rounded-full bg-sidebar/80 backdrop-blur-sm flex items-center justify-center shadow-sm border border-sidebar-border">
-                            <div className="w-8 h-8 rounded-full bg-sidebar-accent/20 flex items-center justify-center">
-                                <div className="w-4 h-4 rounded-full bg-sidebar-accent animate-pulse" />
                             </div>
                         </div>
                     </div>
